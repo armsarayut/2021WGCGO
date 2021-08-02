@@ -1,0 +1,105 @@
+﻿@page "/erp/reservedmat"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Erp
+
+@inject ErpService ObjErpService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<V_Reserved_MaterialsInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+
+            <MudTh>PackID</MudTh>
+            <MudTh>RollID</MudTh>
+            <MudTh>Material</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>WHCode</MudTh>
+            <MudTh>Warehouse</MudTh>
+            <MudTh>Quantity</MudTh>
+            <MudTh>Unit</MudTh>
+            <MudTh>Job</MudTh>
+            <MudTh>JobCode</MudTh>
+            <MudTh>MOBarcode</MudTh>
+
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="PackID">@context.Package_ID</MudTd>
+            <MudTd DataLabel="RollID">@context.Roll_ID</MudTd>
+            <MudTd DataLabel="Material">@context.Material_Code</MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="WHCode">@context.WH_Code</MudTd>
+            <MudTd DataLabel="Warehouse">@context.Warehouse</MudTd>
+            <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+            <MudTd DataLabel="Unit">@context.Unit</MudTd>
+            <MudTd DataLabel="Job">@context.Job</MudTd>
+            <MudTd DataLabel="JobCode">@context.Job_Code</MudTd>
+            <MudTd DataLabel="MOBarcode">@context.MO_Barcode</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Reserved Materials";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private V_Reserved_MaterialsInfo selectedItem = null;
+    private HashSet<V_Reserved_MaterialsInfo> selectedItems = new HashSet<V_Reserved_MaterialsInfo>();
+    private IEnumerable<V_Reserved_MaterialsInfo> Elements = new List<V_Reserved_MaterialsInfo>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErpService objCS = new ErpService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllErpReservedMaterials());
+    }
+
+
+    private bool FilterFunc(V_Reserved_MaterialsInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Material_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Package_ID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Roll_ID.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.WH_Code} {element.Description} {element.MO_Barcode} {element.Warehouse}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}

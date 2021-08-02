@@ -1,0 +1,135 @@
+﻿@page "/wh/capacity"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using Microsoft.EntityFrameworkCore
+@inject WhService ObjService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<WhStorageCapacity,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Rn)">No</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<WhStorageCapacity, object>(x=>x.Srmname)">Lane</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locavlt1)">Occupied</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locemp)">Mass</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Perr)">Block/Error</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Prohloc)">Prohibited Location</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Total)">Total</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.OccRate)">Occupancy Rate</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="No">@context.Rn</MudTd>
+            <MudTd DataLabel="Lane">@context.Srmname</MudTd>
+            <MudTd DataLabel="Occupied [Type A]">@context.Locavlt1</MudTd>
+            <MudTd DataLabel="Empty">@context.Locemp</MudTd>
+            <MudTd DataLabel="Block/Error">@context.Perr</MudTd>
+            <MudTd DataLabel="Prohibited Location">@context.Prohloc</MudTd>
+            <MudTd DataLabel="Total">@context.Total</MudTd>
+            <MudTd DataLabel="Occupancy Rate">@context.OccRate</MudTd> 
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+   
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    private readonly string pageheader = "Warehouse >> Capacity";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private WhStorageCapacity selectedItem = null;
+    private HashSet<WhStorageCapacity> selectedItems = new HashSet<WhStorageCapacity>();
+    private IEnumerable<WhStorageCapacity> Elements = new List<WhStorageCapacity>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WhService objCS = new WhService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetWhStorageCapacities());
+    }
+
+    private void setstr(string str)
+    {
+        //if (mPalletcode.Length <= 0)
+        //{
+        //    mPalletcode = str;
+        //    msgAction = "Enter Pack ID";
+        //    elevation = 3;
+        //}
+        //else
+        //{
+        //    if (str == mPalletcode)
+        //    {
+        //        elevation = 2;
+        //        msgAction = "Mapping successfully";
+        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+        //        mPalletcode = "";
+        //    }
+        //    else
+        //    {
+        //        mPackid = str;
+        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+        //    }
+        //}
+
+        //CustomerService objGR = new CustomerService();
+        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(WhStorageCapacity element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Srmname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+
+
+}

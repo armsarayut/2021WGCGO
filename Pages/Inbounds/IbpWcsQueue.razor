@@ -1,0 +1,109 @@
+﻿@page "/inb/wcsqueue"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Inb
+
+@inject InboundService ObjInboundService
+
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Queue time</MudTh>
+            <MudTh>Masterpallet</MudTh>
+            <MudTh>Worktype</MudTh>
+            <MudTh>SRM</MudTh>
+            <MudTh>Location</MudTh>
+            <MudTh>Start time</MudTh>
+            <MudTh>End time</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Queuetime">@context.Created</MudTd>
+            <MudTd DataLabel="Masterpallet">@context.Palletno</MudTd>
+            <MudTd DataLabel="Worktype">@context.Puttype</MudTd>
+            <MudTd DataLabel="SRM">@context.Storagearea</MudTd>
+            <MudTd DataLabel="Location">@context.Storagebin</MudTd>
+            <MudTd DataLabel="Starttime">@context.Storagetime</MudTd>
+            <MudTd DataLabel="Endtime">@context.Completed</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Master Queuing";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Inb_Putaway_Go selectedItem = null;
+    private HashSet<Inb_Putaway_Go> selectedItems = new HashSet<Inb_Putaway_Go>();
+    private IEnumerable<Inb_Putaway_Go> Elements = new List<Inb_Putaway_Go>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InboundService objCS = new InboundService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllInbPutawayGos());
+    }
+
+    private void setstr(string str)
+    {
+
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Inb_Putaway_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Palletno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Palletmapkey.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Puttype} {element.Storageno} {element.Storagearea} {element.Storagebin} {element.Efstatus}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}
+

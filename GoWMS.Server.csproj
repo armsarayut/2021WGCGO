@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>7cbacb4f-fc4b-4b20-98a2-90e3cf3d2c45</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MudBlazor" Version="5.0.15" />
+    <PackageReference Include="MudBlazor.ThemeManager" Version="1.0.3" />
+    <PackageReference Include="Npgsql" Version="5.0.7" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataAccess\" />
+    <Folder Include="Models\Rpt\" />
+    <Folder Include="Pages\Admins\" />
+    <Folder Include="Pages\Automations\" />
+    <Folder Include="Pages\Services\" />
+    <Folder Include="Pages\Setups\" />
+    <Folder Include="Pages\Reports\" />
+    <Folder Include="Pages\Outbounds\" />
+  </ItemGroup>
+
+</Project>

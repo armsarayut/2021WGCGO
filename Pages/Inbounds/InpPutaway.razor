@@ -1,0 +1,199 @@
+﻿@page "/inb/storage"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Mas
+@using GoWMS.Server.Models.Inb
+
+@inject MasService ObjMasService
+@inject InboundService ObjInboundService
+
+<MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
+
+<MudGrid>
+    <MudItem xs="12" sm="6" md="4">
+        <MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        @if (elevation == 0) //Defult
+        {
+            <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined">@msgAction</MudAlert>
+        }
+        else @if (elevation == 1) //Info
+   {
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
+else if (elevation == 2) //Success
+{
+    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
+else if (elevation == 3) // Warning
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
+else if (elevation == 4) // Error
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
+    </MudItem>
+</MudGrid>
+
+@*<MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-4">Master Pallet : [ @mPalletcode ]</MudText>
+    <MudSkeleton Animation="Animation.False" />*@
+@*<MudText Typo="Typo.h6" Color="Color.Info" Class="mb-4">PackID : [ @mPackid ]</MudText>*@
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Master Pallet : [ @mPalletcode ]</MudText>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Queue time</MudTh>
+            <MudTh>Masterpallet</MudTh>
+            <MudTh>Worktype</MudTh>
+            <MudTh>SRM</MudTh>
+            <MudTh>Location</MudTh>
+            <MudTh>Start time</MudTh>
+            <MudTh>End time</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Queuetime">@context.Created</MudTd>
+            <MudTd DataLabel="Masterpallet">@context.Palletno</MudTd>
+            <MudTd DataLabel="Worktype">@context.Puttype</MudTd>
+            <MudTd DataLabel="SRM">@context.Storagearea</MudTd>
+            <MudTd DataLabel="Location">@context.Storagebin</MudTd>
+            <MudTd DataLabel="Starttime">@context.Storagetime</MudTd>
+            <MudTd DataLabel="Endtime">@context.Completed</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Storage";
+    private string msgAction = "Enter Location";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private string searchString = "";
+    private Inb_Putaway_Go selectedItem = null;
+    private HashSet<Inb_Putaway_Go> selectedItems = new HashSet<Inb_Putaway_Go>();
+    private IEnumerable<Inb_Putaway_Go> Elements = new List<Inb_Putaway_Go>();
+
+    private IEnumerable<Mas_Storagebin_Go> MasterStotageBins = new List<Mas_Storagebin_Go>();
+
+    private IEnumerable<Inb_Putaway_Go> MasterQueue = new List<Inb_Putaway_Go>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InboundService objCS = new InboundService();
+        Elements = await Task.Run(() => objCS.GetAllInbPutawayGos());
+        MasterStotageBins = ObjMasService.GetAllMasterStorageBins();
+        //MasterQueue = ObjInboundService.GetAllInbPutawayGos();
+
+    }
+
+    private void setstr(string str)
+    {
+        if (mPalletcode.Length <= 0)
+        {
+            var allCorrect = MasterStotageBins.Where(a => a.Binno == str).ToList();
+
+            if (allCorrect.ToList().Count > 0)
+            {
+                mPalletcode = str;
+                msgAction = "Enter Masterpallet";
+                elevation = 1;
+            }
+            else
+            {
+                mPalletcode = "";
+                elevation = 4;
+                msgAction = "Location find not found";
+            }
+        }
+        else
+        {
+            var allCorrect = Elements.Where(a => a.Palletno == str).ToList();
+
+            if (allCorrect.ToList().Count > 0)
+            {
+                //InQueue
+                ObjInboundService.SetStorageComplete(str,mPalletcode);
+                elevation = 2;
+                msgAction = "Storage successfully";
+                mPalletcode = "";
+            }
+            else
+            {
+                if (mPalletcode.Length>0)
+                {
+                    elevation = 1;
+                    msgAction = "Please enter Masterpallet";
+                }
+                else
+                {
+                    elevation = 1;
+                    msgAction = "Please enter Location";
+                }
+            }
+        }
+        InboundService objGR = new InboundService();
+        Elements = objGR.GetAllInbPutawayGos();
+    }
+
+    private string stxtInput { get; set; }
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            //Console.WriteLine("Done the thing: " + MyValue);
+            //stxtInput = MyValue;
+            setstr(palletcode);
+
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Inb_Putaway_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Palletno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Storagebin.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Storagearea} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    private void DeleteMap(string pack)
+    {
+        /*
+        msgAction = "Cancle successfully";
+        ObjCustomService.CancelReceivingOrderbypack(mPalletcode, pack);
+
+
+        CustomerService objGR = new CustomerService();
+        Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+        */
+    }
+
+
+}

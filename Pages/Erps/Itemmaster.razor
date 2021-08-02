@@ -1,0 +1,84 @@
+﻿@page "/erp/material"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Erp
+
+@inject ErpService ObjErpService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<MaterialInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>Material</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Unit</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Material">@context.Material_Code</MudTd>
+            <MudTd DataLabel="Description">@context.Material_Description</MudTd>     
+            <MudTd DataLabel="Unit">@context.Unit</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Materials";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private MaterialInfo selectedItem = null;
+    private HashSet<MaterialInfo> selectedItems = new HashSet<MaterialInfo>();
+    private IEnumerable<MaterialInfo> Elements = new List<MaterialInfo>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErpService objCS = new ErpService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllErpMatReceivingOrders());
+    }
+
+
+    private bool FilterFunc(MaterialInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Material_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Material_Description} {element.Unit}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}

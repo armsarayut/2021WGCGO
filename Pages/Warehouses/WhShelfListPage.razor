@@ -1,0 +1,134 @@
+﻿@page "/wh/shelf"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Inv
+
+@inject InvService ObjService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Vrpt_shelf_listInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>Location</MudTh>
+            <MudTh>SRM</MudTh>
+            <MudTh>BANK</MudTh>
+            <MudTh>BAY</MudTh>
+            <MudTh>LEVEL</MudTh>
+            <MudTh>MasterPallet</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>LastUpdate</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Location">@context.Shelfcode</MudTd>
+            <MudTd DataLabel="SRM">@context.Srm_no</MudTd>
+            <MudTd DataLabel="BANK">@context.Shelfbank</MudTd>
+            <MudTd DataLabel="BAY">@context.Shelfbay</MudTd>
+            <MudTd DataLabel="LEVEL">@context.Shelflevel</MudTd>
+            <MudTd DataLabel="MasterPallet">@context.Lpncode</MudTd>
+            <MudTd DataLabel="Status">@context.St_desc</MudTd>
+            <MudTd DataLabel="LastUpdate">@context.Modified</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    private readonly string pageheader = "Location";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Vrpt_shelf_listInfo selectedItem = null;
+    private HashSet<Vrpt_shelf_listInfo> selectedItems = new HashSet<Vrpt_shelf_listInfo>();
+    private IEnumerable<Vrpt_shelf_listInfo> Elements = new List<Vrpt_shelf_listInfo>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InvService objCS = new InvService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetShelfList());
+    }
+
+    private void setstr(string str)
+    {
+        //if (mPalletcode.Length <= 0)
+        //{
+        //    mPalletcode = str;
+        //    msgAction = "Enter Pack ID";
+        //    elevation = 3;
+        //}
+        //else
+        //{
+        //    if (str == mPalletcode)
+        //    {
+        //        elevation = 2;
+        //        msgAction = "Mapping successfully";
+        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+        //        mPalletcode = "";
+        //    }
+        //    else
+        //    {
+        //        mPackid = str;
+        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+        //    }
+        //}
+
+        //CustomerService objGR = new CustomerService();
+        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Vrpt_shelf_listInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Shelfcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+}

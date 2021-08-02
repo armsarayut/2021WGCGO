@@ -1,0 +1,131 @@
+﻿@page "/erp/cylinder"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Erp
+
+@inject ErpService ObjErpService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<V_CylinderInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>Material</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Customer</MudTh>
+            <MudTh>CustomerDescription</MudTh>
+            <MudTh>CustomerReference</MudTh>
+            <MudTh>Color1</MudTh>
+            <MudTh>Cylinder1</MudTh>
+            <MudTh>Color2</MudTh>
+            <MudTh>Cylinder2</MudTh>
+            <MudTh>Color3</MudTh>
+            <MudTh>Cylinder3</MudTh>
+            <MudTh>Color4</MudTh>
+            <MudTh>Cylinder4</MudTh>
+            <MudTh>Color5</MudTh>
+            <MudTh>Cylinder5</MudTh>
+            <MudTh>Color6</MudTh>
+            <MudTh>Cylinder6</MudTh>
+            <MudTh>Color7</MudTh>
+            <MudTh>Cylinder7</MudTh>
+            <MudTh>Color8</MudTh>
+            <MudTh>Cylinder8</MudTh>
+            <MudTh>Color9</MudTh>
+            <MudTh>Cylinder9</MudTh>
+            <MudTh>Color10</MudTh>
+            <MudTh>Cylinder10</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+
+            <MudTd DataLabel="Material">@context.Material</MudTd>
+            <MudTd DataLabel="Description">@context.Material_Description</MudTd>
+            <MudTd DataLabel="Customer">@context.Customer_Code</MudTd>
+            <MudTd DataLabel="CustomerDescription">@context.Customer_Description</MudTd>
+            <MudTd DataLabel="CustomerReference">@context.Customer_Reference</MudTd>
+            <MudTd DataLabel="Color1">@context.Color_1</MudTd>
+            <MudTd DataLabel="Cylinder1">@context.Cylinder1</MudTd>
+            <MudTd DataLabel="Color2">@context.Color_2</MudTd>
+            <MudTd DataLabel="Cylinder2">@context.Cylinder2</MudTd>
+            <MudTd DataLabel="Color3">@context.Color_3</MudTd>
+            <MudTd DataLabel="Cylinder3">@context.Cylinder3</MudTd>
+            <MudTd DataLabel="Color4">@context.Color_4</MudTd>
+            <MudTd DataLabel="Cylinder4">@context.Cylinder4</MudTd>
+            <MudTd DataLabel="Color5">@context.Color_5</MudTd>
+            <MudTd DataLabel="Cylinder5">@context.Cylinder5</MudTd>
+            <MudTd DataLabel="Color6">@context.Color_6</MudTd>
+            <MudTd DataLabel="Cylinder6">@context.Cylinder6</MudTd>
+            <MudTd DataLabel="Color7">@context.Color_7</MudTd>
+            <MudTd DataLabel="Cylinder7">@context.Cylinder7</MudTd>
+            <MudTd DataLabel="Color8">@context.Color_8</MudTd>
+            <MudTd DataLabel="Cylinder8">@context.Cylinder8</MudTd>
+            <MudTd DataLabel="Color9">@context.Color_9</MudTd>
+            <MudTd DataLabel="Cylinder9">@context.Cylinder9</MudTd>
+            <MudTd DataLabel="Color10">@context.Color_10</MudTd>
+            <MudTd DataLabel="Cylinder10">@context.Cylinder10</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Cylinders";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private V_CylinderInfo selectedItem = null;
+    private HashSet<V_CylinderInfo> selectedItems = new HashSet<V_CylinderInfo>();
+    private IEnumerable<V_CylinderInfo> Elements = new List<V_CylinderInfo>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErpService objCS = new ErpService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllErpCylinders());
+    }
+
+
+    private bool FilterFunc(V_CylinderInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Material.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Customer_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Material_Description} {element.Customer_Reference} {element.Customer_Description}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}
