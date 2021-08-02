@@ -1,4 +1,4 @@
-﻿@page "/mas/item"
+﻿@page "/mas/reason"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -9,12 +9,12 @@
 @if (Elements == null)
 {
     //<p><em>Loading...</em></p>
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Mas_Item_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Mas_Reason_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
         <ToolBarContent>
             <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
                 Excel
@@ -27,20 +27,13 @@ else
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh>Material</MudTh>
+            <MudTh>Reason</MudTh>
             <MudTh>Description</MudTh>
-            <MudTh>Unit</MudTh>
-            <MudTh>Netweight</MudTh>
-            <MudTh>Grossweight</MudTh>
-            <MudTh>Weightunit</MudTh>
+           
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Material">@context.Itemcode</MudTd>
-            <MudTd DataLabel="Description">@context.Itemname</MudTd>
-            <MudTd DataLabel="Unit">@context.Itemunit</MudTd>
-            <MudTd DataLabel="Netweight">@context.Weightnet</MudTd>
-            <MudTd DataLabel="Grossweight">@context.Weightgross</MudTd>
-            <MudTd DataLabel="Weightunit">@context.Weightuint</MudTd>
+            <MudTd DataLabel="Reason">@context.Rescode</MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -52,7 +45,7 @@ else
 
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
 
-    private readonly string pageheader = "Material";
+    private readonly string pageheader = "Reason";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -64,16 +57,16 @@ else
     private bool fixed_header = true;
     private bool fixed_footer = true;
     private string searchString = "";
-    private Mas_Item_Go selectedItem = null;
-    private HashSet<Mas_Item_Go> selectedItems = new HashSet<Mas_Item_Go>();
-    private IEnumerable<Mas_Item_Go> Elements = new List<Mas_Item_Go>();
+    private Mas_Reason_Go selectedItem = null;
+    private HashSet<Mas_Reason_Go> selectedItems = new HashSet<Mas_Reason_Go>();
+    private IEnumerable<Mas_Reason_Go> Elements = new List<Mas_Reason_Go>();
     public int elevation = 0;
 
     protected override async Task OnInitializedAsync()
     {
         MasService objCS = new MasService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-        Elements = await Task.Run(() => objCS.GetAllMasterItems());
+        Elements = await Task.Run(() => objCS.GetAllMasterReasons());
     }
 
     private void setstr(string str)
@@ -114,11 +107,11 @@ else
         }
     }
 
-    private bool FilterFunc(Mas_Item_Go element)
+    private bool FilterFunc(Mas_Reason_Go element)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.Itemcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Rescode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }

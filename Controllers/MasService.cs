@@ -30,5 +30,29 @@ namespace GoWMS.Server.Controllers
             return retlist;
         }
 
+        public List<Mas_Storage_Go> GetAllMasterStorages()
+        {
+            List<Mas_Storage_Go> retlist = objDAL.GetAllMasterstorageGo().ToList();
+            return retlist;
+        }
+
+        public List<Mas_Worktype_Go> GetAllMasterWorktypes()
+        {
+            List<Mas_Worktype_Go> retlist = objDAL.GetAllMasterworktypeGo().ToList();
+            return retlist;
+        }
+
+        public List<Mas_Status_Go> GetAllMasterStatus()
+        {
+            List<Mas_Status_Go> retlist = objDAL.GetAllMasterstatusGo().ToList();
+            return retlist;
+        }
+
+        public List<Mas_Reason_Go> GetAllMasterReasons()
+        {
+            List<Mas_Reason_Go> retlist = objDAL.GetAllMasterreasonGo().ToList();
+            return retlist;
+        }
+
     }
 }

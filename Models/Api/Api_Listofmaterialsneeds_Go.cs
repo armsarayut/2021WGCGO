@@ -7,7 +7,6 @@ namespace GoWMS.Server.Models.Api
 {
 	public class Api_Listofmaterialsneeds_Go
 	{
-
 		public Int64? Efidx { get; set; }
 		public Int32? Efstatus { get; set; }
 		public DateTime? Created { get; set; }
