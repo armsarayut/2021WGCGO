@@ -24,5 +24,11 @@ namespace GoWMS.Server.Controllers
             return retlist;
         }
 
+        public List<Mas_Item_Go> GetAllMasterItems()
+        {
+            List<Mas_Item_Go> retlist = objDAL.GetAllMasteritemGo().ToList();
+            return retlist;
+        }
+
     }
 }
