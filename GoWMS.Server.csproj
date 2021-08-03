@@ -29,7 +29,6 @@
     <Folder Include="Pages\Services\" />
     <Folder Include="Pages\Setups\" />
     <Folder Include="Pages\Reports\" />
-    <Folder Include="Pages\Outbounds\" />
   </ItemGroup>
 
 </Project>

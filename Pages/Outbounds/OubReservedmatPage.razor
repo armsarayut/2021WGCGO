@@ -1,0 +1,137 @@
+﻿@page "/oub/reservedmat"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Api
+
+@inject ErpApiService ObjService
+
+@if (Elements == null)
+{
+    //<p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Api_Reservedmaterials_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>MoBarcode</MudTh>
+            <MudTh>Job</MudTh>
+            <MudTh>JobCode</MudTh>
+            <MudTh>PackID</MudTh>
+            <MudTh>Material</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Quantity</MudTh>
+            <MudTh>Unit</MudTh>
+            <MudTh>RollID</MudTh>
+            <MudTh>WhCode</MudTh>
+            <MudTh>Warehouse</MudTh>
+            <MudTh>Location</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="MoBarcode">@context.Mo_Barcode</MudTd>
+            <MudTd DataLabel="Job">@context.Job</MudTd>
+            <MudTd DataLabel="JobCode">@context.Job_Code</MudTd>
+            <MudTd DataLabel="PackID">@context.Package_Id</MudTd>
+            <MudTd DataLabel="Material">@context.Material_Code</MudTd>
+            <MudTd DataLabel="Description">@context.Material_Description</MudTd>
+            <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+            <MudTd DataLabel="Unit">@context.Unit</MudTd>
+            <MudTd DataLabel="RollID">@context.Roll_Id</MudTd>
+            <MudTd DataLabel="WhCode">@context.Wh_Code</MudTd>
+            <MudTd DataLabel="Warehouse">@context.Warehouse</MudTd>
+            <MudTd DataLabel="Location">@context.Locationno</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    private readonly string pageheader = "Material";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Api_Reservedmaterials_Go selectedItem = null;
+    private HashSet<Api_Reservedmaterials_Go> selectedItems = new HashSet<Api_Reservedmaterials_Go>();
+    private IEnumerable<Api_Reservedmaterials_Go> Elements = new List<Api_Reservedmaterials_Go>();
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErpApiService objCS = new ErpApiService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllApiReservedmaterialGos());
+    }
+
+    private void setstr(string str)
+    {
+        //if (mPalletcode.Length <= 0)
+        //{
+        //    mPalletcode = str;
+        //    msgAction = "Enter Pack ID";
+        //    elevation = 3;
+        //}
+        //else
+        //{
+        //    if (str == mPalletcode)
+        //    {
+        //        elevation = 2;
+        //        msgAction = "Mapping successfully";
+        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+        //        mPalletcode = "";
+        //    }
+        //    else
+        //    {
+        //        mPackid = str;
+        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+        //    }
+        //}
+        //CustomerService objGR = new CustomerService();
+        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Api_Reservedmaterials_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Mo_Barcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}
