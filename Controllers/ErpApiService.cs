@@ -77,7 +77,11 @@ namespace GoWMS.Server.Controllers
             return "Map Successfully";
         }
 
-
+        public List<Api_Deliveryorder_Go> GetAllApiDeliveryorder()
+        {
+            List<Api_Deliveryorder_Go> retlist = objDAL.GetAllDeliveryorderGo().ToList();
+            return retlist;
+        }
 
 
 

@@ -367,7 +367,7 @@ namespace GoWMS.Server.Data
             {
                 StringBuilder sql = new StringBuilder();
                 sql.AppendLine("Select * ");
-                sql.AppendLine("From wms.api_listofmaterialsneeds_go");
+                sql.AppendLine("From wms.api_reservedmaterials_go");
                 sql.AppendLine("Order by efidx");
                 NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
                 {
@@ -441,5 +441,60 @@ namespace GoWMS.Server.Data
                 con.Close();
             }
         }
+
+
+        public IEnumerable<Api_Deliveryorder_Go> GetAllDeliveryorderGo()
+        {
+            List<Api_Deliveryorder_Go> lstobj = new List<Api_Deliveryorder_Go>();
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                StringBuilder sql = new StringBuilder();
+                sql.AppendLine("select * ");
+                sql.AppendLine("from wms.api_deliveryorder_go");
+                sql.AppendLine("order by efidx");
+                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                con.Open();
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Api_Deliveryorder_Go objrd = new Api_Deliveryorder_Go
+                    {
+                        Efidx = rdr["efidx"] == DBNull.Value ? null : (Int64?)rdr["efidx"],
+                        Efstatus = rdr["efstatus"] == DBNull.Value ? null : (Int32?)rdr["efstatus"],
+                        Created = rdr["created"] == DBNull.Value ? null : (DateTime?)rdr["created"],
+                        Modified = rdr["modified"] == DBNull.Value ? null : (DateTime?)rdr["modified"],
+                        Innovator = rdr["innovator"] == DBNull.Value ? null : (Int64?)rdr["innovator"],
+                        Device = rdr["device"].ToString(),
+                        Package_Id = rdr["package_id"].ToString(),
+                        Roll_Id = rdr["roll_id"].ToString(),
+                        Material_Code = rdr["material_code"].ToString(),
+                        Material_Description = rdr["material_description"].ToString(),
+                        Quantity = rdr["quantity"] == DBNull.Value ? null : (decimal?)rdr["quantity"],
+                        Picked = rdr["picked"] == DBNull.Value ? null : (decimal?)rdr["picked"],
+                        Unit = rdr["unit"].ToString(),
+                        Wh_Code = rdr["wh_code"].ToString(),
+                        Warehouse = rdr["warehouse"].ToString(),
+                        Locationno = rdr["locationno"].ToString(),
+                        Job = rdr["job"].ToString(),
+                        Job_Code = rdr["job_code"].ToString(),
+                        Mo_Barcode = rdr["mo_barcode"].ToString(),
+                        Customer_Code = rdr["customer_code"].ToString(),
+                        Customer_Description = rdr["customer_description"].ToString(),
+                        Finished_Product = rdr["finished_product"].ToString(),
+                        Finished_Product_Description = rdr["finished_product_description"].ToString(),
+                        Matelement = rdr["matelement"].ToString(),
+                        Dotype = rdr["dotype"].ToString(),
+                    };
+                    lstobj.Add(objrd);
+                }
+                con.Close();
+            }
+            return lstobj;
+        }
+
     }
 }

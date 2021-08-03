@@ -1,0 +1,20 @@
+﻿@page "/oub/moflim"
+@page "/oub/moflim/{start:int}"
+
+<h1>Counter</h1>
+
+<p>Current count: @Start</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+
+    [Parameter]
+    public int Start { get; set; }
+
+
+    private void IncrementCount()
+    {
+        Start++;
+    }
+}
