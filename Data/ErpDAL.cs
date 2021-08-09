@@ -87,7 +87,6 @@ namespace GoWMS.Server.Data
                 {
                     Api_Receivingorders_Go objrd = new Api_Receivingorders_Go
                     {
-
                         Package_Id = rdr["Package_ID"].ToString(),
                         Roll_Id = rdr["Roll_ID"].ToString(),
                         Material_Code = rdr["Material_Code"].ToString(),
@@ -101,7 +100,8 @@ namespace GoWMS.Server.Data
                         Locationno = rdr["Location"].ToString(),
                         Document_Number = rdr["Document_Number"].ToString(),
                         Job = rdr["Job"].ToString(),
-                        Job_Code = rdr["Job_Code"].ToString()
+                        Job_Code = rdr["Job_Code"].ToString(),
+                        Matcategory = rdr["Material_Code"].ToString().Substring(0,2)
                     };
                     lstobj.Add(objrd);
                 }
@@ -139,7 +139,6 @@ namespace GoWMS.Server.Data
                 {
                     V_CylinderInfo objrd = new V_CylinderInfo
                     {
-
                         Material = rdr["Material"].ToString(),
                         Material_Description= rdr["Material_Description"].ToString(),
                         Customer_Code= rdr["Customer_Code"].ToString(),
@@ -165,8 +164,6 @@ namespace GoWMS.Server.Data
                         Cylinder9= rdr["Cylinder9"].ToString(),
                         Color_10= rdr["Color_10"].ToString(),
                         Cylinder10= rdr["Cylinder10"].ToString()
-
-                      
                     };
                     lstobj.Add(objrd);
                 }
@@ -282,7 +279,6 @@ namespace GoWMS.Server.Data
                 {
                     MaterialInfo objrd = new MaterialInfo
                     {
-
                         Material_Code = rdr["Material_Code"].ToString(),
                         Material_Description = rdr["Material_Description"].ToString(),                   
                         Unit = rdr["Unit"].ToString(),

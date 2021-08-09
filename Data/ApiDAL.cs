@@ -328,8 +328,8 @@ namespace GoWMS.Server.Data
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("Delete from wms.api_receivingorders_go Where package_id = @package_idchk ;");
             sql.AppendLine("Insert into wms.api_receivingorders_go");
-            sql.AppendLine("(package_id, roll_id, material_code, material_description, receiving_Date, gr_quantity, unit, gr_quantity_kg, wh_code, warehouse, locationno,  document_number, job, job_code, lpncode)");
-            sql.AppendLine("Values(@package_id, @roll_id, @material_code, @material_description, @receiving_date, @gr_quantity, @unit, @gr_quantity_kg, @wh_code, @warehouse, @locationno, @document_number, @job, @job_code, @lpncode) ;");
+            sql.AppendLine("(package_id, roll_id, material_code, material_description, receiving_Date, gr_quantity, unit, gr_quantity_kg, wh_code, warehouse, locationno,  document_number, job, job_code, lpncode, matcategory)");
+            sql.AppendLine("Values(@package_id, @roll_id, @material_code, @material_description, @receiving_date, @gr_quantity, @unit, @gr_quantity_kg, @wh_code, @warehouse, @locationno, @document_number, @job, @job_code, @lpncode, @matcategory) ;");
             NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
             {
                 CommandType = CommandType.Text
@@ -353,6 +353,7 @@ namespace GoWMS.Server.Data
                 cmd.Parameters.AddWithValue("@job_code", s.Job_Code);
                 cmd.Parameters.AddWithValue("@lpncode", pallet);
                 cmd.Parameters.AddWithValue("@package_idchk", s.Package_Id);
+                cmd.Parameters.AddWithValue("@matcategory", s.Matcategory);
             }
             con.Open();
             cmd.Prepare();

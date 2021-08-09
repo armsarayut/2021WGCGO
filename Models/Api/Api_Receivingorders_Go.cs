@@ -29,6 +29,7 @@ namespace GoWMS.Server.Models.Api
 		public string Job { get; set; }
 		public string Job_Code { get; set; }
 		public string Lpncode { get; set; }
+		public string Matcategory { get; set; }
 
 	}
 }
