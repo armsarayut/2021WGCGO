@@ -32,9 +32,21 @@ namespace GoWMS.Server.Controllers
             return ListRet;
         }
 
+        public List<Api_Deliveryorder_Go> GetAllErpListofNeedsbyMo(string mocode)
+        {
+            List<Api_Deliveryorder_Go> ListRet = objDAL.GetAllErpListofNeedsByMo(mocode).ToList();
+            return ListRet;
+        }
+
+
         public List<V_Reserved_MaterialsInfo> GetAllErpReservedMaterials()
         {
             List<V_Reserved_MaterialsInfo> ListRet = objDAL.GetAllErpReservedMaterials().ToList();
+            return ListRet;
+        }
+        public List<Api_Deliveryorder_Go> GetAllErpReservedMaterialsbyMo(string mocode)
+        {
+            List<Api_Deliveryorder_Go> ListRet = objDAL.GetAllErpReservedMaterialsbyMo(mocode).ToList();
             return ListRet;
         }
 

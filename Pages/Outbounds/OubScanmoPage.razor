@@ -2,19 +2,18 @@
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
-@using GoWMS.Server.Models.Mas
+@using GoWMS.Server.Models.Erp
 @using GoWMS.Server.Models.Inb
 @using GoWMS.Server.Models.Api
 
-@inject MasService ObjMasService
-@inject InboundService ObjInboundService
+@inject NavigationManager UriHelper
+@inject ErpService ObjErpService
+@inject ErpApiService ObjApiService
 
-<MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
+<MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader @mPalletcode</MudText>
 
 <MudGrid>
-    <MudItem xs="12">
-        <MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
-    </MudItem>
+
     <MudItem xs="12">
         @if (elevation == 0) //Defult
         {
@@ -37,150 +36,262 @@
             <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
     </MudItem>
+    <MudItem xs="12">
+        <MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
+    </MudItem>
 </MudGrid>
 
 <MudText Typo="Typo.subtitle1" Color="Color.Primary">Select Category</MudText>
 
-<MudGrid>
-    <MudItem xs="3">
-        <MudLink Href="oub/moflim/" Color="Color.Primary">Film</MudLink>
-    </MudItem>
-    <MudItem xs="3">
-        <MudLink Href="#"Color="Color.Secondary">Ink</MudLink>
-    </MudItem>
-    <MudItem xs="3">
-        <MudLink Href="#"Color="Color.Success">Cylinder</MudLink>
-    </MudItem>
-    <MudItem xs="3">
-        <MudLink Href="#"Color="Color.Info">All</MudLink>
-    </MudItem>
-</MudGrid>
 
 
+<MudItem xs="12">
+    <MudGrid Spacing="@spacing" Justify="Justify.Center">
+        <MudItem>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick=@NavigateFilm>Film</MudButton>
+        </MudItem>
+        <MudItem>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" @onclick=@NavigateInk>Ink</MudButton>
+        </MudItem>
+        <MudItem>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" @onclick=@NavigateCylinder>Cylinder</MudButton>
+        </MudItem>
+        <MudItem>
+            <MudButton Variant="Variant.Filled" Color="Color.Warning" @onclick=@NavigateOther>Other</MudButton>
+        </MudItem>
+        <MudItem>
+            <MudButton Variant="Variant.Filled" Color="Color.Info" @onclick=@NavigateAll>All</MudButton>
+        </MudItem>
+    </MudGrid>
+        
+
+        @*
+           <MudGrid Spacing="@spacing" Justify="Justify.Center">
+            <MudItem>
+                <MudLink Href="@Filmlinkmo" Color="Color.Primary">Film</MudLink>
+            </MudItem>
+            <MudItem>
+                <MudLink Href="@Inklinkmo" Color="Color.Secondary">Ink</MudLink>
+            </MudItem>
+            <MudItem>
+                <MudLink Href="@Cyllinkmo" Color="Color.Success">Cylinder</MudLink>
+            </MudItem>
+            <MudItem>
+                <MudLink Href="@Othlinkmo" Color="Color.Warning">Other</MudLink>
+            </MudItem>
+            <MudItem>
+                <MudLink Href="@Alllinkmo" Color="Color.Info">All</MudLink>
+            </MudItem>
+        </MudGrid>
+        *@
+</MudItem>
+
+@*<MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-4">Master Pallet : [ @mPalletcode ]</MudText>
+    <MudSkeleton Animation="Animation.False" />*@
+@*<MudText Typo="Typo.h6" Color="Color.Info" Class="mb-4">PackID : [ @mPackid ]</MudText>*@
 
 
+@code {
+    bool disabled = false;
+    private int mCounter = 5;
+    private string mPageHeader = "Scan MO";
+    private string msgAction = "Enter MO Barcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private string searchString = "";
+    private Api_Deliveryorder_Go selectedItem = null;
+    private HashSet<Api_Deliveryorder_Go> selectedItems = new HashSet<Api_Deliveryorder_Go>();
+    private IEnumerable<Api_Deliveryorder_Go> Elements = new List<Api_Deliveryorder_Go>();
 
-    @*<MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-4">Master Pallet : [ @mPalletcode ]</MudText>
-        <MudSkeleton Animation="Animation.False" />*@
-    @*<MudText Typo="Typo.h6" Color="Color.Info" Class="mb-4">PackID : [ @mPackid ]</MudText>*@
+    private IEnumerable<Api_Deliveryorder_Go> V_List_OF_Materials_NeedsInfos = new List<Api_Deliveryorder_Go>();
+
+    private IEnumerable<Api_Deliveryorder_Go> V_Reserved_MaterialsInfos = new List<Api_Deliveryorder_Go>();
+
+    public int elevation = 0;
+
+    public int mono { get; set; } = 5;
+
+    private string Filmlinkmo { get; set; }
+    private string Inklinkmo { get; set; }
+    private string Cyllinkmo { get; set; }
+    private string Othlinkmo { get; set; }
+    private string Alllinkmo { get; set; }
+
+    private string setFilmlinkmo { get; set; } = "oub/moflim/";
+    private string setInklinkmo { get; set; } = "oub/moflim/";
+    private string setCyllinkmo { get; set; } = "oub/moflim/";
+    private string setOthlinkmo { get; set; } = "oub/moflim/";
+    private string setAlllinkmo { get; set; } = "oub/moflim/";
 
 
-    @code {
-        private int mCounter = 5;
-        private string mPageHeader = "ScanMO";
-        private string msgAction = "Enter MO Barcode";
-        private string mPalletcode { get; set; } = "";
-        private string mPackid { get; set; } = "";
-        private string palletcode { get; set; }
-        private bool dense = true;
-        private bool hover = true;
-        private bool striped = true;
-        private bool bordered = false;
-        private string searchString = "";
-        private Inb_Putaway_Go selectedItem = null;
-        private HashSet<Inb_Putaway_Go> selectedItems = new HashSet<Inb_Putaway_Go>();
-        private IEnumerable<Inb_Putaway_Go> Elements = new List<Inb_Putaway_Go>();
+    public int spacing { get; set; } = 1;
 
-        private IEnumerable<Mas_Storagebin_Go> MasterStotageBins = new List<Mas_Storagebin_Go>();
+    protected override async Task OnInitializedAsync()
+    {
+        ErpApiService objCS = new ErpApiService();
 
-        private IEnumerable<Inb_Putaway_Go> MasterQueue = new List<Inb_Putaway_Go>();
+        Elements = await Task.Run(() => objCS.GetAllApiDeliveryorder());
 
-        public int elevation = 0;
+        //MasterStotageBins = ObjMasService.GetAllMasterStorageBins();
 
-        protected override async Task OnInitializedAsync()
+        //MasterQueue = ObjInboundService.GetAllInbPutawayGos();
+    }
+
+    private void setstr(string str)
+    {
+        if (mPalletcode.Length <= 0)
         {
-            InboundService objCS = new InboundService();
-            Elements = await Task.Run(() => objCS.GetAllInbPutawayGos());
-            MasterStotageBins = ObjMasService.GetAllMasterStorageBins();
-            //MasterQueue = ObjInboundService.GetAllInbPutawayGos();
-        }
+            var allCorrect = Elements.Where(a => a.Mo_Barcode == str).ToList();
 
-        private void setstr(string str)
-        {
-            if (mPalletcode.Length <= 0)
+            if (allCorrect.ToList().Count > 0)
             {
-                var allCorrect = MasterStotageBins.Where(a => a.Binno == str).ToList();
-
-                if (allCorrect.ToList().Count > 0)
-                {
-                    mPalletcode = str;
-                    msgAction = "Enter Masterpallet";
-                    elevation = 1;
-                }
-                else
-                {
-                    mPalletcode = "";
-                    elevation = 4;
-                    msgAction = "Location find not found";
-                }
+                mPalletcode = str;
+                msgAction = "MO is [" + mPalletcode  + "] Please select category ";
+                elevation = 1;
+                Filmlinkmo = setFilmlinkmo + mPalletcode;
+                Inklinkmo = setInklinkmo + mPalletcode;
+                Cyllinkmo = setCyllinkmo + mPalletcode;
+                Othlinkmo = setOthlinkmo + mPalletcode;
+                Alllinkmo = setAlllinkmo + mPalletcode;
             }
             else
             {
-                var allCorrect = Elements.Where(a => a.Palletno == str).ToList();
+                mPalletcode = "";
+                elevation = 4;
+                msgAction = "MO find not found";
 
-                if (allCorrect.ToList().Count > 0)
+                Filmlinkmo = setFilmlinkmo + mPalletcode;
+                Inklinkmo = setInklinkmo + mPalletcode;
+                Cyllinkmo = setCyllinkmo + mPalletcode;
+                Othlinkmo = setOthlinkmo + mPalletcode;
+                Alllinkmo = setAlllinkmo + mPalletcode;
+
+                V_Reserved_MaterialsInfos = ObjErpService.GetAllErpReservedMaterialsbyMo(str);
+                V_List_OF_Materials_NeedsInfos = ObjErpService.GetAllErpListofNeedsbyMo(str);
+
+                if (V_Reserved_MaterialsInfos.ToList().Count>0)
                 {
-                    //InQueue
-                    ObjInboundService.SetStorageComplete(str, mPalletcode);
-                    elevation = 2;
-                    msgAction = "Storage successfully";
-                    mPalletcode = "";
+                    if (V_List_OF_Materials_NeedsInfos.ToList().Count>0)
+                    {
+                        ObjApiService.InsertDeliveryOrderAsync(V_List_OF_Materials_NeedsInfos.ToList());
+
+                    }
+                    // loop to api 
+                    ObjApiService.InsertDeliveryOrderAsync(V_Reserved_MaterialsInfos.ToList());
+                    //----------------------
+                    mPalletcode = str;
+                    msgAction = "MO is [" + mPalletcode + "] Please select category ";
+                    elevation = 1;
+                    Filmlinkmo = setFilmlinkmo + mPalletcode;
+                    Inklinkmo = setInklinkmo + mPalletcode;
+                    Cyllinkmo = setCyllinkmo + mPalletcode;
+                    Othlinkmo = setOthlinkmo + mPalletcode;
+                    Alllinkmo = setAlllinkmo + mPalletcode;
                 }
                 else
                 {
-                    if (mPalletcode.Length > 0)
+                    if (V_List_OF_Materials_NeedsInfos.ToList().Count > 0)
                     {
+                        // loop to api 
+                        ObjApiService.InsertDeliveryOrderAsync(V_List_OF_Materials_NeedsInfos.ToList());
+                        //----------------------
+                        mPalletcode = str;
+                        msgAction = "MO is [" + mPalletcode + "] Please select category ";
                         elevation = 1;
-                        msgAction = "Please enter Masterpallet";
+                        Filmlinkmo = setFilmlinkmo + mPalletcode;
+                        Inklinkmo = setInklinkmo + mPalletcode;
+                        Cyllinkmo = setCyllinkmo + mPalletcode;
+                        Othlinkmo = setOthlinkmo + mPalletcode;
+                        Alllinkmo = setAlllinkmo + mPalletcode;
                     }
-                    else
-                    {
-                        elevation = 1;
-                        msgAction = "Please enter Location";
-                    }
+
                 }
             }
-            InboundService objGR = new InboundService();
-            Elements = objGR.GetAllInbPutawayGos();
         }
-
-        private string stxtInput { get; set; }
-        private void DoTheThing(KeyboardEventArgs eventArgs)
+        else
         {
-            if (eventArgs.Key == "Enter")        // fire on enter
-            {
-                //Console.WriteLine("Done the thing: " + MyValue);
-                //stxtInput = MyValue;
-                setstr(palletcode);
-
-                palletcode = "";
-            }
+            elevation = 1;
+            msgAction = "MO is [" + mPalletcode + "] Please select category ";
         }
-
-        private bool FilterFunc(Inb_Putaway_Go element)
-        {
-            if (string.IsNullOrWhiteSpace(searchString))
-                return true;
-            if (element.Palletno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if (element.Storagebin.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if ($"{element.Storagearea} ".Contains(searchString))
-                return true;
-            return false;
-        }
-
-        private void DeleteMap(string pack)
-        {
-            /*
-            msgAction = "Cancle successfully";
-            ObjCustomService.CancelReceivingOrderbypack(mPalletcode, pack);
-
-
-            CustomerService objGR = new CustomerService();
-            Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
-            */
-        }
-
-
     }
+
+    private string stxtInput { get; set; }
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            //Console.WriteLine("Done the thing: " + MyValue);
+            //stxtInput = MyValue;
+            setstr(palletcode);
+
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Inb_Putaway_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Palletno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Storagebin.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Storagearea} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    private void DeleteMap(string pack)
+    {
+        /*
+        msgAction = "Cancle successfully";
+        ObjCustomService.CancelReceivingOrderbypack(mPalletcode, pack);
+
+
+        CustomerService objGR = new CustomerService();
+        Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+        */
+    }
+    void NavigateFilm()
+    {
+        if (mPalletcode.Length > 0)
+        {
+            UriHelper.NavigateTo(Filmlinkmo);
+        }
+    }
+    void NavigateInk()
+    {
+        if (mPalletcode.Length > 0)
+        {
+            UriHelper.NavigateTo(Inklinkmo);
+        }
+    }
+    void NavigateCylinder()
+    {
+        if (mPalletcode.Length > 0)
+        {
+            UriHelper.NavigateTo(Cyllinkmo);
+        }
+    }
+    void NavigateOther()
+    {
+        if (mPalletcode.Length > 0)
+        {
+            UriHelper.NavigateTo(Othlinkmo);
+        }
+    }
+    void NavigateAll()
+    {
+        if (mPalletcode.Length > 0)
+        {
+            UriHelper.NavigateTo(Alllinkmo);
+        }
+    }
+
+
+}

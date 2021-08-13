@@ -65,9 +65,15 @@ namespace GoWMS.Server.Controllers
             return "Update Successfully";
         }
 
-        public string InsertReceivingOrderbypack(List<Api_Receivingorders_Go> listOrder, string pallet)
+        public async Task<string> InsertReceivingOrderbypackAsync(List<Api_Receivingorders_Go> listOrder, string pallet)
         {
-            objDAL.InsertReceivingOrdersBypack(listOrder,pallet);
+            await objDAL.InsertReceivingOrdersBypack(listOrder,pallet);
+            return "Update Successfully";
+        }
+
+        public async Task<string> InsertDeliveryOrderAsync(List<Api_Deliveryorder_Go> listOrder)
+        {
+            await objDAL.InsertDeliveryOrder(listOrder);
             return "Update Successfully";
         }
 
@@ -80,6 +86,12 @@ namespace GoWMS.Server.Controllers
         public List<Api_Deliveryorder_Go> GetAllApiDeliveryorder()
         {
             List<Api_Deliveryorder_Go> retlist = objDAL.GetAllDeliveryorderGo().ToList();
+            return retlist;
+        }
+
+        public List<Api_Deliveryorder_Go> GetAllApiDeliveryorderByMo(string mocode)
+        {
+            List<Api_Deliveryorder_Go> retlist = objDAL.GetAllDeliveryorderGoByMo(mocode).ToList();
             return retlist;
         }
 

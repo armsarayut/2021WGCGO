@@ -215,6 +215,57 @@ namespace GoWMS.Server.Data
             return lstobj;
         }
 
+        public IEnumerable<Api_Deliveryorder_Go> GetAllErpListofNeedsByMo(string mocode)
+        {
+            List<Api_Deliveryorder_Go> lstobj = new List<Api_Deliveryorder_Go>();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("SELECT Customer,Customer_Name" +
+                    ",Finished_Product,Finished_Product_Description" +
+                    ",Material_Code,Description" +
+                    ",Element,cast(Quantity AS DECIMAL(18,4)) AS Quantity" +
+                    ",Unit,Job" +
+                    ",Job_Code,MO_Barcode " +
+                    "FROM dbo.V_List_OF_Materials_Need " +
+                    "WHERE MO_Barcode = '" + mocode + "'", con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                con.Open();
+                SqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Api_Deliveryorder_Go objrd = new Api_Deliveryorder_Go
+                    {
+                        Package_Id = "",
+                        Roll_Id = "",
+                        Customer_Code = rdr["Customer"].ToString(),
+                        Customer_Description = rdr["Customer_Name"].ToString(),
+                        Finished_Product = rdr["Finished_Product"].ToString(),
+                        Finished_Product_Description = rdr["Finished_Product_Description"].ToString(),
+                        Material_Code = rdr["Material_Code"].ToString(),
+                        Material_Description = rdr["Description"].ToString(),
+                        Matelement = rdr["Element"].ToString(),
+                        Wh_Code = "",
+                        Warehouse = "",
+                        Locationno = "",
+                        Quantity = rdr["Quantity"] == DBNull.Value ? null : (decimal?)rdr["Quantity"],
+                        Unit = rdr["Unit"].ToString(),
+                        Job = rdr["Job"].ToString(),
+                        Job_Code = rdr["Job_Code"].ToString(),
+                        Mo_Barcode = rdr["MO_Barcode"].ToString(),
+                        Picked = 0,
+                        Dotype = "LON"
+
+                    };
+                    lstobj.Add(objrd);
+                }
+                con.Close();
+            }
+            return lstobj;
+        }
+
 
         public IEnumerable<V_Reserved_MaterialsInfo> GetAllErpReservedMaterials()
         {
@@ -224,7 +275,7 @@ namespace GoWMS.Server.Data
                 SqlCommand cmd = new SqlCommand("SELECT Package_ID,Roll_ID " +
                     ",Material_Code,Description" +
                     ",WH_Code,Warehouse" +
-                    ",Location,cast(Quantity as float)  as Quantity" +
+                    ",Location,cast(Quantity as float) AS Quantity" +
                     ",Unit,Job" +
                     ",Job_Code,MO_Barcode " +
                     "FROM dbo.V_Reserved_Materials", con)
@@ -250,6 +301,57 @@ namespace GoWMS.Server.Data
                         Job = rdr["Job"].ToString(),
                         Job_Code = rdr["Job_Code"].ToString(),
                         MO_Barcode = rdr["MO_Barcode"].ToString()
+
+                    };
+                    lstobj.Add(objrd);
+                }
+                con.Close();
+            }
+            return lstobj;
+        }
+
+        public IEnumerable<Api_Deliveryorder_Go> GetAllErpReservedMaterialsbyMo(string mocode)
+        {
+            List<Api_Deliveryorder_Go> lstobj = new List<Api_Deliveryorder_Go>();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("SELECT Package_ID,Roll_ID " +
+                    ",Material_Code,Description" +
+                    ",WH_Code,Warehouse" +
+                    ",Location,cast(Quantity AS DECIMAL(18,4)) as Quantity" + 
+                    ",Unit,Job" +
+                    ",Job_Code,MO_Barcode " +
+                    "FROM dbo.V_Reserved_Materials " +
+                    "WHERE MO_Barcode = '" + mocode + "'", con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                con.Open();
+                SqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Api_Deliveryorder_Go objrd = new Api_Deliveryorder_Go
+                    {
+                        Package_Id = rdr["Package_ID"].ToString(),
+                        Roll_Id = rdr["Roll_ID"].ToString(),
+                        Material_Code = rdr["Material_Code"].ToString(),
+                        Material_Description = rdr["Description"].ToString(),
+                        Matelement = rdr["Description"].ToString(),
+                        Wh_Code = rdr["WH_Code"].ToString(),
+                        Warehouse = rdr["Warehouse"].ToString(),
+                        Locationno = rdr["Location"].ToString(),
+                        Quantity = rdr["Quantity"] == DBNull.Value ? null : (decimal?)rdr["Quantity"],
+                        Unit = rdr["Unit"].ToString(),
+                        Job = rdr["Job"].ToString(),
+                        Job_Code = rdr["Job_Code"].ToString(),
+                        Mo_Barcode = rdr["MO_Barcode"].ToString(),
+                        Picked = 0,
+                        Dotype = "RES",
+                        Customer_Code = "",
+                        Customer_Description = "",
+                        Finished_Product = "",
+                        Finished_Product_Description = ""
                     };
                     lstobj.Add(objrd);
                 }

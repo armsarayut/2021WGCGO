@@ -11,30 +11,31 @@
 <MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
 
 <MudGrid>
-    <MudItem xs="12" sm="6" md="4">
-        <MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
+
+    <MudItem xs="12">
         @if (elevation == 0) //Defult
         {
             <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
         else @if (elevation == 1) //Info
-   {
-    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@msgAction</MudAlert>
-}
-else if (elevation == 2) //Success
-{
-    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@msgAction</MudAlert>
-}
-else if (elevation == 3) // Warning
-{
-    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@msgAction</MudAlert>
-}
-else if (elevation == 4) // Error
-{
-    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@msgAction</MudAlert>
-}
+        {
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@msgAction</MudAlert>
+        }
+        else if (elevation == 2) //Success
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@msgAction</MudAlert>
+        }
+        else if (elevation == 3) // Warning
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@msgAction</MudAlert>
+        }
+        else if (elevation == 4) // Error
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@msgAction</MudAlert>
+        }
+    </MudItem>
+    <MudItem xs="12">
+        <MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
     </MudItem>
 </MudGrid>
 
