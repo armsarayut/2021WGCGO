@@ -7,6 +7,13 @@
 <MudText Typo="Typo.h4" GutterBottom="true">Sign Up</MudText>
 <MudText>Already have an account? <MudLink Href="/pages/authentication/login">Sign In</MudLink></MudText>
 
+<MudSelect T="string" Label="Department">
+    <MudSelectItem Value="@("A")" />
+    <MudSelectItem Value="@("B")" />
+    <MudSelectItem Value="@("C")" />
+    <MudSelectItem Value="@("D")" />
+</MudSelect>
+
 <MudTextField T="string" Label="Username" Variant="Variant.Outlined" Class="my-4"></MudTextField>
 
 <MudTextField T="string" Label="E-mail" Variant="Variant.Outlined"></MudTextField>
@@ -20,6 +27,7 @@
 @code {
     string Password { get; set; }
     public bool AgreeToTerms { get; set; }
+    string lblAgree { get; set; }
 
     bool PasswordVisibility;
     InputType PasswordInput = InputType.Password;
