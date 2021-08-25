@@ -94,6 +94,7 @@ namespace GoWMS.Server
             // BLAZOR COOKIE Auth Code (begin)
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
             app.UseCookiePolicy();
             app.UseAuthentication();
             // BLAZOR COOKIE Auth Code (end)
@@ -103,6 +104,7 @@ namespace GoWMS.Server
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
         }
     }
 }

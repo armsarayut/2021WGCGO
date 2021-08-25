@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,5 +10,10 @@ namespace GoWMS.Server.Data
     {
         public string MainMenu { get; set; }
         public string CurrentMunu { get; set; }
-     }
+        public static string Imagelogoreport()
+        {
+            return $"{Directory.GetCurrentDirectory()}{@"\wwwroot\images\Logocus.jpg"}" ;
+        }
+
+    }
 }
