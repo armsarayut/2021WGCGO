@@ -15,5 +15,10 @@ namespace GoWMS.Server.Data
             return $"{Directory.GetCurrentDirectory()}{@"\wwwroot\images\Logocus.jpg"}" ;
         }
 
+        public static string Fontreport()
+        {
+            return $"{Directory.GetCurrentDirectory()}{@"\wwwroot\fonts\ARIALUNI.TTF"}";
+        }
+
     }
 }
