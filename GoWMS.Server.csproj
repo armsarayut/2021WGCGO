@@ -28,12 +28,12 @@
 
   <ItemGroup>
     <Folder Include="DataAccess\" />
-    <Folder Include="Models\Rpt\" />
     <Folder Include="Pages\Admins\" />
     <Folder Include="Pages\Automations\" />
     <Folder Include="Pages\Services\" />
     <Folder Include="Pages\Setups\" />
     <Folder Include="Pages\Reports\" />
+    <Folder Include="Reports\NewFolder\" />
   </ItemGroup>
 
 </Project>

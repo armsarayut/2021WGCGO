@@ -1,9 +1,19 @@
 ﻿@page "/wh/shelf"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
+
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inv
+@using GoWMS.Server.Reports
 
+@inject IJSRuntime JSRuntime
 @inject InvService ObjService
 
 @if (Elements == null)
@@ -13,13 +23,13 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPagecaption </MudText>
     <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Vrpt_shelf_listInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+            <MudButton OnClick="DownloadExcelDocument" Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
                 Excel
             </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+            <MudButton OnClick="DownloadPdfDocument" Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
                 PDF
             </MudButton>
             <MudToolBarSpacer />
@@ -28,7 +38,7 @@ else
 
         <HeaderContent>
             <MudTh>Location</MudTh>
-            <MudTh>SRM</MudTh>
+            <MudTh>LANE</MudTh>
             <MudTh>BANK</MudTh>
             <MudTh>BAY</MudTh>
             <MudTh>LEVEL</MudTh>
@@ -58,7 +68,7 @@ else
 
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
 
-    private readonly string pageheader = "Location";
+    private readonly string mPagecaption = "Location";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -130,5 +140,41 @@ else
             return true;
         return false;
     }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            WhShelfListPageRptExcel excelReport = new WhShelfListPageRptExcel();
+            List<Vrpt_shelf_listInfo> listExcelReport = new List<Vrpt_shelf_listInfo>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            WhShelfListPageRptPdf pdfReport = new WhShelfListPageRptPdf();
+           
+            List<Vrpt_shelf_listInfo> listPdfReport = new List<Vrpt_shelf_listInfo>();
+            listPdfReport = Elements.ToList();
+            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
 
 }

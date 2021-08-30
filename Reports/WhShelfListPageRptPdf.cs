@@ -3,19 +3,16 @@ using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using GoWMS.Server.Models.Inb;
+using GoWMS.Server.Models.Inv;
 using GoWMS.Server.Data;
+
 
 namespace GoWMS.Server.Reports
 {
-    public class IbpOrderQueueRptPdf : PdfPageEvents
+    public class WhShelfListPageRptPdf : PdfPageEvents
     {
-        //-----------------------------
-
         #region Attributes
-        readonly string reportCaption = "Good Receive - Report";
+        readonly string reportCaption = "Location - Report";
         readonly Boolean bPageLanscape = false;
         #endregion
 
@@ -31,7 +28,7 @@ namespace GoWMS.Server.Reports
             BaseFont baseFont = BaseFontForHeaderFooter;
             iTextSharp.text.Font font_logo = new iTextSharp.text.Font(baseFont, 20, iTextSharp.text.Font.BOLD, BaseColor.Blue);
             iTextSharp.text.Font font_header1 = new iTextSharp.text.Font(baseFont, 16, iTextSharp.text.Font.BOLD, BaseColor.Blue);
-            iTextSharp.text.Font font_header2 = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.BOLD, BaseColor.Blue);
+            iTextSharp.text.Font font_header2 = new iTextSharp.text.Font(baseFont, 12, iTextSharp.text.Font.BOLD,BaseColor.Blue);
             iTextSharp.text.Font font_headerContent = new iTextSharp.text.Font(baseFont, 8, iTextSharp.text.Font.NORMAL, BaseColor.Blue);
 
             float[] widths = new float[] { 50, 350, 90, 120, 90, 40, 10 };
@@ -183,9 +180,9 @@ namespace GoWMS.Server.Reports
         /// </summary>
         /// <param name="ListRpt">List Data</param>
         /// <returns></returns>
-        public byte[] ExportPDF(List<Inb_Goodreceive_Go> ListRpt)
+        public byte[] ExportPDF(List<Vrpt_shelf_listInfo> ListRpt)
         {
-            IbpOrderQueueRptPdf pdfReport = new IbpOrderQueueRptPdf();
+            WhShelfListPageRptPdf pdfReport = new WhShelfListPageRptPdf();
             Document document;
             if (bPageLanscape)
             {
@@ -195,8 +192,6 @@ namespace GoWMS.Server.Reports
             {
                 document = new Document(PageSize.A4, 10f, 10f, 60f, 20f); // Setup page Protrait
             }
-            
-
             MemoryStream ms = new MemoryStream();
             PdfWriter pdfWriter = PdfWriter.GetInstance(document, ms);
             pdfWriter.PageEvent = pdfReport;//You must assign a value here to trigger the processing of the header and footer
@@ -216,10 +211,10 @@ namespace GoWMS.Server.Reports
         /// <param name="document"></param>
         /// <param name="ListRpts">List<Vrpt_shelf_listInfo></param>
         /// <returns></returns>
-        private void ReportBody(Document document, List<Inb_Goodreceive_Go> ListRpts)
+        private void ReportBody(Document document, List<Vrpt_shelf_listInfo> ListRpts)
         {
             BaseFont baseFont = BaseFontForHeaderFooter;
-
+  
             int maxColum = 8;
             float[] sizes = new float[maxColum];
             for (var i = 0; i < maxColum; i++) // Set up Colum Size
@@ -228,10 +223,10 @@ namespace GoWMS.Server.Reports
                 else if (i == 1) sizes[i] = 1;
                 else if (i == 2) sizes[i] = 1;
                 else if (i == 3) sizes[i] = 1;
-                else if (i == 4) sizes[i] = 2;
-                else if (i == 5) sizes[i] = 3;
-                else if (i == 6) sizes[i] = 1;
-                else if (i == 7) sizes[i] = 1;
+                else if (i == 4) sizes[i] = 1;
+                else if (i == 5) sizes[i] = 2;
+                else if (i == 6) sizes[i] = 3;
+                else if (i == 7) sizes[i] = 3;
                 else sizes[i] = 1;
             }
             PdfPTable bodyTable = new PdfPTable(sizes);
@@ -243,7 +238,7 @@ namespace GoWMS.Server.Reports
 
             #region Table Header
             iTextSharp.text.BaseColor headerBackcolor = BaseColor.LightGray;
-            cell = new PdfPCell(new Phrase("QueuDate", _fontstye))
+            cell = new PdfPCell(new Phrase("LOCATION", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -251,7 +246,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Masterpallet", _fontstye))
+            cell = new PdfPCell(new Phrase("LANE", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -259,7 +254,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Ducument", _fontstye))
+            cell = new PdfPCell(new Phrase("BANK", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -267,7 +262,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("PackID", _fontstye))
+            cell = new PdfPCell(new Phrase("BAY", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -275,7 +270,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Material", _fontstye))
+            cell = new PdfPCell(new Phrase("LEVEL", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -283,7 +278,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Description", _fontstye))
+            cell = new PdfPCell(new Phrase("PALLET", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -291,7 +286,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Qty", _fontstye))
+            cell = new PdfPCell(new Phrase("STATUS", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -299,7 +294,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("Unit", _fontstye))
+            cell = new PdfPCell(new Phrase("LASTUPDATE", _fontstye))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_CENTER,
@@ -314,7 +309,7 @@ namespace GoWMS.Server.Reports
             iTextSharp.text.BaseColor bodyBackcolor = BaseColor.White;
             foreach (var listRpt in ListRpts)
             {
-                cell = new PdfPCell(new Phrase(listRpt.Created.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.Shelfcode.ToString(), _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -322,7 +317,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Pallteno.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.Srm_no.ToString(), _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -330,7 +325,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Docno.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.Shelfbank.ToString(), _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -338,7 +333,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Itemtag.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.Shelfbay.ToString(), _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -346,7 +341,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Itemcode.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.Shelflevel.ToString(), _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -354,7 +349,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Itemname.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.Lpncode, _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -362,7 +357,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Quantity.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.St_desc, _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -370,7 +365,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Unit.ToString(), _fontstye))
+                cell = new PdfPCell(new Phrase(listRpt.Modified.ToString(), _fontstye))
                 {
                     HorizontalAlignment = Element.ALIGN_CENTER,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -386,7 +381,6 @@ namespace GoWMS.Server.Reports
             document.Add(bodyTable);
         }
         #endregion
-
-        //-----------------------------
     }
+
 }

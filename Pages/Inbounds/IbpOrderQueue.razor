@@ -162,11 +162,15 @@ else
     {
         try
         {
+
+
             IbpOrderQueueRptPdf pdfReport = new IbpOrderQueueRptPdf();
             List<Inb_Goodreceive_Go> listPdfReport = new List<Inb_Goodreceive_Go>();
             listPdfReport = Elements.ToList();
             var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
         }
         catch (Exception e)
         {
