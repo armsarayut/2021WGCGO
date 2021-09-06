@@ -1,0 +1,95 @@
+﻿@page "/wgc/deliverynote"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Wgc
+
+@inject WgcService ObjErpService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<DELIVERY_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>SEQ_NO</MudTh>
+            <MudTh>DN_NO</MudTh>
+            <MudTh>ITEM_CODE</MudTh>
+            <MudTh>DN_QTY</MudTh>
+            <MudTh>DN_UM</MudTh>
+            <MudTh>PALLET_GO</MudTh>
+            <MudTh>STATUS_GO</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+
+            <MudTd DataLabel="Material">@context.SEQ_NO</MudTd>
+            <MudTd DataLabel="Description">@context.DN_NO</MudTd>
+            <MudTd DataLabel="Customer">@context.ITEM_CODE</MudTd>
+            <MudTd DataLabel="CustomerDescription">@context.DN_QTY</MudTd>
+            <MudTd DataLabel="CustomerReference">@context.DN_UM</MudTd>
+            <MudTd DataLabel="Color1">@context.PALLET_GO</MudTd>
+            <MudTd DataLabel="Cylinder1">@context.STATUS_GO</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Delivery Note";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private DELIVERY_NOTE_ITEMS selectedItem = null;
+    private HashSet<DELIVERY_NOTE_ITEMS> selectedItems = new HashSet<DELIVERY_NOTE_ITEMS>();
+    private IEnumerable<DELIVERY_NOTE_ITEMS> Elements = new List<DELIVERY_NOTE_ITEMS>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WgcService objCS = new WgcService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllApiDeliverynoteWgc());
+    }
+
+
+    private bool FilterFunc(DELIVERY_NOTE_ITEMS element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.PALLET_GO.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.DN_NO.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.ITEM_CODE} {element.SEQ_NO} {element.JOB_NO}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}

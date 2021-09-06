@@ -61,6 +61,7 @@ namespace GoWMS.Server
             services.AddSingleton<InvService>();
             services.AddSingleton<InboundService>();
             services.AddSingleton<MasService>();
+            services.AddSingleton<WgcService>();
             // ******
             // BLAZOR COOKIE Auth Code (begin)
             // From: https://github.com/aspnet/Blazor/issues/1554

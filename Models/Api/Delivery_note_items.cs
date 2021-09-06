@@ -1,0 +1,125 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace GoWMS.Server.Models.Api
+{
+    public class Delivery_note_items
+    {
+		public Int64? Efidx { get; set; }
+		public Int32? Efstatus { get; set; }
+		public DateTime? Created { get; set; }
+		public DateTime? Modified { get; set; }
+		public Int64? Innovator { get; set; }
+		public String Device { get; set; }
+		public String Dn_no { get; set; }
+		public Decimal Seq_no { get; set; }
+		public String Job_no { get; set; }
+		public String Item_code { get; set; }
+		public Int32? Dn_qty { get; set; }
+		public String Dn_um { get; set; }
+		public DateTime? Dn_date { get; set; }
+		public String Status { get; set; }
+		public String Customer_code { get; set; }
+		public String Batch_no { get; set; }
+		public String Factory_room { get; set; }
+		public String Palette_no { get; set; }
+		public Int32? Box_no { get; set; }
+		public String Close_flag { get; set; }
+		public String Packeting_code { get; set; }
+		public Decimal Dn_weight { get; set; }
+		public String Dn_weight_um { get; set; }
+		public String Lot_no { get; set; }
+		public String Store_id { get; set; }
+		public String Screen_name { get; set; }
+		public String Cust_item_code { get; set; }
+		public String Vehicle_code { get; set; }
+		public String Vehicle_link_code { get; set; }
+		public Decimal Package_weight { get; set; }
+		public String App1_flag { get; set; }
+		public String App2_flag { get; set; }
+		public String App3_flag { get; set; }
+		public String App_ag_flag { get; set; }
+		public DateTime? Net_iron_date { get; set; }
+		public Decimal Net_iron_number { get; set; }
+		public String Created_t1_by { get; set; }
+		public DateTime? Created_t1_on { get; set; }
+		public String Approved_t1_by { get; set; }
+		public DateTime? Approved_t1_on { get; set; }
+		public String Net_iron_nc { get; set; }
+		public DateTime? Infection_date { get; set; }
+		public String Tpc { get; set; }
+		public String Ym { get; set; }
+		public String Saureus { get; set; }
+		public String Ecoli { get; set; }
+		public String Coliform { get; set; }
+		public String Bcereus { get; set; }
+		public String Sallmonella { get; set; }
+		public String Aw { get; set; }
+		public String Remarks_infection { get; set; }
+		public String Infection_nc { get; set; }
+		public String Approved_t2_by { get; set; }
+		public DateTime? Approved_t2_on { get; set; }
+		public String Approved_t3_by { get; set; }
+		public DateTime? Approved_t3_on { get; set; }
+		public String Approved_ag_by { get; set; }
+		public DateTime? Approved_ag_on { get; set; }
+		public String Pk_no { get; set; }
+		public Decimal Pk_seq { get; set; }
+		public String Sticker_code { get; set; }
+		public String Screen_code { get; set; }
+		public String Sub_customer_code { get; set; }
+		public String To_pck_no { get; set; }
+		public String Effect_type { get; set; }
+		public String Remarks { get; set; }
+		public String Flag_book { get; set; }
+		public Decimal Seq_group { get; set; }
+		public String Tank { get; set; }
+		public String Brix { get; set; }
+		public String Ph { get; set; }
+		public String De { get; set; }
+		public String Soii { get; set; }
+		public String Bstar { get; set; }
+		public String Remarks_quality { get; set; }
+		public String Quality_nc { get; set; }
+		public DateTime? Date_quality { get; set; }
+		public String Created_t2_by { get; set; }
+		public DateTime? Created_t2_on { get; set; }
+		public String Created_t3_by { get; set; }
+		public DateTime? Created_t3_on { get; set; }
+		public String Approved_inv_by { get; set; }
+		public DateTime? Approved_inv_on { get; set; }
+		public String Created_inv_by { get; set; }
+		public DateTime? Created_inv_on { get; set; }
+		public String App_inv_flag { get; set; }
+		public String Remarks_inv { get; set; }
+		public String Item_status { get; set; }
+		public String Nc_book { get; set; }
+		public String Rack_no { get; set; }
+		public String Black_carbon { get; set; }
+		public Decimal Dup_pck_no { get; set; }
+		public Decimal Pck_no { get; set; }
+		public String Status_load { get; set; }
+		public DateTime? Packing_date_timestamp_3_without { get; set; }
+		public Decimal Yeast { get; set; }
+		public Decimal Mold { get; set; }
+		public Decimal Shelf_life_day { get; set; }
+		public Decimal Shelf_life_keep_in { get; set; }
+		public DateTime? Shelf_life_date { get; set; }
+		public DateTime? Shelf_life_keep_in_date { get; set; }
+		public Decimal Palet_sort { get; set; }
+		public String Hit_let { get; set; }
+		public String Lot_corn { get; set; }
+		public String Tank_ef { get; set; }
+		public DateTime? Ref_date { get; set; }
+		public String Lstar { get; set; }
+		public String Astar { get; set; }
+		public String Remarks_iss { get; set; }
+		public DateTime? Injection_date { get; set; }
+		public DateTime? Spray_date { get; set; }
+		public String Batch_no_cust { get; set; }
+		public String Pallet_go { get; set; }
+		public String Status_go { get; set; }
+	}
+}

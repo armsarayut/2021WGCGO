@@ -31,6 +31,7 @@ namespace GoWMS.Server.Data
                     CommandType = CommandType.Text
                 };
                 con.Open();
+                
                 NpgsqlDataReader rdr = cmd.ExecuteReader();
                 while (rdr.Read())
                 {

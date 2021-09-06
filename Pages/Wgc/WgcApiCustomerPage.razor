@@ -1,0 +1,87 @@
+﻿@page "/wgc/customers"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Wgc
+
+@inject WgcService ObjErpService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<CUSTOMERS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>CUSTOMER_CODE</MudTh>
+            <MudTh>CUSTOMER_NAME</MudTh>
+            <MudTh>STATUS</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+
+            <MudTd DataLabel="Material">@context.CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel="Description">@context.CUST_NAME_THAI</MudTd>
+            <MudTd DataLabel="Customer">@context.STATUS</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Customers";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private CUSTOMERS selectedItem = null;
+    private HashSet<CUSTOMERS> selectedItems = new HashSet<CUSTOMERS>();
+    private IEnumerable<CUSTOMERS> Elements = new List<CUSTOMERS>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WgcService objCS = new WgcService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllApiCustomerWgc());
+    }
+
+
+    private bool FilterFunc(CUSTOMERS element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.CUSTOMER_CODE.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.CUST_NAME_THAI.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.STATUS} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}

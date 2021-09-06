@@ -1,0 +1,89 @@
+﻿@page "/wgc/items"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Wgc
+
+@inject WgcService ObjErpService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<ITEMS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                Excel
+            </MudButton>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                PDF
+            </MudButton>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>ITEM_CODE</MudTh>
+            <MudTh>ITEM_NAME</MudTh>
+            <MudTh>ITEM_TYPE</MudTh>
+            <MudTh>ITEM_UM</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+
+            <MudTd DataLabel="Material">@context.ITEM_CODE</MudTd>
+            <MudTd DataLabel="Description">@context.ITEM_NAME</MudTd>
+            <MudTd DataLabel="Customer">@context.ITEM_TYPE</MudTd>
+            <MudTd DataLabel="CustomerDescription">@context.ITEM_UM</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "Items";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private ITEMS selectedItem = null;
+    private HashSet<ITEMS> selectedItems = new HashSet<ITEMS>();
+    private IEnumerable<ITEMS> Elements = new List<ITEMS>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WgcService objCS = new WgcService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllApiItemWgc());
+    }
+
+
+    private bool FilterFunc(ITEMS element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.ITEM_CODE.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.ITEM_NAME.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.ITEM_UM} {element.ITEM_TYPE} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}
