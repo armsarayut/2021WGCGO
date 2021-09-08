@@ -26,10 +26,10 @@ namespace GoWMS.Server.Controllers
             return ListRet;
         }
 
-        public List<V_List_OF_Materials_NeedsInfo> GetAllErpListofNeeds()
+        public Task<IEnumerable<V_List_OF_Materials_NeedsInfo>> GetAllErpListofNeeds()
         {
-            List<V_List_OF_Materials_NeedsInfo> ListRet = objDAL.GetAllErpListofNeeds().ToList();
-            return ListRet;
+            //List<V_List_OF_Materials_NeedsInfo> ListRet = objDAL.GetAllErpListofNeeds().ToList();
+            return objDAL.GetAllErpListofNeeds();
         }
 
         public List<Api_Deliveryorder_Go> GetAllErpListofNeedsbyMo(string mocode)

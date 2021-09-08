@@ -3,6 +3,9 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Erp
+@using System;
+@using System.Diagnostics;
+@using System.Threading;
 
 @inject ErpService ObjErpService
 
@@ -39,7 +42,7 @@ else
             <MudTh>Job</MudTh>
             <MudTh>JobCode</MudTh>
             <MudTh>MOBarcode</MudTh>
-            
+
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Customer">@context.Customer</MudTd>
@@ -62,7 +65,7 @@ else
 
 @code {
     private string mPageHeader = "List of Need Material";
-    private string msgAction = "Enter Palletcode";
+    //private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
     private string palletcode { get; set; }
@@ -73,6 +76,7 @@ else
     private bool fixed_header = true;
     private bool fixed_footer = true;
     private string searchString = "";
+    private string stoptime = "";
     private V_List_OF_Materials_NeedsInfo selectedItem = null;
     private HashSet<V_List_OF_Materials_NeedsInfo> selectedItems = new HashSet<V_List_OF_Materials_NeedsInfo>();
     private IEnumerable<V_List_OF_Materials_NeedsInfo> Elements = new List<V_List_OF_Materials_NeedsInfo>();
@@ -83,7 +87,18 @@ else
     {
         ErpService objCS = new ErpService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        // Create new stopwatch.
+        Stopwatch stopwatch = new Stopwatch();
+
+        // Begin timing.
+        stopwatch.Start();
+
         Elements = await Task.Run(() => objCS.GetAllErpListofNeeds());
+        // Stop timing.
+        stopwatch.Stop();
+        // Write result.
+        Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);
+
     }
 
 

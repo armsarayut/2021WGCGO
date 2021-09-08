@@ -37,7 +37,7 @@ else
 
 
 <MudHidden Breakpoint="Breakpoint.Xs">
-    <MudTable Items="@Elements.Where(a => a.Dotype == "LON")" MultiSelection="true" @bind-SelectedItems="selectLON" Hover="@hover"
+    <MudTable Items="@Elements.Where(a => a.Dotype == @_doType1 && a.Material_Code.StartsWith(@_matfilter))" MultiSelection="true" @bind-SelectedItems="selectLON" Hover="@hover"
               Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncLON)"
               RowsPerPage="5">
         <ToolBarContent>
@@ -73,8 +73,9 @@ else
     @*for debug
         <MudText Inline="true">Selected items: @(selectLON==null ? "" : string.Join(", ", selectLON.OrderBy(x=>x.Efidx).Select(x=>x.Efidx)))</MudText>
         end debug*@
+    --x => x.myTextColumn.StartWith('abc')
 
-    <MudTable Items="@Elements.Where(a => a.Dotype == "RES")" MultiSelection="true" @bind-SelectedItems="selectRES" Hover="@hover"
+    <MudTable Items="@Elements.Where(a => a.Dotype == @_doType2 && a.Material_Code.StartsWith(@_matfilter))" MultiSelection="true" @bind-SelectedItems="selectRES" Hover="@hover"
               Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncRES)"
               RowsPerPage="5">
 
@@ -107,12 +108,12 @@ else
         </PagerContent>
     </MudTable>
     @*for debug
-    <MudText Inline="true">Selected items: @(selectRES==null ? "" : string.Join(", ", selectRES.OrderBy(x=>x.Efidx).Select(x=>x.Efidx)))</MudText>
-    end debug*@
+        <MudText Inline="true">Selected items: @(selectRES==null ? "" : string.Join(", ", selectRES.OrderBy(x=>x.Efidx).Select(x=>x.Efidx)))</MudText>
+        end debug*@
 </MudHidden>
 
     <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-        <MudTable Items="@Elements.Where(a => a.Dotype == "LON")" MultiSelection="true" @bind-SelectedItems="selectLON" Hover="@hover"
+        <MudTable Items="@Elements.Where(a => a.Dotype == @_doType1 && a.Material_Code.StartsWith(@_matfilter))" MultiSelection="true" @bind-SelectedItems="selectLON" Hover="@hover"
                   Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncLON)"
                   RowsPerPage="5">
             <ToolBarContent>
@@ -137,7 +138,7 @@ else
             </PagerContent>
         </MudTable>
 
-        <MudTable Items="@Elements.Where(a => a.Dotype == "RES")" MultiSelection="true" @bind-SelectedItems="selectRES" Hover="@hover"
+        <MudTable Items="@Elements.Where(a => a.Dotype == @_doType2 && a.Material_Code.StartsWith(@_matfilter))" MultiSelection="true" @bind-SelectedItems="selectRES" Hover="@hover"
                   Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncRES)"
                   RowsPerPage="5">
             <ToolBarContent>
@@ -175,6 +176,9 @@ else
         public string Mocode { get; set; }
         private bool _dense = false;
         private bool _multiSelect = true;
+        private string _doType1= "LON";
+        private string _doType2 = "RES";
+        private string _matfilter = "02";
 
         TimeSpan? time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
         DateTime? date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day); // 1399-11-26 in Persian calendar

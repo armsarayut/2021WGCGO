@@ -6,7 +6,7 @@ using System.Text;
 using System.Data;
 using System.Threading.Tasks;
 using GoWMS.Server.Models.Wgc;
-using Oracle.ManagedDataAccess.Client;
+using System.Data.OleDb;
 
 namespace GoWMS.Server.Data
 {
@@ -14,33 +14,37 @@ namespace GoWMS.Server.Data
     {
         readonly private string connectionString = ConnGlobals.GetConnErpDBWCG();
 
-
         public async Task<IEnumerable<BOOKING_NOTE_ITEMS>> GetAllApiNewBooking_note()
         {
+            Environment.SetEnvironmentVariable("NLS_LANG",
+                    "AMERICAN_AMERICA.WE8MSWIN1252",
+                    EnvironmentVariableTarget.Process);
 
             List<BOOKING_NOTE_ITEMS> lstobj = new List<BOOKING_NOTE_ITEMS>();
             StringBuilder sql = new StringBuilder();
-            Environment.SetEnvironmentVariable("NLS_LANG", ".UTF8");
-            using (OracleConnection con = new OracleConnection(connectionString))
+
+            using (OleDbConnection con = new OleDbConnection(connectionString))
             {
                 //StringBuilder sql = new StringBuilder();
                 sql.Clear();
                 sql.AppendLine("SELECT * ");
                 sql.AppendLine("FROM WGRB.BOOKING_NOTE_ITEMS");
                 sql.AppendLine("WHERE PALLET_GO is not null");
-                sql.AppendLine("AND STATUS_GO is not null");
+                //sql.AppendLine("AND STATUS_GO is not null");
                 sql.AppendLine("ORDER BY SEQ_NO");
                 
                 try
                 {
-                    OracleCommand cmd = new OracleCommand(sql.ToString(), con)
+                    OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
                     {
                         CommandType = CommandType.Text
                     };
                     //await con.OpenAsync();
                     con.Open();
-                    OracleGlobalization SessionGlob = con.GetSessionInfo();
-                     OracleDataReader rdr = cmd.ExecuteReader();
+
+                    
+
+                    OleDbDataReader rdr = cmd.ExecuteReader();
                     while ( await rdr.ReadAsync())
                     {
                     
@@ -115,19 +119,23 @@ namespace GoWMS.Server.Data
 
         public void UpdateNewBooking_note(string pallet)
         {
-            using OracleConnection con = new OracleConnection(connectionString);
+            Environment.SetEnvironmentVariable("NLS_LANG",
+                    "AMERICAN_AMERICA.WE8MSWIN1252",
+                    EnvironmentVariableTarget.Process);
+
+            using OleDbConnection con = new OleDbConnection(connectionString);
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("Update WGRB.BOOKING_NOTE_ITEMS");
             sql.AppendLine("Set STATUS_GO = :efstatus");
             sql.AppendLine("Where PALLET_GO = :Pallet");
-            sql.AppendLine("And  STATUS_GO = is null");
-            OracleCommand cmd = new OracleCommand(sql.ToString(), con)
+            //sql.AppendLine("And  STATUS_GO = is null");
+            OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
             {
                 CommandType = CommandType.Text
             };
 
-            cmd.Parameters.Add(new OracleParameter("efstatus", "Y"));
-            cmd.Parameters.Add(new OracleParameter("Pallet", pallet));
+            cmd.Parameters.Add(new OleDbParameter("efstatus", "Y"));
+            cmd.Parameters.Add(new OleDbParameter("Pallet", pallet));
 
             con.Open();
             cmd.ExecuteNonQuery();
@@ -136,28 +144,31 @@ namespace GoWMS.Server.Data
 
         public async Task<IEnumerable<DELIVERY_NOTE_ITEMS>> GetAllApiNewDelivery_note()
         {
+            Environment.SetEnvironmentVariable("NLS_LANG",
+                    "AMERICAN_AMERICA.WE8MSWIN1252",
+                    EnvironmentVariableTarget.Process);
+
             List<DELIVERY_NOTE_ITEMS> lstobj = new List<DELIVERY_NOTE_ITEMS>();
             StringBuilder sql = new StringBuilder();
-            Environment.SetEnvironmentVariable("NLS_LANG", ".UTF8");
-            using (OracleConnection con = new OracleConnection(connectionString))
+            using (OleDbConnection con = new OleDbConnection(connectionString))
             {
                 //StringBuilder sql = new StringBuilder();
                 sql.Clear();
                 sql.AppendLine("SELECT * ");
                 sql.AppendLine("FROM WGRB.DELIVERY_NOTE_ITEMS");
                 sql.AppendLine("WHERE PALLET_GO is not null");
-                sql.AppendLine("AND STATUS_GO is not null");
+                //sql.AppendLine("AND STATUS_GO is not null");
                 sql.AppendLine("ORDER BY SEQ_NO");
 
                 try
                 {
-                    OracleCommand cmd = new OracleCommand(sql.ToString(), con)
+                    OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
                     {
                         CommandType = CommandType.Text
                     };
                     //await con.OpenAsync();
                     con.Open();
-                    OracleDataReader rdr = cmd.ExecuteReader();
+                    OleDbDataReader rdr = cmd.ExecuteReader();
                     while (await rdr.ReadAsync())
                     {
 
@@ -290,19 +301,24 @@ namespace GoWMS.Server.Data
 
         public void UpdateNewDelivery_note(string pallet)
         {
-            using OracleConnection con = new OracleConnection(connectionString);
+            Environment.SetEnvironmentVariable("NLS_LANG",
+                    "AMERICAN_AMERICA.WE8MSWIN1252",
+                    EnvironmentVariableTarget.Process);
+
+            using OleDbConnection con = new OleDbConnection(connectionString);
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("Update WGRB.DELIVERY_NOTE_ITEMS");
             sql.AppendLine("Set STATUS_GO = :efstatus");
             sql.AppendLine("Where PALLET_GO = :Pallet");
             sql.AppendLine("And  STATUS_GO = is null");
-            OracleCommand cmd = new OracleCommand(sql.ToString(), con)
+
+            OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
             {
                 CommandType = CommandType.Text
             };
 
-            cmd.Parameters.Add(new OracleParameter("efstatus", "Y"));
-            cmd.Parameters.Add(new OracleParameter("Pallet", pallet));
+            cmd.Parameters.Add(new OleDbParameter("efstatus", "Y"));
+            cmd.Parameters.Add(new OleDbParameter("Pallet", pallet));
 
             con.Open();
             cmd.ExecuteNonQuery();
@@ -310,14 +326,17 @@ namespace GoWMS.Server.Data
         }
 
 
-        public async Task<IEnumerable<CUSTOMERS>> GetAllApiAllCustomer()
+        public async Task<IEnumerable<CUSTOMERS>>GetAllApiAllCustomer()
         {
+            Environment.SetEnvironmentVariable("NLS_LANG",
+                    "AMERICAN_AMERICA.WE8MSWIN1252",
+                    EnvironmentVariableTarget.Process);
+
             List<CUSTOMERS> lstobj = new List<CUSTOMERS>();
             StringBuilder sql = new StringBuilder();
-            //Environment.SetEnvironmentVariable("NLS_LANG", ".UTF8");
-            using (OracleConnection con = new OracleConnection(connectionString))
+
+            using (OleDbConnection con = new OleDbConnection(connectionString))
             {
-             
                 //StringBuilder sql = new StringBuilder();
                 sql.Clear();
                 sql.AppendLine("SELECT * ");
@@ -328,18 +347,18 @@ namespace GoWMS.Server.Data
 
                 try
                 {
-                    OracleCommand cmd = new OracleCommand(sql.ToString(), con)
+                    OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
                     {
                         CommandType = CommandType.Text
                     };
 
-                    await con.OpenAsync();
-                   // con.Open();
-                    OracleDataReader rdr = cmd.ExecuteReader();
+                     con.Open();
+
+
+                    // con.Open();
+                    OleDbDataReader rdr = cmd.ExecuteReader();
                     while (await rdr.ReadAsync())
                     {
-
-
                         CUSTOMERS objrd = new CUSTOMERS
                         {
                             CUSTOMER_CODE = rdr["CUSTOMER_CODE"].ToString(),
@@ -351,7 +370,6 @@ namespace GoWMS.Server.Data
                 }
                 catch (Exception e)
                 {
-
                     throw;
                 }
                 con.Close();
@@ -361,12 +379,14 @@ namespace GoWMS.Server.Data
 
         public async Task<IEnumerable<ITEMS>> GetAllApiAllItem()
         {
+            Environment.SetEnvironmentVariable("NLS_LANG",
+                    "AMERICAN_AMERICA.WE8MSWIN1252",
+                    EnvironmentVariableTarget.Process);
+
             List<ITEMS> lstobj = new List<ITEMS>();
             StringBuilder sql = new StringBuilder();
-            Environment.SetEnvironmentVariable("NLS_LANG", ".UTF8");
-            using (OracleConnection con = new OracleConnection(connectionString))
+            using (OleDbConnection con = new OleDbConnection(connectionString))
             {
-                //StringBuilder sql = new StringBuilder();
                 sql.Clear();
                 sql.AppendLine("SELECT * ");
                 sql.AppendLine("FROM WGRB.ITEMS");
@@ -376,13 +396,13 @@ namespace GoWMS.Server.Data
 
                 try
                 {
-                    OracleCommand cmd = new OracleCommand(sql.ToString(), con)
+                    OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
                     {
                         CommandType = CommandType.Text
                     };
                     //await con.OpenAsync();
                     con.Open();
-                    OracleDataReader rdr = cmd.ExecuteReader();
+                    OleDbDataReader rdr = cmd.ExecuteReader();
                     while (await rdr.ReadAsync())
                     {
 
@@ -410,12 +430,15 @@ namespace GoWMS.Server.Data
 
         public async Task<IEnumerable<PACKETINGS>> GetAllApiAllPackeing()
         {
+            Environment.SetEnvironmentVariable("NLS_LANG",
+                    "AMERICAN_AMERICA.WE8MSWIN1252",
+                    EnvironmentVariableTarget.Process);
+
             List<PACKETINGS> lstobj = new List<PACKETINGS>();
             StringBuilder sql = new StringBuilder();
-            
-            using (OracleConnection con = new OracleConnection(connectionString))
+
+            using (OleDbConnection con = new OleDbConnection(connectionString))
             {
-                //StringBuilder sql = new StringBuilder();
                 sql.Clear();
                 sql.AppendLine("SELECT * ");
                 sql.AppendLine("FROM WGRB.PACKETINGS");
@@ -425,13 +448,13 @@ namespace GoWMS.Server.Data
 
                 try
                 {
-                    OracleCommand cmd = new OracleCommand(sql.ToString(), con)
+                    OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
                     {
                         CommandType = CommandType.Text
                     };
                     //await con.OpenAsync();
                     con.Open();
-                    OracleDataReader rdr = cmd.ExecuteReader();
+                    OleDbDataReader rdr = cmd.ExecuteReader();
                     while (await rdr.ReadAsync())
                     {
 

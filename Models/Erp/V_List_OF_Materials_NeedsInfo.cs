@@ -14,7 +14,7 @@ namespace GoWMS.Server.Models.Erp
         public string Material_Code { get; set; }
         public string Description { get; set; }
         public string Element { get; set; }
-        public double? Quantity { get; set; }
+        public decimal? Quantity { get; set; }
         public string Unit { get; set; }
         public string Job { get; set; }
         public string Job_Code { get; set; }

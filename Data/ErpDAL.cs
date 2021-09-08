@@ -173,7 +173,7 @@ namespace GoWMS.Server.Data
         }
 
 
-        public IEnumerable<V_List_OF_Materials_NeedsInfo> GetAllErpListofNeeds()
+        public async Task<IEnumerable<V_List_OF_Materials_NeedsInfo>> GetAllErpListofNeeds()
         {
             List<V_List_OF_Materials_NeedsInfo> lstobj = new List<V_List_OF_Materials_NeedsInfo>();
             using (SqlConnection con = new SqlConnection(connectionString))
@@ -181,7 +181,7 @@ namespace GoWMS.Server.Data
                 SqlCommand cmd = new SqlCommand("SELECT Customer,Customer_Name" +
                     ",Finished_Product,Finished_Product_Description" +
                     ",Material_Code,Description" +
-                    ",Element,Quantity" +
+                    ",Element,cast(Quantity AS DECIMAL(18,4)) AS Quantity" +
                     ",Unit,Job" +
                     ",Job_Code,MO_Barcode " +
                     "FROM dbo.V_List_OF_Materials_Need", con)
@@ -189,9 +189,14 @@ namespace GoWMS.Server.Data
                     CommandType = CommandType.Text
                 };
 
-                con.Open();
-                SqlDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
+                await con.OpenAsync();
+
+                var rdr = await cmd.ExecuteReaderAsync();
+
+                //SqlDataReader rdr = cmd.ExecuteReader();
+                //Task ReadSQL = await rdr.ReadAsync();
+
+                while (await rdr.ReadAsync())
                 {
                     V_List_OF_Materials_NeedsInfo objrd = new V_List_OF_Materials_NeedsInfo
                     {
@@ -202,7 +207,7 @@ namespace GoWMS.Server.Data
                         Material_Code= rdr["Material_Code"].ToString(),
                         Description= rdr["Description"].ToString(),
                         Element= rdr["Element"].ToString(),
-                        Quantity= rdr["Quantity"] == DBNull.Value ? null : (double?)rdr["Quantity"],
+                        Quantity= rdr["Quantity"] == DBNull.Value ? null : (decimal?)rdr["Quantity"],
                         Unit = rdr["Unit"].ToString(),
                         Job= rdr["Job"].ToString(),
                         Job_Code= rdr["Job_Code"].ToString(),
@@ -210,7 +215,7 @@ namespace GoWMS.Server.Data
                     };
                     lstobj.Add(objrd);
                 }
-                con.Close();
+                await con.CloseAsync();
             }
             return lstobj;
         }

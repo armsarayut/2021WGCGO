@@ -7,7 +7,7 @@ using GoWMS.Server.Models;
 
 namespace GoWMS.Server.Controllers
 {
-    public class CustomerService
+    public class CustomerService 
     {
         readonly CustomerDataAccessLayer objCustomerDAL = new CustomerDataAccessLayer();
 
@@ -34,6 +34,7 @@ namespace GoWMS.Server.Controllers
             List<CustomerInfo> customers = objCustomerDAL.GetCustomerDataName(id).ToList();
             return customers;
         }
+
         public string UpdateCustomer(CustomerInfo objcustomer)
         {
             objCustomerDAL.UpdateCustomer(objcustomer);
