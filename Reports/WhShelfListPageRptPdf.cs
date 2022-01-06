@@ -6,7 +6,6 @@ using System.IO;
 using GoWMS.Server.Models.Inv;
 using GoWMS.Server.Data;
 
-
 namespace GoWMS.Server.Reports
 {
     public class WhShelfListPageRptPdf : PdfPageEvents
@@ -72,27 +71,6 @@ namespace GoWMS.Server.Reports
             cell.Phrase = new Paragraph("", font_headerContent);
             header.AddCell(cell);
             return header;
-        }
-
-        private static PdfPCell ImageCell(string path, float scale, int align)
-        {
-            iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance(path);
-            image.ScalePercent(scale);
-            PdfPCell cell = new PdfPCell(image)
-            {
-                //cell.BorderColor = Color.WHITE;
-                VerticalAlignment = PdfCell.ALIGN_TOP,
-                HorizontalAlignment = align,
-                PaddingBottom = 0f,
-                PaddingTop = 0f,
-                BorderWidthBottom = 1,
-                BorderWidthLeft = 0,
-                BorderWidthTop = 0,
-                BorderWidthRight = 0,
-                FixedHeight = 35
-            };
-
-            return cell;
         }
 
 

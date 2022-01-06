@@ -83,6 +83,12 @@ namespace GoWMS.Server.Controllers
             return "Map Successfully";
         }
 
+        public string SetMappedPalletReturn(string pallet)
+        {
+            objDAL.SetMappPalletReturn(pallet);
+            return "Map Successfully";
+        }
+
         public List<Api_Deliveryorder_Go> GetAllApiDeliveryorder()
         {
             List<Api_Deliveryorder_Go> retlist = objDAL.GetAllDeliveryorderGo().ToList();
@@ -94,6 +100,25 @@ namespace GoWMS.Server.Controllers
             List<Api_Deliveryorder_Go> retlist = objDAL.GetAllDeliveryorderGoByMo(mocode).ToList();
             return retlist;
         }
+
+        public string SetPick(string jsonLon, string jsonRes , DateTime DeliverDate, Int64 idistination, ref  Int32 iret , ref string sret )
+        {
+            objDAL.SetPicking(jsonLon, jsonRes, DeliverDate , idistination, ref iret , ref sret);
+            return sret;
+        }
+
+        public string SetPickWgc(string jsonRes,  ref Int32 iret, ref string sret)
+        {
+            objDAL.SetPickingWgc(jsonRes, ref iret, ref sret);
+            return sret;
+        }
+
+        public string SetPickWgcmanual(string jsonRes, ref Int32 iret, ref string sret)
+        {
+            objDAL.SetPickingWgcmanual(jsonRes, ref iret, ref sret);
+            return sret;
+        }
+
 
 
 

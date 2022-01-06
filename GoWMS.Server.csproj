@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AKSoftware.Localization.MultiLanguages" Version="5.2.0" />
+    <PackageReference Include="AKSoftware.Localization.MultiLanguages.Blazor" Version="1.0.0" />
+    <PackageReference Include="BlazorTable" Version="1.17.0" />
     <PackageReference Include="ClosedXML" Version="0.95.4" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
     <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.7.3" />
@@ -21,7 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
-    <PackageReference Include="MudBlazor" Version="5.0.15" />
+    <PackageReference Include="MudBlazor" Version="5.1.4" />
     <PackageReference Include="MudBlazor.ThemeManager" Version="1.0.3" />
     <PackageReference Include="Npgsql" Version="5.0.7" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
@@ -29,6 +32,7 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="System.Data.OleDb" Version="5.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="Toolbelt.Blazor.I18nText" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +41,6 @@
     <Folder Include="Pages\Services\" />
     <Folder Include="Pages\Setups\" />
     <Folder Include="Pages\Reports\" />
-    <Folder Include="Reports\NewFolder\" />
   </ItemGroup>
 
 </Project>

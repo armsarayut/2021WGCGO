@@ -1,0 +1,185 @@
+﻿@page "/oub-picklist"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
+
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Data
+@using GoWMS.Server.Reports
+@using GoWMS.Server.Models.Oub
+@using GoWMS.Server.Controllers
+
+@inject IJSRuntime JSRuntime
+@inject StoreoutService ObjService
+@inject IStringLocalizer<OubPicklist> L
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+<MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Sap_Storeout,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+
+            <MudButton OnClick="DownloadExcelDocument" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
+                @L["Excel"]
+            </MudButton>
+            <MudButton Class="ml-1" OnClick="DownloadPdfDocument" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
+                @L["PDF"]
+            </MudButton>
+
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>@L["QUEUEDATE"]</MudTh>
+            <MudTh>@L["SONO"]</MudTh>
+            <MudTh>@L["REQUESTDATE"]</MudTh>
+            <MudTh>@L["ITEMCODE"]</MudTh>
+            <MudTh>@L["ITEMNAME"]</MudTh>
+            <MudTh>@L["PALLETGO"]</MudTh>
+            <MudTh>@L["DNSEQ"]</MudTh>
+            <MudTh>@L["QTY"]</MudTh>
+            <MudTh>@L["UNIT"]</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+
+            <MudTd DataLabel="QUEUEDATE">@context.Created</MudTd>
+            <MudTd DataLabel="SONO">@context.Order_No</MudTd>
+            <MudTd DataLabel="REQUESTDATE">@Convert.ToDateTime(context.Delivery_Date).ToShortDateString()</MudTd>
+            <MudTd DataLabel="ITEMCODE">@context.Item_Code</MudTd>
+            <MudTd DataLabel="ITEMNAME">@context.Item_Name</MudTd>
+            <MudTd DataLabel="PALLETGO">@context.Pallet_No</MudTd>
+            <MudTd DataLabel="DNSEQ">@context.Su_No</MudTd>
+            <MudTd DataLabel="QTY">@context.Request_Qty</MudTd>
+            <MudTd DataLabel="UNIT">@context.Unit</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPagecaption { get; set; } = "Queue Picking";
+    private bool _processing = false;
+
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Sap_Storeout selectedItem = null;
+    private HashSet<Sap_Storeout> selectedItems = new HashSet<Sap_Storeout>();
+    private IEnumerable<Sap_Storeout> Elements = new List<Sap_Storeout>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        StoreoutService objCS = new StoreoutService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllSapStoreout());
+    }
+
+    private void setstr(string str)
+    {
+        //if (mPalletcode.Length <= 0)
+        //{
+        //    mPalletcode = str;
+        //    msgAction = "Enter Pack ID";
+        //    elevation = 3;
+        //}
+        //else
+        //{
+        //    if (str == mPalletcode)
+        //    {
+        //        elevation = 2;
+        //        msgAction = "Mapping successfully";
+        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+        //        mPalletcode = "";
+        //    }
+        //    else
+        //    {
+        //        mPackid = str;
+        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+        //    }
+        //}
+
+        //CustomerService objGR = new CustomerService();
+        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Sap_Storeout element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Pallet_No.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Item_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Item_Name} {element.Order_No} {element.Su_No}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            IbpOrderQueueRptExcel excelReport = new IbpOrderQueueRptExcel();
+            List<Sap_Storeout> listExcelReport = new List<Sap_Storeout>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+
+
+            IbpOrderQueueRptPdf pdfReport = new IbpOrderQueueRptPdf();
+            List<Sap_Storeout> listPdfReport = new List<Sap_Storeout>();
+            listPdfReport = Elements.ToList();
+            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+}

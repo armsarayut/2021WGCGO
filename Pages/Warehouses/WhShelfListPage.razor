@@ -1,4 +1,4 @@
-﻿@page "/wh/shelf"
+﻿@page "/wh-shelf"
 @using System
 @using System.IO
 @using System.Linq
@@ -15,6 +15,7 @@
 
 @inject IJSRuntime JSRuntime
 @inject InvService ObjService
+@inject IStringLocalizer<WhShelfListPage> L
 
 @if (Elements == null)
 {
@@ -23,28 +24,28 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPagecaption </MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]  </MudText>
     <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Vrpt_shelf_listInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
         <ToolBarContent>
-            <MudButton OnClick="DownloadExcelDocument" Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
+            <MudButton OnClick="DownloadExcelDocument" Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
+                @L["Excel"] 
             </MudButton>
-            <MudButton OnClick="DownloadPdfDocument" Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
+            <MudButton OnClick="DownloadPdfDocument" Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
+                @L["PDF"]
             </MudButton>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh>Location</MudTh>
-            <MudTh>LANE</MudTh>
-            <MudTh>BANK</MudTh>
-            <MudTh>BAY</MudTh>
-            <MudTh>LEVEL</MudTh>
-            <MudTh>MasterPallet</MudTh>
-            <MudTh>Status</MudTh>
-            <MudTh>LastUpdate</MudTh>
+            <MudTh>@L["Location"] </MudTh>
+            <MudTh>@L["LANE"] </MudTh>
+            <MudTh>@L["BANK"] </MudTh>
+            <MudTh>@L["BAY"] </MudTh>
+            <MudTh>@L["LEVEL"] </MudTh>
+            <MudTh>@L["MasterPallet"] </MudTh>
+            <MudTh>@L["Status"] </MudTh>
+            <MudTh>@L["LastUpdate"] </MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Location">@context.Shelfcode</MudTd>
@@ -162,7 +163,7 @@ else
         try
         {
             WhShelfListPageRptPdf pdfReport = new WhShelfListPageRptPdf();
-           
+
             List<Vrpt_shelf_listInfo> listPdfReport = new List<Vrpt_shelf_listInfo>();
             listPdfReport = Elements.ToList();
             var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";

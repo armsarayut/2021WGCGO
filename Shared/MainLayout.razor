@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
-
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
 
 <MudThemeProvider Theme="_themeManager.Theme" />
 <MudDialogProvider />
@@ -7,45 +8,83 @@
 
 <MudLayout>
     <MudAppBar Elevation="4">
-
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
-            <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Large" />
-            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" />
+          
+        <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Large" />
+        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" />
+          
+            @*<img src="Images/AEI_Logo_2.png" width="100px" />*@
+
+
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.MdAndUp">
             <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.Xs">
-            <MudText Typo="Typo.h6" Class="ml-4">Warehouse Management System</MudText>
+            <MudText Typo="Typo.h6" Class="ml-1">Warehouse Management System</MudText>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-            <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Medium" />
-            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Medium" /> 
-            <MudText Typo="Typo.subtitle1">WMS</MudText>
+       
+        <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Medium" />
+        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Medium" />
+        <MudText Typo="Typo.button" Class="ml-1">WMS</MudText>
+        
+            @*<img src="Images/AEI_Logo_2.png" width="50px" />*@
+
+
         </MudHidden>
         <MudAppBarSpacer />
-        <MudMenu Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
-            <MudMenuItem>English</MudMenuItem>
-            <MudMenuItem>Thai</MudMenuItem>
-        </MudMenu>
+        <ChooseLanguage />
+
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" OnClick="@((e) => DarkMode())" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="_themeManager.DrawerClipMode">
+        <MudDrawerHeader>
+            <div class="d-flex justify-center mb-1">
+                <img src="Images/AEI_Logo_2.png" width="100px" />
+            </div>
+            @*
+        <MudDrawerContainer>
+            <div class="d-flex justify-center mb-1">
+                <img src="Images/AEI_Logo_2.png" width="100px" />
+            </div>
+            <MudText Color="Color.Primary" Align="Align.Center">WE AUTOMATE YOUR INTRALOGISTICS</MudText>
+        </MudDrawerContainer>
+            *@
+
+
+            @*
+        <MudDrawerContainer>
+        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Align="Align.Center">WE AUTOMATE YOUR INTRALOGISTICS</MudText>
+        </MudDrawerContainer>
+            *@
+            @*
+        <MudCardContent>
+        <div class="d-flex justify-center mb-1">
+            <img src="Images/AEI_Logo_2.png" width="100px" />
+        </div>
+        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Align="Align.Center">WE AUTOMATE YOUR INTRALOGISTICS</MudText>
+        </MudCardContent>
+            *@
+        </MudDrawerHeader>
         <NavMenu />
     </MudDrawer>
     <MudMainContent>
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
             <MudToolBar DisableGutters="true">
                 <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
+
+                <MudSpacer />
+                <MudButton Variant="Variant.Text" Link="https://aei-solution.com/" Color="Color.Primary" >AEI Solution</MudButton>
             </MudToolBar>
         </MudHidden>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             @Body
-        </MudContainer>
+        </MudContainer>    
     </MudMainContent>
 </MudLayout>
 
-@code 
+@code
 {
 
     private ThemeManagerTheme _themeManager = new ThemeManagerTheme();
@@ -75,8 +114,12 @@
         _themeManager.DrawerClipMode = DrawerClipMode.Docked;
         _themeManager.FontFamily = "Roboto";
         _themeManager.DefaultBorderRadius = 3;
-       // _themeManager.AppBarElevation = 4;
-       // _themeManager.DrawerElevation = 25;
+        // _themeManager.AppBarElevation = 4;
+        // _themeManager.DrawerElevation = 25;
+
+        cultures = Configuration.GetSection("Cultures")
+       .GetChildren().ToDictionary(x => x.Key, x => x.Value);
+
         StateHasChanged();
     }
 
@@ -101,7 +144,7 @@
         Palette = new Palette()
         {
             Primary = "#1E88E5",
-            AppbarBackground = "#1E88E5",
+            AppbarBackground = "#D32F2F", //AppbarBackground = "#1E88E5",
             Background = Colors.Grey.Lighten5,
             DrawerBackground = "#FFF",
             DrawerText = "rgba(0,0,0, 0.7)",
@@ -244,8 +287,20 @@
     #endregion
 
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem("Main", href: "#"),
-        new BreadcrumbItem("Dashboard", href: "#"),
-    }; 
+{
+        new BreadcrumbItem("Admin", href: "#"),
+        new BreadcrumbItem("Administrator", href: "#"),
+    };
+
+
+    private Dictionary<string, string> cultures;
+
+
+   
+
+
+
+   
+
+
 }

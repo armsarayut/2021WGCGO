@@ -7,18 +7,20 @@ namespace GoWMS.Server.Data
 {
     public static class ConnGlobals
     {
-
         public static string GetConnLocalDB()
         {
             return "server=DESKTOP-NQ62BHU\\MSSQL; database=GoSQL;Trusted_Connection=True;";
         }
 
         #region Local Database
-        private static readonly string NpgServer = "localhost";
-        //private static readonly string NpgServer = "192.188.180.38";
+        //private static readonly string NpgServer = "localhost"; // Develop
+        private static readonly string NpgServer = "192.168.1.141"; // Production
+
+        //private static readonly string NpgDB = "GoDemo_WGC"; // Develop
+        private static readonly string NpgDB = "Gowes"; // Production
+
         private static readonly string NpgPort = "5432";
-        private static readonly string NpgDB = "GoDemo";
-        //private static readonly string NpgDB = "GoPG";
+        
         private static readonly string NpgUser = "postgres";
         private static readonly string NpgPass = "@ei0u2020";
         //private static readonly string NpgPass = "@ei0u";
@@ -60,7 +62,6 @@ namespace GoWMS.Server.Data
         {
             return "Data Source=" + ErpServer + ";Initial Catalog=" + ErpDB + ";Persist Security Info=True;User ID=" + ErpUser + ";Password=" + ErpPass + ";Connect Timeout=" + ErpContime + ";";
             //return "server=DESKTOP-NQ62BHU\\MSSQL; database=GoSQL;Trusted_Connection=True;";
-
         }
         #endregion
 
@@ -81,11 +82,8 @@ namespace GoWMS.Server.Data
         {
             //Using Oracle.ManagedDataAccess.Core without tnsnames.ora
             //return "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=" + oraServer + ")(PORT=" + oraPort + ")))(CONNECT_DATA=(SERVER=DEDICATED)(SID = " + oraDB + ")));User Id=" + oraUser + ";Password=" + oraPass + ";";
-
-            return "Provider = OraOLEDB.Oracle; Data Source = WGRB; User Id = WGRB; Password = WGRB2021LINK; OLEDB.NET = True;";
-
+            return "Provider = OraOLEDB.Oracle; Data Source = " + oraUser +"; User Id = " + oraUser +"; Password = "+ oraPass+"; OLEDB.NET = True;";
         }
         #endregion
-
     }
 }

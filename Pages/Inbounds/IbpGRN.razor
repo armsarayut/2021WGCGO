@@ -1,60 +1,73 @@
-﻿@page "/inb/receiveorders"
+﻿@page "/inb-receiveorders"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models.Api
 @using GoWMS.Server.Models.Inb
+@using Microsoft.Extensions.Localization
+
+@inject IStringLocalizer<IbpGRN> L
+
 
 @inject CustomerService ObjCustomService
+
 
 @if (Elements == null)
 {
     // <p><em>Loading...</em></p>
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary"> Receiving Order </MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Inb_Goodreceipt_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
-        <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
-            </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
-            </MudButton>
-            <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
+<MudText Typo="Typo.h6" Color="Color.Primary"> @L["ReceivingOrder"]  </MudText>
+<MudTable Items="@Elements" 
+          FixedHeader="@fixed_header" 
+          FixedFooter="@fixed_footer" 
+          Height="@(fixed_header || fixed_footer ?"600px":"")" 
+          Dense="@dense" 
+          Hover="@hover" 
+          Bordered="@bordered" 
+          Striped="@striped" 
+          Filter="new Func<Inb_Goodreceipt_Go,bool>(FilterFunc)" 
+          @bind-SelectedItem="selectedItem">
+    <ToolBarContent>
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
+            @L["Excel"]
+        </MudButton>
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
+            @L["PDF"]
+        </MudButton>
+        <MudToolBarSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
 
-        <HeaderContent>
-            <MudTh>ReceivingDate</MudTh>
-            <MudTh>Document</MudTh>
-            <MudTh>PackID</MudTh>
-            <MudTh>Material</MudTh>
-            <MudTh>Description</MudTh>
-            <MudTh>GRQty</MudTh>
-            <MudTh>Unit</MudTh>
-            <MudTh>GRWeight</MudTh>
-            <MudTh>Job</MudTh>
-            <MudTh>JobCode</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="ReceivingDate">@context.Docdate</MudTd>
-            <MudTd DataLabel="Document">@context.Pono</MudTd>
-            <MudTd DataLabel="PackID">@context.Pallettag</MudTd>
-            <MudTd DataLabel="Material">@context.Itemcode</MudTd>
-            <MudTd DataLabel="Description">@context.Itemname</MudTd>
-            <MudTd DataLabel="GRQty">@context.Quantity</MudTd>
-            <MudTd DataLabel="Unit">@context.Unit</MudTd>
-            <MudTd DataLabel="GRWeight">@context.Weight</MudTd>
-            <MudTd DataLabel="Job">@context.Docno</MudTd>
-            <MudTd DataLabel="JobCode">@context.Docnote</MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+    <HeaderContent>
+        <MudTh>@L["DNDate"]</MudTh>
+        <MudTh>@L["DNNo"]</MudTh>
+        <MudTh>@L["ItemCode"]</MudTh>
+        <MudTh>@L["ItemName"]</MudTh>
+        <MudTh>@L["Qty"]</MudTh>
+        <MudTh>@L["Unit"]</MudTh>
+        <MudTh>@L["Weight"]</MudTh>
+        <MudTh>@L["LotNo"]</MudTh>
+        <MudTh>@L["BatchNo"]</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="DNDate">@Convert.ToDateTime(context.Docdate).ToShortDateString()</MudTd>
+        <MudTd DataLabel="DNNo">@context.Pono</MudTd>
+        <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
+        <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
+        <MudTd DataLabel="Qty">@context.Quantity</MudTd>
+        <MudTd DataLabel="Unit">@context.Unit</MudTd>
+        <MudTd DataLabel="Weight">@context.Weight</MudTd>
+        <MudTd DataLabel="LotNo">@context.Docno</MudTd>
+        <MudTd DataLabel="BatchNo">@context.Docnote</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
 
-        </PagerContent>
-    </MudTable>
+    </PagerContent>
+</MudTable>
+
 }
 
 @code {
@@ -75,11 +88,16 @@ else
 
     public int elevation = 0;
 
+
+
+
     protected override async Task OnInitializedAsync()
     {
         InboundService objCS = new InboundService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllInbGoodreceiptGos());
+
+
     }
 
     private void setstr(string str)

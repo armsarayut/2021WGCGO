@@ -226,7 +226,6 @@ namespace GoWMS.Server.Data
                
                 cmd.Parameters.AddWithValue("@pallet", NpgsqlDbType.Varchar, pallet);
 
-
                 NpgsqlDataReader rdr = cmd.ExecuteReader();
                 while (rdr.Read())
                 {
@@ -267,9 +266,10 @@ namespace GoWMS.Server.Data
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("Update wms.api_receivingorders_go");
             sql.AppendLine("Set Lpncode = NULL");
-            sql.AppendLine(", Lpncode = @Pallet");
+            //sql.AppendLine(", Lpncode = @Pallet");
             sql.AppendLine(", efstatus = @efstatus");
             sql.AppendLine("Where package_id = @Pack ");
+            sql.AppendLine("and Lpncode = @Pallet");
             NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
             {
                 CommandType = CommandType.Text
@@ -328,19 +328,13 @@ namespace GoWMS.Server.Data
             using NpgsqlConnection con = new NpgsqlConnection(connectionString);
             try
             {
+
                 StringBuilder sql = new StringBuilder();
-                sql.AppendLine("Delete from wms.api_receivingorders_go Where package_id = @package_idchk ;");
+                //sql.AppendLine("Delete from wms.api_receivingorders_go Where package_id = @package_idchk ;");
                 sql.AppendLine("Insert into wms.api_receivingorders_go");
                 sql.AppendLine("(package_id, roll_id, material_code, material_description, receiving_Date, gr_quantity, unit, gr_quantity_kg, wh_code, warehouse, locationno,  document_number, job, job_code, lpncode, matcategory)");
                 sql.AppendLine("Values");
 
-                //sql.AppendLine("Values(@package_id, @roll_id, @material_code, @material_description, @receiving_date, @gr_quantity, @unit, @gr_quantity_kg, @wh_code, @warehouse, @locationno, @document_number, @job, @job_code, @lpncode, @matcategory) ;");
-                /*
-                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
-                {
-                    CommandType = CommandType.Text
-                };
-                */
                 using var cmd = new NpgsqlCommand(connection: con, cmdText: null);
 
                 var i = 0;
@@ -362,7 +356,6 @@ namespace GoWMS.Server.Data
                     var job = "job" + i.ToString();
                     var job_code = "job_code" + i.ToString();
                     var lpncode = "lpncode" + i.ToString();
-                    var package_idchk = "package_idchk" + i.ToString();
                     var matcategory = "matcategory" + i.ToString();
 
                     sql.Append("(@").Append(package_id)
@@ -371,6 +364,7 @@ namespace GoWMS.Server.Data
                    .Append(", @").Append(material_description)
                    .Append(", @").Append(receiving_date)
                    .Append(", @").Append(gr_quantity)
+                   .Append(", @").Append(unit)
                    .Append(", @").Append(gr_quantity_kg)
                    .Append(", @").Append(wh_code)
                    .Append(", @").Append(warehouse)
@@ -379,7 +373,6 @@ namespace GoWMS.Server.Data
                    .Append(", @").Append(job)
                    .Append(", @").Append(job_code)
                    .Append(", @").Append(lpncode)
-                   .Append(", @").Append(package_idchk)
                    .Append(", @").Append(matcategory)
                    .Append(')');
 
@@ -398,12 +391,11 @@ namespace GoWMS.Server.Data
                     cmd.Parameters.Add(new NpgsqlParameter<string>(job, s.Job));
                     cmd.Parameters.Add(new NpgsqlParameter<string>(job_code, s.Job_Code));
                     cmd.Parameters.Add(new NpgsqlParameter<string>(lpncode, pallet));
-                    cmd.Parameters.Add(new NpgsqlParameter<string>(package_idchk, s.Package_Id));
                     cmd.Parameters.Add(new NpgsqlParameter<string>(matcategory, s.Matcategory));
+                    i++;
+
                 }
                 con.Open();
-                //cmd.Prepare();
-                //cmd.ExecuteNonQuery();
                 cmd.CommandText = sql.ToString();
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -416,8 +408,6 @@ namespace GoWMS.Server.Data
                 con.Close();
             }
         }
-
-
 
         public async Task InsertDeliveryOrder(List<Api_Deliveryorder_Go> listOrder)
         {
@@ -444,7 +434,6 @@ namespace GoWMS.Server.Data
             var i = 0;
             foreach (var s in listOrder)
             {
-
                 if (i != 0) sql.AppendLine(",");
                 var package_id = "package_id" + i.ToString();
                 var roll_id = "roll_id" + i.ToString();
@@ -506,10 +495,7 @@ namespace GoWMS.Server.Data
                 cmd.Parameters.Add(new NpgsqlParameter<string>(finished_product_description, s.Finished_Product_Description));
                 cmd.Parameters.Add(new NpgsqlParameter<string>(mo_barcode, s.Mo_Barcode));
                 cmd.Parameters.Add(new NpgsqlParameter<string>(dotype, s.Dotype));
-
                 i++;
-
-
             }
             con.Open();
             //cmd.Prepare();
@@ -526,9 +512,6 @@ namespace GoWMS.Server.Data
             {
                 con.Close();
             }
-
-
-
         }
 
         public IEnumerable<Api_Reservedmaterials_Go> GetAllApiReservedmaterialGo()
@@ -613,6 +596,41 @@ namespace GoWMS.Server.Data
             }
         }
 
+        public void SetMappPalletReturn(string pallet)
+        {
+            Int32? iRet = 0;
+            string sRet = "Calling";
+            NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            try
+            {
+                con.Open();
+                StringBuilder sql = new StringBuilder();
+                sql.AppendLine("Call wms.poc_inb_returnmappallet(");
+                sql.AppendLine("@spalletno,@retchk,@retmsg)");
+                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                cmd.Parameters.AddWithValue("@spalletno", pallet);
+                cmd.Parameters.AddWithValue("@retchk", iRet);
+                cmd.Parameters.AddWithValue("@retmsg", sRet);
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    iRet = rdr["retchk"] == DBNull.Value ? null : (Int32?)rdr["retchk"];
+                    sRet = rdr["retmsg"].ToString();
+                }
+            }
+            catch (NpgsqlException exp)
+            {
+                //Response.Write(exp.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
 
         public IEnumerable<Api_Deliveryorder_Go> GetAllDeliveryorderGo()
         {
@@ -622,6 +640,7 @@ namespace GoWMS.Server.Data
                 StringBuilder sql = new StringBuilder();
                 sql.AppendLine("select * ");
                 sql.AppendLine("from wms.api_deliveryorder_go");
+                sql.AppendLine("where picked < quantity");
                 sql.AppendLine("order by efidx");
                 NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
                 {
@@ -676,6 +695,7 @@ namespace GoWMS.Server.Data
                 sql.AppendLine("select * ");
                 sql.AppendLine("from wms.api_deliveryorder_go");
                 sql.AppendLine("where mo_barcode = @mo_barcode");
+                sql.AppendLine("and picked < quantity");
                 sql.AppendLine("order by efidx");
                 NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
                 {
@@ -723,6 +743,134 @@ namespace GoWMS.Server.Data
             }
             return lstobj;
         }
+
+        public void SetPicking(string jsonLON , string jsonRES, DateTime DeliverDate, Int64 idistination, ref Int32 Refiret, ref string Refsret)
+        {
+            Int32? iRet = 0;
+            string sRet = "Calling";
+            NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            try
+            {
+                con.Open();
+                StringBuilder sql = new StringBuilder();
+              
+                sql.AppendLine("CALL wms.poc_oub_deliveryorderselect(");
+                sql.AppendLine(":jsonlon, :jsonres, :deliverdate, :idistination, :retchk, :retmsg)");
+                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                cmd.Parameters.AddWithValue("jsonlon",NpgsqlDbType.Json, jsonLON );
+                cmd.Parameters.AddWithValue("jsonres", NpgsqlDbType.Json, jsonRES );
+                cmd.Parameters.AddWithValue("deliverdate", NpgsqlDbType.Timestamp, DeliverDate);
+                cmd.Parameters.AddWithValue("idistination", NpgsqlDbType.Bigint, idistination);
+                cmd.Parameters.AddWithValue("retchk", NpgsqlDbType.Integer, iRet);
+                cmd.Parameters.AddWithValue("retmsg",  NpgsqlDbType.Varchar ,sRet);
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    iRet = rdr["retchk"] == DBNull.Value ? null : (Int32?)rdr["retchk"];
+                    sRet = rdr["retmsg"].ToString();
+                   
+                }
+                Refiret = (int)iRet; 
+                Refsret = sRet;
+
+            }
+            catch (NpgsqlException exp)
+            {
+                //Response.Write(exp.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        public void SetPickingWgc(string jsonRES,ref Int32 Refiret, ref string Refsret)
+        {
+            Int32? iRet = 0;
+            string sRet = "Calling";
+            NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            try
+            {
+                con.Open();
+                StringBuilder sql = new StringBuilder();
+
+                sql.AppendLine("CALL wms.poc_oub_deliveryorderselectwgc(");
+                sql.AppendLine(":jsonbook, :retchk, :retmsg)");
+                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                cmd.Parameters.AddWithValue("jsonbook", NpgsqlDbType.Json, jsonRES);
+                cmd.Parameters.AddWithValue("retchk", NpgsqlDbType.Integer, iRet);
+                cmd.Parameters.AddWithValue("retmsg", NpgsqlDbType.Varchar, sRet);
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    iRet = rdr["retchk"] == DBNull.Value ? null : (Int32?)rdr["retchk"];
+                    sRet = rdr["retmsg"].ToString();
+
+                }
+                Refiret = (int)iRet;
+                Refsret = sRet;
+
+            }
+            catch (NpgsqlException exp)
+            {
+                //Response.Write(exp.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+
+        public void SetPickingWgcmanual(string jsonRES, ref Int32 Refiret, ref string Refsret)
+        {
+            Int32? iRet = 0;
+            string sRet = "Calling";
+            NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            try
+            {
+                con.Open();
+                StringBuilder sql = new StringBuilder();
+
+                sql.AppendLine("CALL wms.poc_oub_deliveryorderselectwgcunplanned(");
+                sql.AppendLine(":jsonbook, :retchk, :retmsg)");
+                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                cmd.Parameters.AddWithValue("jsonbook", NpgsqlDbType.Json, jsonRES);
+                cmd.Parameters.AddWithValue("retchk", NpgsqlDbType.Integer, iRet);
+                cmd.Parameters.AddWithValue("retmsg", NpgsqlDbType.Varchar, sRet);
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    iRet = rdr["retchk"] == DBNull.Value ? null : (Int32?)rdr["retchk"];
+                    sRet = rdr["retmsg"].ToString();
+
+                }
+                Refiret = (int)iRet;
+                Refsret = sRet;
+
+            }
+            catch (NpgsqlException exp)
+            {
+                //Response.Write(exp.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
 
     }
 }

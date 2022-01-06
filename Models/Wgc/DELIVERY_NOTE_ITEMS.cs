@@ -119,5 +119,9 @@ namespace GoWMS.Server.Models.Wgc
 		public string BATCH_NO_CUST { get; set; }
 		public string PALLET_GO { get; set; }
 		public string STATUS_GO { get; set; }
+		public DateTime? UPDATE_DATE_GO{ get; set; }
+		public string CREATED_BY { get; set; }
+		public DateTime? CREATED_DATE { get; set; }
+		public string ITEM_NAME { get; set; }
 	}
 }

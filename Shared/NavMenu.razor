@@ -1,103 +1,105 @@
-﻿<PersonCard Style="background-color: var(--mud-palette-drawer-background);color: var(--mud-palette-drawer-text);"/>
-<MudDivider Class="mb-4" />
+﻿@inject IStringLocalizer<NavMenu> L
+
+@*
+    <PersonCard Style="background-color: var(--mud-palette-drawer-background);color: var(--mud-palette-drawer-text);" />
+*@
+
+<MudDivider Class="mb-1" />
 <MudNavMenu>
     @*<MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Personal</MudText>*@
-    <MudNavLink Href="/personal/dashboard" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+    <MudNavLink Href="/dashboard" Icon="@Icons.Material.Filled.Dashboard">@L["Dashboard"]</MudNavLink>
 
-        <MudNavGroup Title="1.Inbound" Icon="@Icons.Material.Filled.Inbox">
-            <MudNavLink Href="inb/receiveorders" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">Receiving Order</MudNavLink>
-            <MudNavLink Href="inb/palletmap" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">Master Mapping</MudNavLink>
-            <MudNavLink Href="inb/receivingqueue" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">Good Receive</MudNavLink>
-            <MudNavLink Href="inb/wcsqueue" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">Master Queuing</MudNavLink>
-            <MudNavLink Href="inb/storage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">Storage</MudNavLink>
+    <MudNavGroup Title=@L["1.Inbound"] Icon="@Icons.Material.Filled.Inbox">
+        <MudNavLink Href="inb-receiveorders" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">@L["ReceivingOrder"] </MudNavLink>
+        <MudNavLink Href="inb-palletmap" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">@L["MasterMapping"]</MudNavLink>
+        <MudNavLink Href="inb-receivingqueue" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">@L["GoodReceive"]</MudNavLink>
+        <MudNavLink Href="inb-wcsqueue" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">@L["MasterQueuing"]</MudNavLink>
+        <MudNavLink Href="inb-storage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">@L["Storage"]</MudNavLink>
+        <MudNavLink Href="inb-palletreturn" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Input">@L["Return"]</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title=@L["2.Warehouse"] Icon="@Icons.Material.Filled.Store">
+        <MudNavLink Href="wh-stock" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["StockList"]</MudNavLink>
+        <MudNavLink Href="wh-capacity" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["Capacity"]</MudNavLink>
+        <MudNavLink Href="wh-shelf" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["Location"]</MudNavLink>
+        <MudNavLink Href="wh-cyclecount" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["CycleCount"]</MudNavLink>
+        @*
+            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["CountCheck"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["CountSuggesstion"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["HoldStock"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["ReleaseStock"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">@L["Transfer"]</MudNavLink>
+        *@
+    </MudNavGroup>
+
+    <MudNavGroup Title=@L["3.Outbound"] Icon="@Icons.Material.Filled.Outbox">
+        <MudNavLink Href="wgc-bookingnoteselect" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">@L["OrderBooking"]</MudNavLink>
+        <MudNavLink Href="oub-pickbatch" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">@L["OrderPicking"]</MudNavLink>
+        @*<MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Start Wave</MudNavLink>*@
+        <MudNavLink Href="oub-picklist" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">@L["QueuePicking"]</MudNavLink>
+        @*<MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">@L["Picking"]</MudNavLink>*@
+        <MudNavLink Href="oub-unplaned" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">@L["Unplanned"]</MudNavLink>
+        @*<MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Create order</MudNavLink>*@
+    </MudNavGroup>
+
+    <MudNavGroup Title=@L["4.Automation"] Icon="@Icons.Material.Filled.Android">
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Android">@L["SRM"]</MudNavLink>
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Android">@L["Conveyor"]</MudNavLink>
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Android">@L["RGV"]</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title=@L["5.Report"] Icon="@Icons.Material.Filled.Report">
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Report">@L["AuditTrail"]</MudNavLink>
+        <MudNavGroup Title=@L["Inbound"] Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptOrderReceive"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptOrderReceiveSummary"]</MudNavLink>
         </MudNavGroup>
-
-        <MudNavGroup Title="2.Warehouse" Icon="@Icons.Material.Filled.Store">
-            <MudNavLink Href="wh/stock" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">StockList</MudNavLink>
-            <MudNavLink Href="wh/capacity" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Capacity</MudNavLink>
-            <MudNavLink Href="wh/shelf" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Location</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Cycle Count</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Count Check</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Count Suggesstion</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Hold Stock</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Release Stock</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Transfer</MudNavLink>
+        <MudNavGroup Title=@L["Inventory"] Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptInventorylocation"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptInventorysummary"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptInventoryaging"]</MudNavLink>
         </MudNavGroup>
-
-        <MudNavGroup Title="3.Outbound" Icon="@Icons.Material.Filled.Outbox">
-            <MudNavLink Href="oub/listofneed" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">ListofNeed</MudNavLink>
-            <MudNavLink Href="oub/reservedmat" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">ReservedMaterial</MudNavLink>
-            <MudNavLink Href="oub/scanmo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Scan MO</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Create Wave</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Start Wave</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Pickinglist</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Picking</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Outbox">Create order</MudNavLink>
+        <MudNavGroup Title=@L["Outbound"] Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptOrderPicking"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptOrderPickingSummary"]</MudNavLink>
         </MudNavGroup>
-
-        <MudNavGroup Title="4.Automation" Icon="@Icons.Material.Filled.Android">
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Android">SRM</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Android">Conveyor</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Android">RGV</MudNavLink>
+        <MudNavGroup Title=@L["Machine"] Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
+            <MudNavLink Href="" Icon="@Icons.Material.Filled.Report">@L["History"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptErrorSummary"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptInboundCounting"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptOutboundCounting"]</MudNavLink>
+            <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">@L["RptEndofday"]</MudNavLink>
         </MudNavGroup>
+    </MudNavGroup>
 
-        <MudNavGroup Title="5.Report" Icon="@Icons.Material.Filled.Report">
-            <MudNavLink Href="application/tdata" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Report">Audit trail</MudNavLink>
-            <MudNavGroup Title="Inbound" Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Order Receive</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Order Receive Summary</MudNavLink>
-            </MudNavGroup>
-            <MudNavGroup Title="Inventory" Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Inventory location</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Inventory summary</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Inventory aging</MudNavLink>
-            </MudNavGroup>
-            <MudNavGroup Title="Outbound" Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Order picking</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Order picking summary</MudNavLink>
-            </MudNavGroup>
-            <MudNavGroup Title="Machine" Icon="@Icons.Material.Filled.Report" HideExpandIcon="true">
-                <MudNavLink Href="" Icon="@Icons.Material.Filled.Report">History</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Error summary</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Inbound Counting</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">Outbound Counting</MudNavLink>
-                <MudNavLink Href="pages/error/404" Icon="@Icons.Material.Filled.Report">End of day</MudNavLink>
-            </MudNavGroup>
-        </MudNavGroup>
+    <MudNavGroup Title=@L["6.Setup"] Icon="@Icons.Material.Filled.Settings">
+        <MudNavLink Href="mas-item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">@L["SetMaterial"]</MudNavLink>
+        <MudNavLink Href="mas-work" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">@L["SetWorktype"]</MudNavLink>
+        <MudNavLink Href="mas-reason" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">@L["SetReason"]</MudNavLink>
+        <MudNavLink Href="mas-status" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">@L["SetStatus"]</MudNavLink>
+        <MudNavLink Href="mas-pallet" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">@L["SetPallet"]</MudNavLink>
+        <MudNavLink Href="mas-store" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">@L["SetStore"]</MudNavLink>
+    </MudNavGroup>
 
-        <MudNavGroup Title="6.Setup" Icon="@Icons.Material.Filled.Settings">
-            <MudNavLink Href="mas/item" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Material</MudNavLink>
-            <MudNavLink Href="mas/work" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Worktype</MudNavLink>
-            <MudNavLink Href="mas/reason" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Reason</MudNavLink>
-            <MudNavLink Href="mas/status" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Status</MudNavLink>
-            <MudNavLink Href="mas/pallet" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Pallet</MudNavLink>
-            <MudNavLink Href="mas/store" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Settings">Store</MudNavLink>
-        </MudNavGroup>
+    <MudNavGroup Title=@L["7.Admin"] Icon="@Icons.Material.Filled.AdminPanelSettings">
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">@L["AdmPrivileges"]</MudNavLink>
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">@L["AdmUser"]</MudNavLink>
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">@L["AdmGroup"]</MudNavLink>
+    </MudNavGroup>
 
-        <MudNavGroup Title="7.Admin" Icon="@Icons.Material.Filled.AdminPanelSettings">
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">Privileges</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">User</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AdminPanelSettings">Group</MudNavLink>
-        </MudNavGroup>
+    <MudNavGroup Title=@L["8.Help"] Icon="@Icons.Material.Filled.MiscellaneousServices">
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">@L["HlpUserguide"]</MudNavLink>
+        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">@L["HlpHelpdesk"]</MudNavLink>
+    </MudNavGroup>
 
-        <MudNavGroup Title="8.Help" Icon="@Icons.Material.Filled.MiscellaneousServices">
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">User'guide</MudNavLink>
-            <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">Helpdesk</MudNavLink>
-        </MudNavGroup>
-
-        <MudNavGroup Title="9.ERP" Icon="@Icons.Material.Filled.MiscellaneousServices">
-            <MudNavLink Href="erp/material" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">Materials</MudNavLink>
-            <MudNavLink Href="erp/receiveorder" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">Receiving Orders</MudNavLink>
-            <MudNavLink Href="erp/cylinder" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">Cylinders</MudNavLink>
-            <MudNavLink Href="erp/listofneed" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">ListofNeed</MudNavLink>
-            <MudNavLink Href="erp/reservedmat" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.MiscellaneousServices">Reserved Materials</MudNavLink>
-            <MudNavLink Href="wgc/bookingnote" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">BookingNote</MudNavLink>
-            <MudNavLink Href="wgc/deliverynote" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">DeliveryNote</MudNavLink>
-            <MudNavLink Href="wgc/items" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">Items</MudNavLink>
-            <MudNavLink Href="wgc/customers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">Customers</MudNavLink>
-            <MudNavLink Href="wgc/packeing" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">Packeing</MudNavLink>
-
-        </MudNavGroup>
+    <MudNavGroup Title=@L["9.ERP"] Icon="@Icons.Material.Filled.MiscellaneousServices">
+        <MudNavLink Href="wgc-bookingnote" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">@L["ErpBookingNote"]</MudNavLink>
+        <MudNavLink Href="wgc-deliverynote" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">@L["ErpDeliveryNote"]</MudNavLink>
+        <MudNavLink Href="wgc-items" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">@L["ErpItems"]</MudNavLink>
+        <MudNavLink Href="wgc-customers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">@L["ErpCustomers"]</MudNavLink>
+        <MudNavLink Href="wgc-packeing" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">@L["ErpPackeing"]</MudNavLink>
+        <MudNavLink Href="wgc-bookingnoteselect" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountCircle">@L["ErpBookingOrder"]</MudNavLink>
+    </MudNavGroup>
 
     @*
         <MudNavGroup Title="Personal">
@@ -139,6 +141,4 @@
 
 </MudNavMenu>
 
-@code {
-    string AlertAssignmentIcon { get; set; } = "<path d=\"M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H9.18C9.6,1.84 10.7,1 12,1C13.3,1 14.4,1.84 14.82,3H19M12,3A1,1 0 0,0 11,4A1,1 0 0,0 12,5A1,1 0 0,0 13,4A1,1 0 0,0 12,3M7,7V5H5V19H19V5H17V7H7M11,9H13V13.5H11V9M11,15H13V17H11V15Z\" />";
-} 
+@code { string AlertAssignmentIcon { get; set; } = "<path d=\"M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H9.18C9.6,1.84 10.7,1 12,1C13.3,1 14.4,1.84 14.82,3H19M12,3A1,1 0 0,0 11,4A1,1 0 0,0 12,5A1,1 0 0,0 13,4A1,1 0 0,0 12,3M7,7V5H5V19H19V5H17V7H7M11,9H13V13.5H11V9M11,15H13V17H11V15Z\" />"; } 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,6 +30,7 @@ namespace GoWMS.Server.Models.Inb
 		public Decimal? Totalweight { get; set; }
 		public string Docno { get; set; }
 		public string Docby { get; set; }
+		[DataType(DataType.Date)]
 		public DateTime? Docdate { get; set; }
 		public string Docnote { get; set; }
 		public string Grntype { get; set; }

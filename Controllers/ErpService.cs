@@ -38,7 +38,6 @@ namespace GoWMS.Server.Controllers
             return ListRet;
         }
 
-
         public List<V_Reserved_MaterialsInfo> GetAllErpReservedMaterials()
         {
             List<V_Reserved_MaterialsInfo> ListRet = objDAL.GetAllErpReservedMaterials().ToList();

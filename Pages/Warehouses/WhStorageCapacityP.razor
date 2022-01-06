@@ -1,9 +1,11 @@
-﻿@page "/wh/capacity"
+﻿@page "/wh-capacity"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using Microsoft.EntityFrameworkCore
 @inject WhService ObjService
+@inject IStringLocalizer<WhStorageCapacityP> L
+
 
 @if (Elements == null)
 {
@@ -12,28 +14,28 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"] </MudText>
     <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<WhStorageCapacity,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
+                @L["Excel"]
             </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
+                @L["PDF"]
             </MudButton>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Rn)">No</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<WhStorageCapacity, object>(x=>x.Srmname)">Lane</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locavlt1)">Occupied</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locemp)">Mass</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Perr)">Block/Error</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Prohloc)">Prohibited Location</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Total)">Total</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.OccRate)">Occupancy Rate</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Rn)">@L["No"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<WhStorageCapacity, object>(x=>x.Srmname)">@L["Lane"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locavlt1)">@L["Occupied"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locemp)">@L["Mass"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Perr)">@L["Block/Error"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Prohloc)">@L["ProhibitedLocation"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Total)">@L["Total"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.OccRate)">@L["OccupancyRate"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="No">@context.Rn</MudTd>
@@ -43,7 +45,7 @@ else
             <MudTd DataLabel="Block/Error">@context.Perr</MudTd>
             <MudTd DataLabel="Prohibited Location">@context.Prohloc</MudTd>
             <MudTd DataLabel="Total">@context.Total</MudTd>
-            <MudTd DataLabel="Occupancy Rate">@context.OccRate</MudTd> 
+            <MudTd DataLabel="Occupancy Rate">@context.OccRate</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -53,11 +55,11 @@ else
 
 @code {
 
-   
+
 
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
 
-    private readonly string pageheader = "Warehouse >> Capacity";
+    private readonly string pageheader = "Capacity";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";

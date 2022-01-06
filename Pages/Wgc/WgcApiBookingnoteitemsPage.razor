@@ -1,4 +1,4 @@
-﻿@page "/wgc/bookingnote"
+﻿@page "/wgc-bookingnote"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -28,22 +28,44 @@ else
 
         <HeaderContent>
             <MudTh>SEQ_NO</MudTh>
+            <MudTh>BK_NO</MudTh>
             <MudTh>DN_NO</MudTh>
+            <MudTh>DN_SEQ</MudTh>
             <MudTh>ITEM_CODE</MudTh>
+            <MudTh>ITEM_NAME</MudTh>
             <MudTh>DN_QTY</MudTh>
             <MudTh>DN_UM</MudTh>
+            <MudTh>CUSTOMER_CODE</MudTh>
+            <MudTh>PACKETING_CODE</MudTh>
+            <MudTh>CUSTOMER_ITEM</MudTh>
+            <MudTh>SUBCUSTOMER_CODE</MudTh>
+            <MudTh>BOOKING_MODEL</MudTh>
+            <MudTh>REQUEST_DATE</MudTh>
             <MudTh>PALLET_GO</MudTh>
             <MudTh>STATUS_GO</MudTh>
+            <MudTh>CREATED_DATE</MudTh>
+            <MudTh>UPDATE_DATE</MudTh>
         </HeaderContent>
         <RowTemplate>
 
-            <MudTd DataLabel="Material">@context.SEQ_NO</MudTd>
-            <MudTd DataLabel="Description">@context.DN_NO</MudTd>
-            <MudTd DataLabel="Customer">@context.ITEM_CODE</MudTd>
-            <MudTd DataLabel="CustomerDescription">@context.DN_QTY</MudTd>
-            <MudTd DataLabel="CustomerReference">@context.DN_UM</MudTd>
-            <MudTd DataLabel="Color1">@context.PALLET_GO</MudTd>
-            <MudTd DataLabel="Cylinder1">@context.STATUS_GO</MudTd>
+            <MudTd DataLabel="SEQ_NO">@context.SEQ_NO</MudTd>
+            <MudTd DataLabel="BK_NO">@context.BK_NO</MudTd>
+            <MudTd DataLabel="DN_NO">@context.DN_NO</MudTd>
+            <MudTd DataLabel="DN_SEQ">@context.DN_SEQ</MudTd>
+            <MudTd DataLabel="ITEM_CODE">@context.ITEM_CODE</MudTd>
+            <MudTd DataLabel="ITEM_NAME">@context.ITEM_NAME</MudTd>
+            <MudTd DataLabel="DN_QTY">@context.DN_QTY</MudTd>
+            <MudTd DataLabel="DN_UM">@context.DN_UM</MudTd>
+            <MudTd DataLabel="CUSTOMER_CODE">@context.CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel="PACKETING_CODE">@context.PACKETING_CODE</MudTd>
+            <MudTd DataLabel="CUST_ITEM_CODE">@context.CUST_ITEM_CODE</MudTd>
+            <MudTd DataLabel="SUB_CUSTOMER_CODE">@context.SUB_CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel="BOOKING_MODEL_NO">@context.BOOKING_MODEL_NO</MudTd>
+            <MudTd DataLabel="REQUEST_DATE">@context.REQUEST_DATE</MudTd>
+            <MudTd DataLabel="PALLET_GO">@context.PALLET_GO</MudTd>
+            <MudTd DataLabel="STATUS_GO">@context.STATUS_GO</MudTd>
+            <MudTd DataLabel="CREATED_DATE">@context.CREATED_DATE</MudTd>
+            <MudTd DataLabel="UPDATE_DATE_GO">@context.UPDATE_DATE_GO</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />

@@ -16,9 +16,9 @@ namespace GoWMS.Server.Data
     public class InvDAL
     {
         readonly private string connectionString = ConnGlobals.GetConnLocalDBPG();
-
-        public IEnumerable<InvStockList> GetStockList()
+        public async Task<IEnumerable<InvStockList>> GetStockList()
         {
+    
             List<InvStockList> lstobj = new List<InvStockList>();
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
             {
@@ -45,7 +45,7 @@ namespace GoWMS.Server.Data
 
                 con.Open();
                 NpgsqlDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
+                while (await rdr.ReadAsync())
                 {
                     InvStockList objrd = new InvStockList
                     {
@@ -57,6 +57,85 @@ namespace GoWMS.Server.Data
                         Palletcode = rdr["pallteno"].ToString(),
                         Shelfname = rdr["storagebin"].ToString(),
                         StorageArae = rdr["storagearea"].ToString()
+                    };
+                    lstobj.Add(objrd);
+                }
+                con.Close();
+            }
+            return lstobj;
+        }
+
+        public async Task<IEnumerable<Inv_Stock_GoInfo>> GetStockListInfo()
+        {
+
+            List<Inv_Stock_GoInfo> lstobj = new List<Inv_Stock_GoInfo>();
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                StringBuilder Sql = new StringBuilder();
+                /*
+                Sql.AppendLine("select row_number() over(order by  itemcode asc) AS rn,");
+                Sql.AppendLine("itemcode, itemname, quantity, pallettag, pallteno, storagearea, storagebin");
+                Sql.AppendLine("from wms.inv_stock_go ");
+                Sql.AppendLine("order by itemcode, ");
+                */
+                Sql.AppendLine("SELECT efidx, efstatus, created, modified, innovator, device");
+                Sql.AppendLine(", pono, pallettag, itemtag, itemcode, itemname, itembar, unit");
+                Sql.AppendLine(", weightunit, quantity, weight, lotno, totalquantity, totalweight");
+                Sql.AppendLine(", docno, docby, docdate, docnote, grnrefer, grntime, grtime");
+                Sql.AppendLine(", grtype, pallteno, palltmapkey, storagetime, storageno");
+                Sql.AppendLine(", storagearea, storagebin, gnrefer, allocatequantity, allocateweight");
+                Sql.AppendLine("FROM wms.inv_stock_go");
+                Sql.AppendLine("WHERE allocatequantity < quantity");
+                Sql.AppendLine("order by itemcode ASC, docdate ASC, pallettag ASC");
+
+
+                NpgsqlCommand cmd = new NpgsqlCommand(Sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                con.Open();
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (await rdr.ReadAsync())
+                {
+                    Inv_Stock_GoInfo objrd = new Inv_Stock_GoInfo
+                    {
+                        Efidx = rdr["efidx"] == DBNull.Value ? null : (Int64?)rdr["efidx"],
+                        Efstatus = rdr["efstatus"] == DBNull.Value ? null : (Int32?)rdr["efstatus"],
+                        Created = rdr["created"] == DBNull.Value ? null : (DateTime?)rdr["created"],
+                        Modified = rdr["modified"] == DBNull.Value ? null : (DateTime?)rdr["modified"],
+                        Innovator = rdr["innovator"] == DBNull.Value ? null : (Int64?)rdr["innovator"],
+                        Device = rdr["device"].ToString(),
+                        Pono = rdr["pono"].ToString(),
+                        Pallettag = rdr["pallettag"].ToString(),
+                        Itemtag = rdr["itemtag"].ToString(),
+                        Itemcode = rdr["itemcode"].ToString(),
+                        Itemname = rdr["itemname"].ToString(),
+                        Itembar = rdr["itembar"].ToString(),
+                        Unit = rdr["unit"].ToString(),
+                        Weightunit = rdr["weightunit"].ToString(),
+                        Quantity = rdr["quantity"] == DBNull.Value ? null : (decimal?)rdr["quantity"],
+                        Weight = rdr["weight"] == DBNull.Value ? null : (decimal?)rdr["weight"],
+                        Lotno = rdr["lotno"].ToString(),
+                        Totalquantity = rdr["totalquantity"] == DBNull.Value ? null : (decimal?)rdr["totalquantity"],
+                        Totalweight = rdr["totalweight"] == DBNull.Value ? null : (decimal?)rdr["totalweight"],
+                        Docno = rdr["docno"].ToString(),
+                        Docby = rdr["docby"].ToString(),
+                        Docdate = rdr["docdate"] == DBNull.Value ? null : (DateTime?)rdr["docdate"],
+                        Docnote = rdr["docnote"].ToString(),
+                        Grnrefer = rdr["grnrefer"] == DBNull.Value ? null : (Int64?)rdr["grnrefer"],
+                        Grntime = rdr["grntime"] == DBNull.Value ? null : (DateTime?)rdr["grntime"],
+                        Grtime = rdr["grtime"] == DBNull.Value ? null : (DateTime?)rdr["grtime"],
+                        Grtype = rdr["grtype"].ToString(),
+                        Pallteno = rdr["pallteno"].ToString(),
+                        Palltmapkey = rdr["palltmapkey"].ToString(),
+                        Storagetime = rdr["storagetime"] == DBNull.Value ? null : (DateTime?)rdr["storagetime"],
+                        Storageno = rdr["storageno"].ToString(),
+                        Storagearea = rdr["storagearea"].ToString(),
+                        Storagebin = rdr["storagebin"].ToString(),
+                        Gnrefer = rdr["gnrefer"] == DBNull.Value ? null : (Int64?)rdr["gnrefer"],
+                        Allocatequantity = rdr["allocatequantity"] == DBNull.Value ? null : (decimal?)rdr["allocatequantity"],
+                        Allocateweight = rdr["allocateweight"] == DBNull.Value ? null : (decimal?)rdr["allocateweight"]
                     };
                     lstobj.Add(objrd);
                 }

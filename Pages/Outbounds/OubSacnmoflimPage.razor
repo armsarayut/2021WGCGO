@@ -1,5 +1,5 @@
-﻿@page "/oub/moflim"
-@page "/oub/moflim/{mocode}"
+﻿@page "/oub-moflim"
+@page "/oub-moflim/{mocode}"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -73,8 +73,6 @@ else
     @*for debug
         <MudText Inline="true">Selected items: @(selectLON==null ? "" : string.Join(", ", selectLON.OrderBy(x=>x.Efidx).Select(x=>x.Efidx)))</MudText>
         end debug*@
-    --x => x.myTextColumn.StartWith('abc')
-
     <MudTable Items="@Elements.Where(a => a.Dotype == @_doType2 && a.Material_Code.StartsWith(@_matfilter))" MultiSelection="true" @bind-SelectedItems="selectRES" Hover="@hover"
               Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncRES)"
               RowsPerPage="5">

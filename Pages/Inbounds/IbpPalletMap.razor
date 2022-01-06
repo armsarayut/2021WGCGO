@@ -1,44 +1,65 @@
-﻿@page "/inb/palletmap"
+﻿@page "/inb-palletmap"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Api
 @using GoWMS.Server.Models.Mas
+@using GoWMS.Server.Models.Wgc
+
 
 @inject ErpService ObjErpService
 @inject ErpApiService ObjErpApiService
 @inject MasService ObjMasService
+@inject WgcService ObjWgcService
+@inject IStringLocalizer<IbpPalletMap> L
 
-<MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
+<MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
 
 <MudGrid>
-
-    <MudItem xs="12" >
-        @if (elevation == 0) //Defult
+    <MudItem xs="12">
+        @if (@elevation == 0) //Defult
         {
             <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
-        else @if (elevation == 1) //Info
+        else if (@elevation == 1) //Info
         {
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
-        else if (elevation == 2) //Success
+        else if (@elevation == 2) //Success
         {
             <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
-        else if (elevation == 3) // Warning
+        else if (@elevation == 3) // Warning
         {
             <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
-        else if (elevation == 4) // Error
+        else if (@elevation == 4) // Error
         {
             <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
-            </MudItem>
-    <MudItem xs="12" >
-        <MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
     </MudItem>
+
+    <MudItem xs="12">
+        <div class="form-group">
+            <input style="width: 100%; height: 40px" type="text" class="form-control" @bind-value="@stringput" @onkeyup="@KeyUp" placeholder="Input scan" />
+        </div>
+
+
+        @*<input type="text" @bind="@StringKeyPressed" @onkeydown="KeyboardEventHandler " @onkeypress=" KeyboardEventHandler " @onkeyup="KeyboardEventHandler " />
+            <MudTextFieldString @bind-Text="@StringKeyPressed" @onkeyup="KeyboardEventHandler"> </MudTextFieldString>
+            <MudTextField Value="@StringKeyPressed" @onkeyup="KeyboardEventHandler" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
+            <MudTextField
+                @bind-Value="@StringKeyPressed" @onchange="" @onkeyup="KeyboardEventHandler" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary">
+            </MudTextField>*@
+    </MudItem>
+
 </MudGrid>
+
+<br />
+
+
+
+
 @*<MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-4">Master Pallet : [ @mPalletcode ]</MudText>
     <MudSkeleton Animation="Animation.False" />*@
 @*<MudText Typo="Typo.h6" Color="Color.Info" Class="mb-4">PackID : [ @mPackid ]</MudText>*@
@@ -49,20 +70,27 @@
 }
 else
 {
-    <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Api_Receivingorders_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+
+    <MudTable Items="@Elements" 
+              Dense="@dense" 
+              Hover="@hover" 
+              Bordered="@bordered" 
+              Striped="@striped" 
+              Filter="new Func<Api_Receivingorders_Go,bool>(FilterFunc)" 
+              @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Master Pallet : [ @mPalletcode ]</MudText>
+            <MudText Typo="Typo.h6">@L["MasterPallet"] : [ @mPalletcode ]</MudText>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>MasterPallet</MudTh>
-            <MudTh>PackID</MudTh>
-            <MudTh>Material</MudTh>
-            <MudTh>Description</MudTh>
-            <MudTh>Qty</MudTh>
-            <MudTh>Unit</MudTh>
-            <MudTh>Action</MudTh>
+            <MudTh>@L["PalletGo"]</MudTh>
+            <MudTh>@L["SeqNo"]</MudTh>
+            <MudTh>@L["ItemCode"]</MudTh>
+            <MudTh>@L["ItemName"]</MudTh>
+            <MudTh>@L["Qty"]</MudTh>
+            <MudTh>@L["Unit"]</MudTh>
+            <MudTh>@L["Action"]</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="MasterPallet">@context.Lpncode</MudTd>
@@ -86,7 +114,7 @@ else
     private string msgAction = "Enter MasterPallet";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
-    private string palletcode { get; set; }
+    public string stringput { get; set; } = "";
     private bool dense = true;
     private bool hover = true;
     private bool striped = true;
@@ -101,6 +129,23 @@ else
     private IEnumerable<Mas_Pallet_Go> MasterPallets = new List<Mas_Pallet_Go>();
 
     public int elevation = 0;
+
+    public string StringKeyPressed = "AAA";
+
+    string KeyPressed = "";
+    string EventInfo = "";
+
+    private void KeyboardEventHandler(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            //KeyPressed = "";
+            //EventInfo = "";
+            StringKeyPressed = "";
+            KeyPressed = "Key Pressed is " + args.Key;
+            EventInfo = "Event Type " + args.Type;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,15 +163,33 @@ else
 
             if (allCorrect.ToList().Count > 0)
             {
+
                 mPalletcode = str;
-                msgAction = "Enter PackID";
-                elevation = 1;
+
+                MapPalletItem = null;
+                MapPalletItem = ObjWgcService.GetMapPalletApiNewDelivery_note(mPalletcode);
+                if (MapPalletItem.ToList().Count > 0)
+                {
+                    Task<string> retString;
+
+                    retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), mPalletcode);
+
+                    //ObjErpApiService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+                    msgAction = "Enter PalletGo for complete";
+                    elevation = 1;
+                }
+                else
+                {
+                    mPalletcode = "";
+                    msgAction = "Enter PalletGo";
+                    elevation = 1;
+                }
             }
             else
             {
                 mPalletcode = "";
                 elevation = 4;
-                msgAction = "Masterpallet find not found";
+                msgAction = "PalletGo find not found";
             }
         }
         else
@@ -139,12 +202,15 @@ else
                     msgAction = "Mapping successfully";
                     //ObjErpApiService.UpdateReceivingOrderbypallet(mPalletcode);
                     ObjErpApiService.SetMappedPallet(mPalletcode);
+
+                    ObjWgcService.UpdatePalletNewDelivery_note(mPalletcode);
+
                     mPalletcode = "";
                 }
                 else
                 {
                     elevation = 3;
-                    msgAction = "Please enter PackID";
+                    msgAction = "Please enter PalletGo";
                 }
             }
             else
@@ -152,27 +218,24 @@ else
                 mPackid = str;
                 MapPalletItem = null;
                 MapPalletItem = ObjErpService.GetErpMatReceivingOrdersByTag(mPackid);
-                if (MapPalletItem.ToList().Count>0)
+                if (MapPalletItem.ToList().Count > 0)
                 {
-                    ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), mPalletcode);
+                    Task<string> retString;
+
+                    retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), mPalletcode);
 
                     //ObjErpApiService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
-                    msgAction = "Enter PackID or Pallet code for complete";
+                    msgAction = "Enter PalletGo for complete";
                     elevation = 1;
                 }
                 else
                 {
 
                 }
-
-
-
             }
         }
-
         ErpApiService objGR = new ErpApiService();
         Elements = objGR.GetAllApiRecevingorderGosypallet(mPalletcode);
-
     }
 
     private string stxtInput { get; set; }
@@ -182,9 +245,24 @@ else
         if (eventArgs.Key == "Enter")        // fire on enter
         {
             //Console.WriteLine("Done the thing: " + MyValue);
-            //stxtInput = MyValue;
-            setstr(palletcode);
-            palletcode = "";
+            //stxtInput = MyValue
+            string pallettemp = stringput;
+
+            setstr(pallettemp);
+
+            //Reset();
+        }
+    }
+
+    void KeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+
+            string pallettemp = stringput;
+
+            setstr(pallettemp);
+            Reset();
         }
     }
 
@@ -210,6 +288,12 @@ else
         ErpApiService objGR = new ErpApiService();
         Elements = objGR.GetAllApiRecevingorderGosypallet(mPalletcode);
 
+    }
+
+    private void Reset()
+    {
+        this.stringput = string.Empty;
+        StateHasChanged();
     }
 
 }

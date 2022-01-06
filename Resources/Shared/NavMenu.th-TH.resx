@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="1.Inbound" xml:space="preserve">
+    <value>1.ขาเข้า</value>
+  </data>
+  <data name="2.Warehouse" xml:space="preserve">
+    <value>2.คลังสินค้า</value>
+  </data>
+  <data name="3.Outbound" xml:space="preserve">
+    <value>3.ขาออก</value>
+  </data>
+  <data name="4.Automation" xml:space="preserve">
+    <value>4.ระบบอัตโนมัติ</value>
+  </data>
+  <data name="5.Report" xml:space="preserve">
+    <value>5.รายงาน</value>
+  </data>
+  <data name="6.Setup" xml:space="preserve">
+    <value>6.ตั้งค่า</value>
+  </data>
+  <data name="7.Admin" xml:space="preserve">
+    <value>7.ผู้ดูแลระบบ</value>
+  </data>
+  <data name="8.Help" xml:space="preserve">
+    <value>8.ช่วยเหลือ</value>
+  </data>
+  <data name="9.ERP" xml:space="preserve">
+    <value>9.ระบบERP</value>
+  </data>
+  <data name="AdmGroup" xml:space="preserve">
+    <value>กลุ่มผู้ใช้</value>
+  </data>
+  <data name="AdmPrivileges" xml:space="preserve">
+    <value>สิทธิพิเศษ</value>
+  </data>
+  <data name="AdmUser" xml:space="preserve">
+    <value>ผู้ใช้</value>
+  </data>
+  <data name="AuditTrail" xml:space="preserve">
+    <value>แนวทางการตรวจสอบ</value>
+  </data>
+  <data name="Capacity" xml:space="preserve">
+    <value>ความจุคลัง</value>
+  </data>
+  <data name="Conveyor" xml:space="preserve">
+    <value>สายพาน</value>
+  </data>
+  <data name="CountCheck" xml:space="preserve">
+    <value>ตรวจนับ</value>
+  </data>
+  <data name="CountSuggesstion" xml:space="preserve">
+    <value>แนะนำการนับ</value>
+  </data>
+  <data name="CycleCount" xml:space="preserve">
+    <value>รอบการนับ</value>
+  </data>
+  <data name="Dashboard" xml:space="preserve">
+    <value>แผงควบคุม</value>
+  </data>
+  <data name="ErpBookingNote" xml:space="preserve">
+    <value>บันทึกการจอง</value>
+  </data>
+  <data name="ErpBookingOrder" xml:space="preserve">
+    <value>การจองคำสั่งซื้อ</value>
+  </data>
+  <data name="ErpCustomers" xml:space="preserve">
+    <value>ลูกค้า</value>
+  </data>
+  <data name="ErpDeliveryNote" xml:space="preserve">
+    <value>บันทึกการส่งมอบ</value>
+  </data>
+  <data name="ErpItems" xml:space="preserve">
+    <value>สินค้า</value>
+  </data>
+  <data name="ErpPackeing" xml:space="preserve">
+    <value>การบรรจุ</value>
+  </data>
+  <data name="GoodReceive" xml:space="preserve">
+    <value>การรับ</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>ประวัติ</value>
+  </data>
+  <data name="HlpHelpdesk" xml:space="preserve">
+    <value>ฝ่ายช่วยเหลือ</value>
+  </data>
+  <data name="HlpUserguide" xml:space="preserve">
+    <value>คู่มือ</value>
+  </data>
+  <data name="HoldStock" xml:space="preserve">
+    <value>กักสินค้า</value>
+  </data>
+  <data name="Inbound" xml:space="preserve">
+    <value>ขาเข้า</value>
+  </data>
+  <data name="Inventory" xml:space="preserve">
+    <value>คงคลัง</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>พื้นที่จัดเก็บ</value>
+  </data>
+  <data name="Machine" xml:space="preserve">
+    <value>เครื่องจักร</value>
+  </data>
+  <data name="MasterMapping" xml:space="preserve">
+    <value>การทำแพลน</value>
+  </data>
+  <data name="MasterQueuing" xml:space="preserve">
+    <value>มาสเตอร์คิว</value>
+  </data>
+  <data name="OrderBooking" xml:space="preserve">
+    <value>รายการจองสินค้า</value>
+  </data>
+  <data name="OrderPicking" xml:space="preserve">
+    <value>การเลือกคำสั่งหยิบ</value>
+  </data>
+  <data name="Outbound" xml:space="preserve">
+    <value>ขาออก</value>
+  </data>
+  <data name="Picking" xml:space="preserve">
+    <value>หยิบ</value>
+  </data>
+  <data name="QueuePicking" xml:space="preserve">
+    <value>การเลือกคิว</value>
+  </data>
+  <data name="ReceivingOrder" xml:space="preserve">
+    <value>รับออเดอร์</value>
+  </data>
+  <data name="ReleaseStock" xml:space="preserve">
+    <value>ปล่อยสินค้า</value>
+  </data>
+  <data name="Return" xml:space="preserve">
+    <value>คืน</value>
+  </data>
+  <data name="RGV" xml:space="preserve">
+    <value>รถขนส่ง</value>
+  </data>
+  <data name="RptEndofday" xml:space="preserve">
+    <value>สรุปสินวัน</value>
+  </data>
+  <data name="RptErrorSummary" xml:space="preserve">
+    <value>สรุปปัญหา</value>
+  </data>
+  <data name="RptInboundCounting" xml:space="preserve">
+    <value>จำนวนขาเข้า</value>
+  </data>
+  <data name="RptInventoryaging" xml:space="preserve">
+    <value>อายุคงคลัง</value>
+  </data>
+  <data name="RptInventorylocation" xml:space="preserve">
+    <value>พื้นที่คงคลัง</value>
+  </data>
+  <data name="RptInventorysummary" xml:space="preserve">
+    <value>สรุปคงคลัง</value>
+  </data>
+  <data name="RptOrderPicking" xml:space="preserve">
+    <value>รายการหยิบ</value>
+  </data>
+  <data name="RptOrderPickingSummary" xml:space="preserve">
+    <value>สรุปการหยิย</value>
+  </data>
+  <data name="RptOrderReceive" xml:space="preserve">
+    <value>รายการรับ</value>
+  </data>
+  <data name="RptOrderReceiveSummary" xml:space="preserve">
+    <value>สรุปการรับ</value>
+  </data>
+  <data name="RptOutboundCounting" xml:space="preserve">
+    <value>จำนวนขาออก</value>
+  </data>
+  <data name="SetMaterial" xml:space="preserve">
+    <value>วัสดุ</value>
+  </data>
+  <data name="SetPallet" xml:space="preserve">
+    <value>พาเลท</value>
+  </data>
+  <data name="SetReason" xml:space="preserve">
+    <value>เหตุผล</value>
+  </data>
+  <data name="SetStatus" xml:space="preserve">
+    <value>สถานะ</value>
+  </data>
+  <data name="SetStore" xml:space="preserve">
+    <value>คลัง</value>
+  </data>
+  <data name="SetWorktype" xml:space="preserve">
+    <value>ประเภทงาน</value>
+  </data>
+  <data name="SRM" xml:space="preserve">
+    <value>เครน</value>
+  </data>
+  <data name="StockList" xml:space="preserve">
+    <value>รายการคงคลัง</value>
+  </data>
+  <data name="Storage" xml:space="preserve">
+    <value>จัดเก็บ</value>
+  </data>
+  <data name="Transfer" xml:space="preserve">
+    <value>โอนย้าย</value>
+  </data>
+  <data name="Unplanned" xml:space="preserve">
+    <value>เบิกแมนนวล</value>
+  </data>
+</root>

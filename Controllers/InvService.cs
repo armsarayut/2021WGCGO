@@ -13,11 +13,17 @@ namespace GoWMS.Server.Controllers
     {
         readonly InvDAL objDAL = new InvDAL();
 
+        public Task<IEnumerable<InvStockList>> GetStckList()
+        {
+            return objDAL.GetStockList();
+        }
+        /*
         public List<InvStockList> GetStckList()
         {
             List<InvStockList> ListRet = objDAL.GetStockList().ToList();
             return ListRet;
         }
+        */
         public List<InvStockSum> GetStockSum()
         {
             List<InvStockSum> ListRet = objDAL.GetStockSum().ToList();
@@ -28,6 +34,10 @@ namespace GoWMS.Server.Controllers
         {
             List<Vrpt_shelf_listInfo> ListRet = objDAL.GetShelfLocation().ToList();
             return ListRet;
+        }
+        public Task<IEnumerable<Inv_Stock_GoInfo>> GetStockListInfo()
+        {
+            return objDAL.GetStockListInfo();
         }
 
     }

@@ -247,6 +247,87 @@ namespace GoWMS.Server.Data
             }
         }
 
+        public async Task<Int64> GetSumOrderAllInbGoodreceiptGo()
+        {
+            Int64 lRet = 0;
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                NpgsqlCommand cmd = new NpgsqlCommand("select count(*) " +
+                    "from wms.inb_goodreceipt_go " +
+                    "where efstatus=0 ", con)
+                {
+                    CommandType = CommandType.Text
+                };
+                con.Open();
+                lRet= Convert.ToInt64(cmd.ExecuteScalar());
+                
+                con.Close();
+            }
+
+            return lRet;
+        }
+
+        public async Task<Int64> GetSumPalletAllInbGoodreceiptGo()
+        {
+            Int64 lRet = 0;
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                NpgsqlCommand cmd = new NpgsqlCommand("select count(*) " +
+                    "from wms.inb_putaway_go " +
+                    "where efstatus=0 ", con)
+                {
+                    CommandType = CommandType.Text
+                };
+                con.Open();
+                lRet = Convert.ToInt64(cmd.ExecuteScalar());
+
+                con.Close();
+            }
+
+            return lRet;
+        }
+
+
+        public async Task<Int64> GetSumPalletAllOubGoodPickingGo()
+        {
+            Int64 lRet = 0;
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                NpgsqlCommand cmd = new NpgsqlCommand("select count(lpncode) " +
+                    "from wcs.tas_works " +
+                    "where work_code='05' " +
+                    "and work_status='AVL' ", con)
+                {
+                    CommandType = CommandType.Text
+                };
+                con.Open();
+                lRet = Convert.ToInt64(cmd.ExecuteScalar());
+
+                con.Close();
+            }
+
+            return lRet;
+        }
+
+        public async Task<Int64> GetSumOrderAllOubGoodPickingGo()
+        {
+            Int64 lRet = 0;
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                NpgsqlCommand cmd = new NpgsqlCommand("select count(*) " +
+                    "from public.sap_storeout " +
+                    "where status<3 ", con)
+                {
+                    CommandType = CommandType.Text
+                };
+                con.Open();
+                lRet = Convert.ToInt64(cmd.ExecuteScalar());
+
+                con.Close();
+            }
+
+            return lRet;
+        }
 
 
     }

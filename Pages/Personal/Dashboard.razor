@@ -1,165 +1,200 @@
-﻿@page "/personal/dashboard"
+﻿@page "/dashboard"
+@using GoWMS.Server.Models.Das
+@using GoWMS.Server.Models.Public
+
+@using System.Threading
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+
+
+
+@inject WgcService ObjErpService
+@inject InboundService ObjInbService
+@inject DashService ObjDashService
+
 
 <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Dashboard</MudText>
 <MudGrid>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.Receipt" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.Receipt" Color="Color.Primary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Pending Receving</MudText>
-                <MudText Typo="Typo.h5">5,000</MudText>
+                <MudText Typo="Typo.h5">@palletGR/@orderGR</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.Queue" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.Queue" Color="Color.Secondary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Pending Put away</MudText>
-                <MudText Typo="Typo.h5">299</MudText>
+                <MudText Typo="Typo.h5">@palletPut/@orderPut</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Success" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Pending picking</MudText>
-                <MudText Typo="Typo.h5">1,900</MudText>
+                <MudText Typo="Typo.h5">@palletPicking/@orderPicking</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Warning" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Warning" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Complete Order</MudText>
-                <MudText Typo="Typo.h5">29,999</MudText>
+                <MudText Typo="Typo.h5">@orderCompletePut/@orderCompletePick</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Primary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Storage</MudText>
-                <MudText Typo="Typo.h5">2,999</MudText>
+                <MudText Typo="Typo.h5">@mstorage</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Secondary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Retrieval</MudText>
-                <MudText Typo="Typo.h5">5,999</MudText>
+                <MudText Typo="Typo.h5">@mretrieval</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.SyncAlt" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.SyncAlt" Color="Color.Success" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total</MudText>
-                <MudText Typo="Typo.h5">8,998</MudText>
+                <MudText Typo="Typo.h5">@mtotal</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-            <MudIcon Icon="@Icons.Material.Filled.Speed" Color="Color.Warning" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+        <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
+            <MudIcon Icon="@Icons.Material.Filled.Speed" Color="Color.Warning" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Average Time</MudText>
-                <MudText Typo="Typo.h5">00:00:30</MudText>
+                <MudText Typo="Typo.h5">00:00:00</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Elevation="25" Style="height:400px;">
+        <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6">Lane 01</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-            <MudPaper Class="d-flex py-2 px-1"> 
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 mud-theme-secondary order-2"><MudText Typo="Typo.h6">Use:900</MudText> </MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 mud-theme-info order-3"><MudText Typo="Typo.h6">Empty:100</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 mud-theme-primary order-1"><MudText Typo="Typo.h6">Total:1,000</MudText></MudPaper>
+            <MudPaper Class="d-flex py-2 px-1">
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L1Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L1Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L1Total</MudText></MudPaper>
             </MudPaper>
             <br />
-            <MudChart ChartType="ChartType.Pie" InputData="@data1" @bind-SelectedIndex="Index1" InputLabels="@labels1" Width="200px" Height="200px" />
+            <MudChart ChartType="ChartType.Pie" InputData="@data1" @bind-SelectedIndex="Index1" InputLabels="@labels1" Width="150px" Height="150px" />
         </MudCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Elevation="25" Style="height:400px;">
+        <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6">Lane 02</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudPaper Class="d-flex py-2 px-1">
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 mud-theme-secondary order-2"><MudText Typo="Typo.h6">Use:600</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 mud-theme-info order-3"><MudText Typo="Typo.h6">Empty:400</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 mud-theme-primary order-1"><MudText Typo="Typo.h6">Total:1,000</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L2Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L2Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L2Total</MudText></MudPaper>
             </MudPaper>
             <br />
-            <MudChart ChartType="ChartType.Pie" InputData="@data2" @bind-SelectedIndex="Index2" InputLabels="@labels2" Width="200px" Height="200px" />
+            <MudChart ChartType="ChartType.Pie" InputData="@data2" @bind-SelectedIndex="Index2" InputLabels="@labels2" Width="150px" Height="150px" />
         </MudCard>
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Elevation="25" Style="height:400px;">
+        <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6">Lane 03</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudPaper Class="d-flex py-2 px-1">
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 mud-theme-secondary order-2"><MudText Typo="Typo.h6">Use:400</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 mud-theme-info order-3"><MudText Typo="Typo.h6">Empty:600</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 mud-theme-primary order-1"><MudText Typo="Typo.h6">Total:1,000</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L3Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L3Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L3Total</MudText></MudPaper>
             </MudPaper>
             <br />
-            <MudChart ChartType="ChartType.Pie" InputData="@data3" @bind-SelectedIndex="Index3" InputLabels="@labels3" Width="200px" Height="200px" />
+            <MudChart ChartType="ChartType.Pie" InputData="@data3" @bind-SelectedIndex="Index3" InputLabels="@labels3" Width="150px" Height="150px" />
         </MudCard>
 
     </MudItem>
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Elevation="25" Style="height:500px;">
+        <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Notification</MudText>
+                    <MudText Typo="Typo.h6">Lane 04</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-            <MudCardContent Class="px-0">
-                <MudSimpleTable Elevation="0" Hover="true">
-                    <thead>
-                        <tr>
-                            <th>Station</th>
-                            <th>Priority</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var report in earningReports.OrderBy(x => x.SeverityTitle))
-                        {
-<tr>
-    <td>
-        <div class="d-flex flex-row">
-            @*<MudAvatar Image="@report.Avatar" Class="mud-elevation-25" />*@
-            <div class="ml-6">
-                <MudText Typo="Typo.subtitle2">@report.Name</MudText>
-                <MudText Typo="Typo.body2">@report.Title</MudText>
-            </div>
-        </div>
-    </td>
-    <td><MudChip Label="true" Color="@report.Severity" Size="Size.Small" Class="ml-auto mud-elevation-25">@report.SeverityTitle</MudChip></td>
-    <td><MudText>@report.Salary</MudText></td>
-</tr>}
-                    </tbody>
-                </MudSimpleTable>
-            </MudCardContent>
+            <MudPaper Class="d-flex py-2 px-1">
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L4Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L4Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L4Total</MudText></MudPaper>
+            </MudPaper>
+            <br />
+            <MudChart ChartType="ChartType.Pie" InputData="@data4" @bind-SelectedIndex="Index4" InputLabels="@labels4" Width="150px" Height="150px" />
         </MudCard>
     </MudItem>
+
+
+
+
+    @*
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="25" Style="height:500px;">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Notification</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="px-0">
+                    <MudSimpleTable Elevation="0" Hover="true">
+                        <thead>
+                            <tr>
+                                <th>Station</th>
+                                <th>Priority</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var report in earningReports.OrderBy(x => x.SeverityTitle))
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex flex-row">
+                                            <div class="ml-6">
+                                                <MudText Typo="Typo.subtitle2">@report.Name</MudText>
+                                                <MudText Typo="Typo.body2">@report.Title</MudText>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><MudChip Label="true" Color="@report.Severity" Size="Size.Small" Class="ml-auto mud-elevation-25">@report.SeverityTitle</MudChip></td>
+                                    <td><MudText>@report.Salary</MudText></td>
+                                </tr>
+                             }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    *@
 
     @*
         <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">@stxtInput</MudText>
@@ -258,17 +293,69 @@
     *@
 </MudGrid>
 
-@code {
+@code { private System.Threading.Timer timer;
+    private List<DasLocation> daslos;
+    private DasLocation daslocations = new DasLocation();
+
+    private Int64 palletGR = 0;
+    private Int64 orderGR = 0;
+
+    private Int64 palletPut = 0;
+    private Int64 orderPut = 0;
+
+    private Int64 palletPicking = 0;
+    private Int64 orderPicking = 0;
+
+    private Int64 palletComplete = 0;
+    private Int64 orderComplete = 0;
+
+    private Int64 orderCompletePut = 0;
+    private Int64 orderCompletePick = 0;
+
+
+    private Int64 mstorage = 0;
+    private Int64 mretrieval = 0;
+    private Int64 mtotal = 0;
+
+
+
+    private Int64 L1Total = 0;
+    private Int64 L1Use = 0;
+    private Int64 L1Emp = 0;
+
+    private Int64 L2Total = 0;
+    private Int64 L2Use = 0;
+    private Int64 L2Emp = 0;
+
+    private Int64 L3Total = 0;
+    private Int64 L3Use = 0;
+    private Int64 L3Emp = 0;
+
+    private Int64 L4Total = 0;
+    private Int64 L4Use = 0;
+    private Int64 L4Emp = 0;
+
+
+    private Boolean bRun = true;
+
+    private int Count { get; set; } = 10;
+    private Boolean bRefresh = false;
+
+    private IEnumerable<Vrpt_operationresult_sum> Elementorders = new List<Vrpt_operationresult_sum>();
+
+    private IEnumerable<Vrpt_shelfsummary> Elementlocation = new List<Vrpt_shelfsummary>();
+
+    private IEnumerable<VLocationDash> ElementWorks = new List<VLocationDash>();
 
     EarningReport[] earningReports = new EarningReport[]
-    {
+{
         new EarningReport { Name = "SRM01", Title = "Disconnect", Avatar = "https://avatars2.githubusercontent.com/u/71094850?s=460&u=66c16f5bb7d27dc751f6759a82a3a070c8c7fe4b&v=4", Salary = "10:01", Severity = Color.Error, SeverityTitle = "High"},
         new EarningReport { Name = "RGV01", Title = "Disconnect", Avatar = "https://avatars.githubusercontent.com/u/16208742?s=120&v=4", Salary = "10:02", Severity = Color.Error, SeverityTitle = "High"},
         new EarningReport { Name = "CVY01", Title = "Barcode not found", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "10:05", Severity = Color.Warning, SeverityTitle = "Medium"},
         new EarningReport { Name = "CVY02", Title = "Sensor not found", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "10:10", Severity = Color.Warning, SeverityTitle = "Medium"},
         new EarningReport { Name = "SRM02", Title = "Distance error", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "10:10", Severity = Color.Error, SeverityTitle = "High"},
         new EarningReport { Name = "SRM03", Title = "Limit X error", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "10:10", Severity = Color.Error, SeverityTitle = "High"},
-    };
+        };
 
     class EarningReport
     {
@@ -282,25 +369,223 @@
 
     private int Index1 = -1; //default value cannot be 0 -> first selectedindex is 0.
     int dataSize1 = 2;
-    double[] data1 = { 90, 10 };
+    double[] data1 = new double[2];
     string[] labels1 = { "Use", "Empty" };
+    string[] xlabels1 = { "80", "100" };
 
     private int Index2 = -1; //default value cannot be 0 -> first selectedindex is 0.
     int dataSize2 = 2;
-    double[] data2 = { 80, 10 };
+    double[] data2 = new double[2];
     string[] labels2 = { "Use", "Empty" };
     string[] xlabels2 = { "80", "100" };
 
     private int Index3 = -1; //default value cannot be 0 -> first selectedindex is 0.
     int dataSize3 = 2;
-    double[] data3 = { 50, 10 };
+    double[] data3 = new double[2];
     string[] labels3 = { "Use", "Empty" };
+    string[] xlabels3 = { "80", "100" };
+
+    private int Index4 = -1; //default value cannot be 0 -> first selectedindex is 0.
+    int dataSize4 = 2;
+    double[] data4 = new double[2];
+    string[] labels4 = { "Use", "Empty" };
+    string[] xlabels4 = { "80", "100" };
 
     private ChartOptions _lineChartOptions = new ChartOptions
     {
         DisableLegend = true
-
     };
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Ticker();
+        await base.OnInitializedAsync();
+        /*
+        
+        palletGR = await ObjErpService.GetSumPalletAllApiNewDelivery_note();
+        orderGR = await ObjErpService.GetSumOrderAllApiNewDelivery_note();
+        palletPut = await ObjInbService.GetSumPalletAllInbGoodreceiptGo();
+        orderPut = await ObjInbService.GetSumOrderAllInbGoodreceiptGo();
+
+        palletPicking = await ObjInbService.GetSumPalletAllOubGoodPickingGo();
+        orderPicking = await ObjInbService.GetSumOrderAllOubGoodPickingGo();
+
+        Elementorders = await Task.Run(() => ObjDashService.GetAllOrderofDay());
+
+        Elementlocation = await Task.Run(() => ObjDashService.GetAllLocationSummary());
+
+
+        ElementWorks = await Task.Run(() => ObjDashService.GetAllTasworkofday());
+
+        if (Elementorders.ToList().Count > 0)
+        {
+            var vorderCompletePut = Elementorders.Select(a => a.C01).Single();
+            orderCompletePut = (Int64)vorderCompletePut;
+
+            var vorderCompletePick = Elementorders.Select(a => a.C05).Single();
+            orderCompletePick = (Int64)vorderCompletePick;
+        }
+        else
+        {
+            orderCompletePut = 0;
+            orderCompletePick = 0;
+
+        }
+
+        var allCorrect1 = Elementlocation.Where(a => a.Srm_No == 1).ToList();
+
+        if (allCorrect1.ToList().Count > 0)
+        {
+            foreach (var val in allCorrect1)
+            {
+                //data1.Concat(new double[] { (double)val.Locavl }).ToArray();
+                //data1.Concat(new double[] { (double)val.Locemp }).ToArray();
+
+                data1[0] = (double)val.Locavl;
+                data1[1] = (double)val.Locemp;
+
+                L1Total = (Int64)val.Total;
+                L1Use = (Int64)val.Locavl;
+                L1Emp = (Int64)val.Locemp;
+            }
+        }
+        else
+        {
+            data1.Append(0);
+            data1.Append(0);
+            L1Total = 0;
+            L1Use = 0;
+            L1Emp = 0;
+        }
+
+        var allCorrect2 = Elementlocation.Where(a => a.Srm_No == 2).ToList();
+
+        if (allCorrect2.ToList().Count > 0)
+        {
+            foreach (var val in allCorrect2)
+            {
+                //data2.Concat(new double[] { (double)val.Locavl }).ToArray();
+                //data2.Concat(new double[] { (double)val.Locemp }).ToArray();
+                data2[0] = (double)val.Locavl;
+                data2[1] = (double)val.Locemp;
+                L2Total = (Int64)val.Total;
+                L2Use = (Int64)val.Locavl;
+                L2Emp = (Int64)val.Locemp;
+            }
+        }
+        else
+        {
+            data2.Append(0);
+            data2.Append(0);
+            L2Total = 0;
+            L2Use = 0;
+            L2Emp = 0;
+        }
+
+        var allCorrect3 = Elementlocation.Where(a => a.Srm_No == 3).ToList();
+
+        if (allCorrect3.ToList().Count > 0)
+        {
+            foreach (var val in allCorrect3)
+            {
+                //data3.Concat(new double[] { (double)val.Locavl }).ToArray();
+                //data3.Concat(new double[] { (double)val.Locemp }).ToArray();
+                data3[0] = (double)val.Locavl;
+                data3[1] = (double)val.Locemp;
+                L3Total = (Int64)val.Total;
+                L3Use = (Int64)val.Locavl;
+                L3Emp = (Int64)val.Locemp;
+            }
+        }
+        else
+        {
+            data3.Append(0);
+            data3.Append(0);
+            L3Total = 0;
+            L3Use = 0;
+            L3Emp = 0;
+        }
+
+        var allCorrect4 = Elementlocation.Where(a => a.Srm_No == 4).ToList();
+
+        if (allCorrect4.ToList().Count > 0)
+        {
+            foreach (var val in allCorrect4)
+            {
+                //data4.Concat(new double[] { (double)val.Locavl }).ToArray();
+                //data4.Concat(new double[] { (double)val.Locemp }).ToArray();
+                data4[0] = (double)val.Locavl;
+                data4[1] = (double)val.Locemp;
+                L4Total = (Int64)val.Total;
+                L4Use = (Int64)val.Locavl;
+                L4Emp = (Int64)val.Locemp;
+            }
+        }
+        else
+        {
+
+            data4.Append(0);
+            data4.Append(0);
+
+            L4Total = 0;
+            L4Use = 0;
+            L4Emp = 0;
+        }
+
+        var allCorrectTas01 = ElementWorks.Where(a => a.Work_Code == "01").ToList();
+
+        if(allCorrectTas01.ToList().Count > 0)
+        {
+            foreach (var val in allCorrectTas01)
+            {
+
+                mstorage = (Int64)val.Clpncode;
+            }
+        }
+        else
+        {
+
+            mstorage = 0;
+        }
+
+        var allCorrectTas05 = ElementWorks.Where(a => a.Work_Code == "05").ToList();
+
+        if (allCorrectTas05.ToList().Count > 0)
+        {
+            foreach (var val in allCorrectTas05)
+            {
+
+                mretrieval = (Int64)val.Clpncode;
+            }
+        }
+        else
+        {
+
+            mretrieval = 0;
+        }
+
+        mtotal = mstorage + mretrieval;
+
+
+
+        //custs = await Http.GetFromJsonAsync<List<Customer>>("/api/customers");
+
+        //timer = new System.Threading.Timer(async (object stateInfo) =>
+        //{
+        //    daslos = await Http.GetFromJsonAsync<List<Customer>>("/api/customers");
+        //    StateHasChanged(); // MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
+        //}, new System.Threading.AutoResetEvent(false), 1000, 1000);
+        Count = 10;
+
+        if (bRefresh == false)
+        {
+            this.StartCountdown();
+            bRefresh = true;
+        }
+        */
+    
+    }
+
 
 
     private void setstr(string str)
@@ -333,7 +618,7 @@
     public string MyValue { get; set; }
     private void DoTheThing(KeyboardEventArgs eventArgs)
     {
-        if (eventArgs.Key == "Enter")        // fire on enter 
+        if (eventArgs.Key == "Enter")        // fire on enter
         {
             //Console.WriteLine("Done the thing: " + MyValue);
             //stxtInput = MyValue;
@@ -343,4 +628,50 @@
         }
     }
 
+    string theTime;
+
+    // use an async-void or a timer. An async-void needs no cleanup.
+    async void Ticker()
+    {
+        while (bRun)
+        {
+            theTime = DateTime.Now.ToLongTimeString();
+            // get code ---
+            palletGR = await ObjErpService.GetSumPalletAllApiNewDelivery_note();
+            orderGR = await ObjErpService.GetSumOrderAllApiNewDelivery_note();
+            palletPut = await ObjInbService.GetSumPalletAllInbGoodreceiptGo();
+            orderPut = await ObjInbService.GetSumOrderAllInbGoodreceiptGo();
+
+            palletPicking = await ObjInbService.GetSumPalletAllOubGoodPickingGo();
+            orderPicking = await ObjInbService.GetSumOrderAllOubGoodPickingGo();
+
+            //-----
+            await Task.Delay(10_000);
+            StateHasChanged();   // refresh everything
+        }
+    }
+
+    void StartCountdown()
+    {
+        /*
+        var timer = new Timer(new TimerCallback(_ =>
+        {
+            if (Count > 0)
+            {
+                Count--;
+
+                // Note that the following line is necessary because otherwise
+                // Blazor would not recognize the state change and not refresh the UI
+                InvokeAsync(() =>
+                {
+                    this.StateHasChanged();
+                });
+            }
+            else
+            {
+                Count = 10;
+            }
+        }), null, 1000, 1000);
+        */
+    } 
 }

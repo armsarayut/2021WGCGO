@@ -9,7 +9,7 @@ namespace GoWMS.Server.DataAccess
     {
         public PostgreSqlContext(DbContextOptions<PostgreSqlContext> options) : base(options)
         {
-
+            
         }
         DbSet<Oub_Deliveryorder_Go> IDataContext.OubDeliveryorderGos { get; init ; }
     }

@@ -1,10 +1,11 @@
-﻿@page "/inb/wcsqueue"
+﻿@page "/inb-wcsqueue"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inb
 
 @inject InboundService ObjInboundService
+@inject IStringLocalizer<IbpWcsQueue> L
 
 
 @if (Elements == null)
@@ -14,30 +15,39 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+<MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
+    <MudTable Items="@Elements" 
+              FixedHeader="@fixed_header" 
+              FixedFooter="@fixed_footer" 
+              Height="@(fixed_header || fixed_footer ?"600px":"")" 
+              Dense="@dense" 
+              Hover="@hover" 
+              Bordered="@bordered" 
+              Striped="@striped" 
+              Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)" 
+              @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
+                @L["Excel"]
             </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
+                @L["PDF"]
             </MudButton>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Queue time</MudTh>
-            <MudTh>Masterpallet</MudTh>
-            <MudTh>Worktype</MudTh>
-            <MudTh>SRM</MudTh>
-            <MudTh>Location</MudTh>
-            <MudTh>Start time</MudTh>
-            <MudTh>End time</MudTh>
+            <MudTh>@L["Queuetime"]</MudTh>
+            <MudTh>@L["PalletGo"]</MudTh>
+            <MudTh>@L["Worktype"]</MudTh>
+            <MudTh>@L["SRM"]</MudTh>
+            <MudTh>@L["Location"]</MudTh>
+            <MudTh>@L["Starttime"]</MudTh>
+            <MudTh>@L["Endtime"]</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Queuetime">@context.Created</MudTd>
-            <MudTd DataLabel="Masterpallet">@context.Palletno</MudTd>
+            <MudTd DataLabel="PalletGo">@context.Palletno</MudTd>
             <MudTd DataLabel="Worktype">@context.Puttype</MudTd>
             <MudTd DataLabel="SRM">@context.Storagearea</MudTd>
             <MudTd DataLabel="Location">@context.Storagebin</MudTd>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GoWMS.Server.Data;
@@ -41,8 +42,30 @@ namespace GoWMS.Server.Controllers
             objDAL.SetStorageComplete(pallet, bin);
             return "Map Successfully";
         }
-        
 
+        public Task<Int64> GetSumOrderAllInbGoodreceiptGo()
+        {
+            return objDAL.GetSumOrderAllInbGoodreceiptGo();
+        }
+
+        public Task<Int64> GetSumPalletAllInbGoodreceiptGo()
+        {
+            return objDAL.GetSumPalletAllInbGoodreceiptGo();
+        }
+
+
+        public Task<Int64> GetSumPalletAllOubGoodPickingGo()
+        {
+            return objDAL.GetSumPalletAllOubGoodPickingGo();
+        }
+
+        public Task<Int64> GetSumOrderAllOubGoodPickingGo()
+        {
+            return objDAL.GetSumOrderAllOubGoodPickingGo();
+        }
+
+
+   
 
     }
 }

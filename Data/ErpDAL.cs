@@ -30,6 +30,7 @@ namespace GoWMS.Server.Data
                     ",Location,Document_Number" +
                     ",Job,Job_Code " +
                     "FROM dbo.V_Receiving_Orders", con)
+
                 {
                     CommandType = CommandType.Text
                 };

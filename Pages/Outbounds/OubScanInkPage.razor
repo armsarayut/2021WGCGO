@@ -1,6 +1,340 @@
-﻿@page "/oub/molink"
-@page "/oub/molink/{mocode}"
+﻿@page "/oub-scanmolink"
+@page "/oub-scanmolink/{mocode}"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Api
+@using System.Globalization
+@using System.Reflection
+@using System.Text.Json
+
+@inject ErpApiService ObjApiService
+@inject ISnackbar Snackbar
+
+@if (Elements == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader @Mocode </MudText>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudDatePicker Label="Delivery Date" @bind-Date="date" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudTimePicker Label="Delivery Time " @bind-Time="time" TimeEditMode="TimeEditMode.Normal" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Save" Style="background-color: limegreen; color: white; width: 200px; height: 30px;">
+                Set Picking
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+
+
+    <MudHidden Breakpoint="Breakpoint.Xs">
+        <MudTable Items="@Elements.Where(a => a.Dotype == @_doType1 && @_matfilter.Any(prefix => a.Material_Code.ToString().StartsWith(prefix)))" MultiSelection="true" @bind-SelectedItems="selectLON" Hover="@hover"
+                  Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncLON)"
+                  RowsPerPage="5">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">List Of Material Need</MudText>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchStringLON" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+
+            <HeaderContent>
+                <MudTh>Customer</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Product</MudTh>
+                <MudTh>ProductName</MudTh>
+                <MudTh>Material</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Quantity</MudTh>
+                <MudTh>Unit</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Customer">@context.Customer_Code</MudTd>
+                <MudTd DataLabel="Name">@context.Customer_Description</MudTd>
+                <MudTd DataLabel="Product">@context.Finished_Product</MudTd>
+                <MudTd DataLabel="ProductName">@context.Finished_Product_Description</MudTd>
+                <MudTd DataLabel="Material">@context.Material_Code</MudTd>
+                <MudTd DataLabel="Description">@context.Material_Description</MudTd>
+                <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+                <MudTd DataLabel="Unit">@context.Unit</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{5}" />
+            </PagerContent>
+        </MudTable>
+        @*for debug
+            <MudText Inline="true">Selected items: @(selectLON==null ? "" : string.Join(", ", selectLON.OrderBy(x=>x.Efidx).Select(x=>x.Efidx)))</MudText>
+            end debug*@
+        <MudTable Items="@Elements.Where(a => a.Dotype == @_doType2 && @_matfilter.Any(prefix => a.Material_Code.ToString().StartsWith(prefix)))" MultiSelection="true" @bind-SelectedItems="selectRES" Hover="@hover"
+                  Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncRES)"
+                  RowsPerPage="5">
+
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Reserved Materials</MudText>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchStringRES" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+
+            <HeaderContent>
+                <MudTh>PackID</MudTh>
+                <MudTh>Material</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Warehouse</MudTh>
+                <MudTh>WarehouseName</MudTh>
+                <MudTh>Quantity</MudTh>
+                <MudTh>Unit</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="PackID">@context.Package_Id</MudTd>
+                <MudTd DataLabel="Material">@context.Material_Code</MudTd>
+                <MudTd DataLabel="Description">@context.Material_Description</MudTd>
+                <MudTd DataLabel="Warehouse">@context.Wh_Code</MudTd>
+                <MudTd DataLabel="WarehouseName">@context.Warehouse</MudTd>
+                <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+                <MudTd DataLabel="Unit">@context.Unit</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{5}" />
+            </PagerContent>
+        </MudTable>
+        @*for debug
+            <MudText Inline="true">Selected items: @(selectRES==null ? "" : string.Join(", ", selectRES.OrderBy(x=>x.Efidx).Select(x=>x.Efidx)))</MudText>
+            end debug*@
+    </MudHidden>
+
+    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+        <MudTable Items="@Elements.Where(a => a.Dotype == @_doType1 && @_matfilter.Any(prefix => a.Material_Code.ToString().StartsWith(prefix)))" MultiSelection="true" @bind-SelectedItems="selectLON" Hover="@hover"
+                  Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncLON)"
+                  RowsPerPage="5">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">List Of Material Need</MudText>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchStringLON" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Product</MudTh>
+                <MudTh>Material</MudTh>
+                <MudTh>Quantity</MudTh>
+                <MudTh>Unit</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Product">@context.Finished_Product</MudTd>
+                <MudTd DataLabel="Material">@context.Material_Code</MudTd>
+                <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+                <MudTd DataLabel="Unit">@context.Unit</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{5}" />
+            </PagerContent>
+        </MudTable>
+
+        <MudTable Items="@Elements.Where(a => a.Dotype == @_doType2 && @_matfilter.Any(prefix => a.Material_Code.ToString().StartsWith(prefix)))" MultiSelection="true" @bind-SelectedItems="selectRES" Hover="@hover"
+                  Filter="new Func<Api_Deliveryorder_Go,bool>(FilterFuncRES)"
+                  RowsPerPage="5">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Reserved Materials</MudText>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchStringRES" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+
+            <HeaderContent>
+                <MudTh>PackID</MudTh>
+                <MudTh>Material</MudTh>
+                <MudTh>Quantity</MudTh>
+                <MudTh>Unit</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="PackID">@context.Package_Id</MudTd>
+                <MudTd DataLabel="Material">@context.Material_Code</MudTd>
+                <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+                <MudTd DataLabel="Unit">@context.Unit</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{5}" />
+            </PagerContent>
+        </MudTable>
+    </MudHidden>
+
+
+
+}
+
 
 @code {
+
+    [Parameter]
+    public string Mocode { get; set; }
+    private bool _dense = false;
+    private bool _multiSelect = true;
+    private string _doType1 = "LON";
+    private string _doType2 = "RES";
+    //private string _matfilter = "40";
+    private string[] _matfilter = new string[] { "40" };
+
+    TimeSpan? time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+    DateTime? date = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day); // 1399-11-26 in Persian calendar
+    private DateTime DeliveryDate;
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    private readonly string pageheader = "MO : ";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private string searchStringLON = "";
+    private string searchStringRES = "";
+    private Api_Deliveryorder_Go selectedItem = null;
+    private HashSet<Api_Deliveryorder_Go> selectLON = new HashSet<Api_Deliveryorder_Go>();
+    private HashSet<Api_Deliveryorder_Go> selectRES = new HashSet<Api_Deliveryorder_Go>();
+    private IEnumerable<Api_Deliveryorder_Go> Elements = new List<Api_Deliveryorder_Go>();
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErpApiService objCS = new ErpApiService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllApiDeliveryorderByMo(Mocode));
+
+    }
+
+    private void setstr(string str)
+    {
+        //if (mPalletcode.Length <= 0)
+        //{
+        //    mPalletcode = str;
+        //    msgAction = "Enter Pack ID";
+        //    elevation = 3;
+        //}
+        //else
+        //{
+        //    if (str == mPalletcode)
+        //    {
+        //        elevation = 2;
+        //        msgAction = "Mapping successfully";
+        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+        //        mPalletcode = "";
+        //    }
+        //    else
+        //    {
+        //        mPackid = str;
+        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+        //    }
+        //}
+        //CustomerService objGR = new CustomerService();
+        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Api_Deliveryorder_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Mo_Barcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Job.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Material_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private bool FilterFuncLON(Api_Deliveryorder_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchStringLON))
+            return true;
+        if (element.Customer_Code.Contains(searchStringLON, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Job.Contains(searchStringLON, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Material_Code.Contains(searchStringLON, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Material_Description.Contains(searchStringLON, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Finished_Product.Contains(searchStringLON, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Finished_Product_Description.Contains(searchStringLON, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private bool FilterFuncRES(Api_Deliveryorder_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchStringRES))
+            return true;
+        if (element.Package_Id.Contains(searchStringRES, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Job.Contains(searchStringRES, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Material_Code.Contains(searchStringRES, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Material_Description.Contains(searchStringRES, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private void SetOrderpicking()
+    {
+        var serializeOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+
+        var tim = time.Value;
+        var dat = date.Value;
+
+        DeliveryDate = dat.Add(tim);
+
+
+        var strLON = selectLON.OrderBy(x => x.Efidx).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Package_Id, materialcode = x.Material_Code }).ToList();
+        var strRES = selectRES.OrderBy(x => x.Efidx).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Package_Id, materialcode = x.Material_Code }).ToList();
+
+
+
+        var jsonLON = JsonSerializer.Serialize(strLON, serializeOptions);
+        var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
+        var iReturn = 0;
+        var sReturn = "Call";
+        Int64 iStation = 1;
+
+        ObjApiService.SetPick(jsonLON, jsonRES, DeliveryDate, iStation, ref iReturn, ref sReturn);
+        if (iReturn == 0)
+        {
+            Snackbar.Add("SET PICKING >> " + sReturn, Severity.Error);
+        }
+        else
+        {
+            Snackbar.Add("SET PICKING >> Success", Severity.Success);
+        }
+    }
 
 }

@@ -1,10 +1,11 @@
-﻿@page "/wh/stock"
+﻿@page "/wh-stock"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inv
 
 @inject InvService ObjService
+@inject IStringLocalizer<WhStockListPage> L
 
 @if (Elements == null)
 {
@@ -13,160 +14,162 @@
 }
 else
 {
-<MudGrid>
-    <MudItem xs="12" md="3">
-        <MudSwitch T="bool" CheckedChanged="@OnSelectChange" Color="Color.Primary" Label="Select View Stock" />
-    </MudItem>
-</MudGrid>
+    <MudGrid>
+        <MudItem xs="12" md="3">
+            <MudSwitch T="bool" CheckedChanged="@OnSelectChange" Color="Color.Primary" Label="Select View Stock" />
+        </MudItem>
+    </MudGrid>
 
-        @if (StkGroup)
+    @if (StkGroup)
+    {
+<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"] </MudText>
+        <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+            <ToolBarContent>
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
+                    @L["Excel"]
+                </MudButton>
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
+                    @L["PDF"]
+                </MudButton>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>@L["ItemCode"]</MudTh>
+                <MudTh>@L["ItemName"]</MudTh>
+                <MudTh>@L["Stock"]</MudTh>
+                <MudTh>@L["Lot"]</MudTh>
+                <MudTh>@L["SEQ"]</MudTh>
+                <MudTh>@L["PalletGo"]</MudTh>
+                <MudTh>@L["Area"]</MudTh>
+                <MudTh>@L["Location"]</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
+                <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
+                <MudTd DataLabel="Stock">@context.Quantity</MudTd>
+                <MudTd DataLabel="Lot">@context.Docno</MudTd>
+                <MudTd DataLabel="SEQ">@context.Pallettag</MudTd>
+                <MudTd DataLabel="PalletGo">@context.Pallteno</MudTd>
+                <MudTd DataLabel="Area">@context.Storagearea</MudTd>
+                <MudTd DataLabel="Location">@context.Storagebin</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+            </PagerContent>
+        </MudTable>
+    }
+    else
+    {
+<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeaderlist"]</MudText>
+        <MudTable Items="@Elements_" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<InvStockSum,bool>(FilterFunc_)" @bind-SelectedItem="selectedItem_">
+            <ToolBarContent>
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
+                    @L["Excel"]
+                </MudButton>
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
+                    @L["PDF"]
+                </MudButton>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>@L["ItemCode"]</MudTh>
+                <MudTh>@L["ItemName"]</MudTh>
+                <MudTh>@L["TotalStock"]</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="ItemCode">@context.Item_code</MudTd>
+                <MudTd DataLabel="ItemName">@context.Item_name</MudTd>
+                <MudTd DataLabel="TotalStock">@context.Totalstock</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+            </PagerContent>
+        </MudTable>
+    }
+
+}
+
+@code {
+
+    private string mPageHeader = "Stock List";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Inv_Stock_GoInfo selectedItem = null;
+    private HashSet<Inv_Stock_GoInfo> selectedItems = new HashSet<Inv_Stock_GoInfo>();
+    private IEnumerable<Inv_Stock_GoInfo> Elements = new List<Inv_Stock_GoInfo>();
+
+    private InvStockSum selectedItem_ = null;
+    private HashSet<InvStockSum> selectedItems_ = new HashSet<InvStockSum>();
+    private IEnumerable<InvStockSum> Elements_ = new List<InvStockSum>();
+
+    public int elevation = 0;
+
+    public bool StkGroup { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        InvService objCS = new InvService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetStockListInfo());
+        Elements_ = await Task.Run(() => objCS.GetStockSum());
+
+        OnSelectChange();
+    }
+
+
+    protected void OnSelectChange()
+    {
+        StkGroup = !StkGroup;
+        if (StkGroup)
         {
-            <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
-            <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<InvStockList,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
-                <ToolBarContent>
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                        Excel
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                        PDF
-                    </MudButton>                   
-                    <MudToolBarSpacer />
-                    <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Material</MudTh>
-                    <MudTh>Description</MudTh>
-                    <MudTh>Stock</MudTh>
-                    <MudTh>PackID</MudTh>
-                    <MudTh>MasterPallet</MudTh>
-                    <MudTh>Area</MudTh>
-                    <MudTh>Location</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Material">@context.Item_code</MudTd>
-                    <MudTd DataLabel="Description">@context.Item_name</MudTd>
-                    <MudTd DataLabel="Stock">@context.Qty</MudTd>
-                    <MudTd DataLabel="PackID">@context.Su_no</MudTd>
-                    <MudTd DataLabel="MasterPallet">@context.Palletcode</MudTd>
-                    <MudTd DataLabel="Area">@context.StorageArae</MudTd>
-                    <MudTd DataLabel="Location">@context.Shelfname</MudTd>
-                </RowTemplate>
-                <PagerContent>
-                    <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-                </PagerContent>
-            </MudTable>
+            mPageHeader = "Stock List";
         }
         else
         {
-            <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
-            <MudTable Items="@Elements_" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<InvStockSum,bool>(FilterFunc_)" @bind-SelectedItem="selectedItem_">
-                <ToolBarContent>
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                        Excel
-                    </MudButton>
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                        PDF
-                    </MudButton>
-                    <MudToolBarSpacer />
-                    <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Material</MudTh>
-                    <MudTh>Description</MudTh>
-                    <MudTh>TotalStock</MudTh>
-                    <MudTh>TotalMasterPallet</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Material">@context.Item_code</MudTd>
-                    <MudTd DataLabel="Description">@context.Item_name</MudTd>
-                    <MudTd DataLabel="TotalStock">@context.Totalstock</MudTd>
-                    <MudTd DataLabel="TotalMasterPallet">@context.Countpallet</MudTd>
-                </RowTemplate>
-                <PagerContent>
-                    <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-                </PagerContent>
-            </MudTable>
+            mPageHeader = "Stock Summary";
         }
-
-        }
-
-        @code {
-
-    private string mPageHeader = "Stock List";
-        private string msgAction = "Enter Palletcode";
-        private string mPalletcode { get; set; } = "";
-        private string mPackid { get; set; } = "";
-        private string palletcode { get; set; }
-        private bool dense = true;
-        private bool hover = true;
-        private bool striped = true;
-        private bool bordered = false;
-        private bool fixed_header = true;
-        private bool fixed_footer = true;
-        private string searchString = "";
-        private InvStockList selectedItem = null;
-        private HashSet<InvStockList> selectedItems = new HashSet<InvStockList>();
-        private IEnumerable<InvStockList> Elements = new List<InvStockList>();
-
-        private InvStockSum selectedItem_ = null;
-        private HashSet<InvStockSum> selectedItems_ = new HashSet<InvStockSum>();
-        private IEnumerable<InvStockSum> Elements_ = new List<InvStockSum>();
-
-        public int elevation = 0;
-
-        public bool StkGroup { get; set; }
-
-
-        protected override async Task OnInitializedAsync()
-        {
-            InvService objCS = new InvService();
-            //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-            Elements = await Task.Run(() => objCS.GetStckList());
-            Elements_ = await Task.Run(() => objCS.GetStockSum());
-
-            OnSelectChange();
-        }
-
-
-        protected void OnSelectChange()
-        {
-            StkGroup = !StkGroup;
-            if (StkGroup)
-            {
-                mPageHeader = "Stock List";
-            }
-            else
-            {
-                mPageHeader = "Stock Group";
-            }
-        }
+    }
 
 
 
-        private bool FilterFunc(InvStockList element)
-        {
-            if (string.IsNullOrWhiteSpace(searchString))
-                return true;
-            if (element.Item_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if (element.Palletcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if (element.Su_no.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if ($"{element.Item_name} {element.Shelfname}".Contains(searchString))
-                return true;
-            return false;
-        }
+    private bool FilterFunc(Inv_Stock_GoInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Itemcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Pallteno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Pallettag.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Docno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Itemname} {element.Storagebin}".Contains(searchString))
+            return true;
+        return false;
+    }
 
-        private bool FilterFunc_(InvStockSum element)
-        {
-            if (string.IsNullOrWhiteSpace(searchString))
-                return true;
-            if (element.Item_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if ($"{element.Item_name} ".Contains(searchString))
-                return true;
-            return false;
-        }
+    private bool FilterFunc_(InvStockSum element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Item_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Item_name} ".Contains(searchString))
+            return true;
+        return false;
+    }
 
-        }
+}

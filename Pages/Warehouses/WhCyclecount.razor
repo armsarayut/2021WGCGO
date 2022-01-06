@@ -1,0 +1,304 @@
+﻿@page "/wh-cyclecount"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Inv
+@using System.Text.Json
+@inject InvService ObjService
+@inject IDialogService DialogService
+
+
+
+@inject WgcService ObjErpService
+@inject ISnackbar Snackbar
+@inject ErpApiService ObjApiService
+@inject IStringLocalizer<WhCyclecount> L
+
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+
+    @if (StkGroup)
+    {
+<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]  </MudText>
+
+        <MudTable Items="@Elements"
+                  FixedHeader="@fixed_header"
+                  FixedFooter="@fixed_footer"
+                  Height="@(fixed_header || fixed_footer ?"600px":"")"
+                  MultiSelection="true"
+                  Dense="@dense"
+                  Hover="@hover"
+                  Bordered="@bordered"
+                  Striped="@striped"
+                  Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)"
+                  @bind-SelectedItems="selectedItems">
+            <ToolBarContent>
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.SaveAlt" Style="background-color: mediumseagreen; color: white; width: 160px; height: 30px;" OnClick=@OnButtonOrderSelected>
+                    @L["START"]
+                </MudButton>
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemcode)">@L["ItemCode"] </MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemname)">@L["ItemName"] </MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Quantity)">@L["Stock"] </MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Docno)">@L["Lot"] </MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallettag)">@L["SEQ"] </MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallteno)">@L["PalletGo"] </MudTableSortLabel></MudTh>
+            </HeaderContent>
+
+
+            <RowTemplate>
+                <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
+                <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
+                <MudTd DataLabel="Stock">@context.Quantity</MudTd>
+                <MudTd DataLabel="Lot">@context.Docno</MudTd>
+                <MudTd DataLabel="SEQ">@context.Pallettag</MudTd>
+                <MudTd DataLabel="PalletGo">@context.Pallteno</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+            </PagerContent>
+        </MudTable>
+    }
+    else
+    {
+
+    }
+
+
+    <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
+        <MessageContent>
+            @foreach (var item in References)
+            {
+                <br />
+                @item
+            }
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.DataSaverOn">Confirm!</MudButton>
+        </YesButton>
+    </MudMessageBox>
+}
+
+@code {
+
+    MudMessageBox mbox { get; set; }
+
+    private bool _dense = false;
+    private bool _multiSelect = true;
+
+    private string mPageHeader = "Cycle Count";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Inv_Stock_GoInfo selectedItem = null;
+    private HashSet<Inv_Stock_GoInfo> selectedItems = new HashSet<Inv_Stock_GoInfo>();
+    private IEnumerable<Inv_Stock_GoInfo> Elements = new List<Inv_Stock_GoInfo>();
+
+    string state = "Message box hasn't been opened yet";
+
+    string mboxheader { get; set; } = "รายการที่ขอตรวจสอบ";
+    string mboxcontent { get; set; } = "";
+    string mboxmessage { get; set; } = "";
+
+    public int elevation = 0;
+
+    public bool StkGroup { get; set; }
+
+    protected List<string> References { get; set; } = new List<string>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        InvService objCS = new InvService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+
+        Elements = await Task.Run(() => objCS.GetStockListInfo());
+
+        OnSelectChange();
+    }
+
+    protected void OnSelectChange()
+    {
+        StkGroup = !StkGroup;
+        if (StkGroup)
+        {
+            mPageHeader = "Cycle Count";
+        }
+        else
+        {
+            mPageHeader = "Stock Group";
+        }
+    }
+
+    private bool FilterFunc(Inv_Stock_GoInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Itemcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Pallteno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Pallettag.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Docno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Itemname} {element.Storagebin}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    private bool FilterFunc_(InvStockSum element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Item_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Item_name} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    async Task SelectOrder()
+    {
+        var result = selectedItems.GroupBy(t => t.Itemcode)
+                   .Select(t => new
+                   {
+                       Itemcode = t.Key,
+                       Qty = t.Sum(ta => ta.Quantity),
+                   }).ToList();
+
+        System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
+        Int16 i = 0;
+
+        foreach (var rec in result)
+        {
+            i++;
+            strPopup.Append(i.ToString() + ". รายการ : ");
+            strPopup.Append(rec.Itemcode.ToString());
+            strPopup.Append(" จำนวน : ");
+            strPopup.AppendLine(rec.Qty.ToString());
+        }
+
+        System.Text.StringBuilder popup = new System.Text.StringBuilder();
+        popup.AppendLine("รายการที่ขอตรวจสอบ");
+        popup.Append(strPopup.ToString());
+
+        string sContentText = popup.ToString();
+
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", sContentText);
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
+
+        var formModal = DialogService.Show<DialogTemplateExample_Dialog>("Confirm", parameters);
+
+        var resultModal = await Task.Run(() => formModal.Result);
+
+        var formModal1 = await Task.Run(() => DialogService.ShowMessageBox("AA", "XX"));
+
+    }
+
+    private async void OnButtonOrderSelected()
+    {
+        var resultlist = selectedItems.GroupBy(t => t.Itemcode)
+                 .Select(t => new
+                 {
+                     Itemcode = t.Key,
+                     Qty = t.Sum(ta => ta.Quantity),
+                 }).ToList();
+
+        System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
+        Int16 i = 0;
+        mboxcontent = "";
+
+        References.Clear();
+
+        if (resultlist.Count > 0)
+        {
+            foreach (var rec in resultlist)
+            {
+                i++;
+                strPopup.Clear();
+                strPopup.Append(i.ToString() + ". รายการ : ");
+                strPopup.Append(rec.Itemcode.ToString());
+                strPopup.Append(" จำนวน : ");
+                strPopup.AppendLine(rec.Qty.ToString());
+
+                References.Add(strPopup.ToString());
+            }
+            bool? result = await mbox.Show();
+            state = result == null ? "Cancelled" : "Confirmed";
+
+            if (state == "Confirmed")
+            {
+                SelectOrderPick();
+            }
+
+            StateHasChanged();
+        }
+
+    }
+
+    private void SelectOrderPick()
+    {
+        var serializeOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+
+        string cus = "MANUAL";
+        string so = "CY-" + DateTime.Now.ToString("yyMMddHHmmssffff");
+        string lot = "-";
+        string batch = "-";
+        DateTime requestdate = DateTime.Today.Date;
+
+        var strRES = selectedItems.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
+
+        //var strLON = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { SEQ_NO = x.SEQ_NO, SO_NO = x.SO_NO, DN_SEQ = x.DN_SEQ, ITEM_CODE = x.ITEM_CODE, PALLET_GO = x.PALLET_GO, DN_QTY = x.DN_QTY }).ToList();
+
+        //var jsonLON = JsonSerializer.Serialize(strLON, serializeOptions);
+
+        var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
+
+        var iReturn = 0;
+        var sReturn = "Call";
+
+        ObjApiService.SetPickWgcmanual(jsonRES, ref iReturn, ref sReturn);
+
+        if (selectedItems.Count > 0)
+        {
+            if (iReturn == 0)
+            {
+                Snackbar.Add(sReturn, Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add("Order picking created", Severity.Success);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Please select order picking", Severity.Warning);
+        }
+    }
+
+}

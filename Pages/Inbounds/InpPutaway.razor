@@ -1,4 +1,4 @@
-﻿@page "/inb/storage"
+﻿@page "/inb-storage"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -7,8 +7,9 @@
 
 @inject MasService ObjMasService
 @inject InboundService ObjInboundService
+@inject IStringLocalizer<InpPutaway> L
 
-<MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
+<MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
 
 <MudGrid>
 
@@ -18,30 +19,34 @@
             <MudAlert Severity="Severity.Normal" Variant="Variant.Outlined">@msgAction</MudAlert>
         }
         else @if (elevation == 1) //Info
-        {
-            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@msgAction</MudAlert>
-        }
-        else if (elevation == 2) //Success
-        {
-            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@msgAction</MudAlert>
-        }
-        else if (elevation == 3) // Warning
-        {
-            <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@msgAction</MudAlert>
-        }
-        else if (elevation == 4) // Error
-        {
-            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@msgAction</MudAlert>
-        }
+   {
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
+else if (elevation == 2) //Success
+{
+    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
+else if (elevation == 3) // Warning
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
+else if (elevation == 4) // Error
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@msgAction</MudAlert>
+}
     </MudItem>
     <MudItem xs="12">
-        <MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
+        <div class="form-group">
+            <input style="width: 100%; height: 40px" type="text" class="form-control" @bind="@palletcode" @onkeydown="@DoTheThing" placeholder="Input scan" />
+        </div>
+        @*<MudTextField @bind-Value="palletcode" @onkeyup="DoTheThing" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />*@
     </MudItem>
 </MudGrid>
 
 @*<MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-4">Master Pallet : [ @mPalletcode ]</MudText>
     <MudSkeleton Animation="Animation.False" />*@
 @*<MudText Typo="Typo.h6" Color="Color.Info" Class="mb-4">PackID : [ @mPackid ]</MudText>*@
+
 @if (Elements == null)
 {
     // <p><em>Loading...</em></p>
@@ -49,24 +54,30 @@
 }
 else
 {
-    <MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+    <MudTable Items="@Elements" 
+              Dense="@dense" 
+              Hover="@hover" 
+              Bordered="@bordered" 
+              Striped="@striped" 
+              Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)" 
+              @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Master Pallet : [ @mPalletcode ]</MudText>
+            <MudText Typo="Typo.h6">@L["MasterPallet"] : [ @mPalletcode ]</MudText>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>Queue time</MudTh>
-            <MudTh>Masterpallet</MudTh>
-            <MudTh>Worktype</MudTh>
-            <MudTh>SRM</MudTh>
-            <MudTh>Location</MudTh>
-            <MudTh>Start time</MudTh>
-            <MudTh>End time</MudTh>
+            <MudTh>@L["Queuetime"]</MudTh>
+            <MudTh>@L["PalletGo"]</MudTh>
+            <MudTh>@L["Worktype"]</MudTh>
+            <MudTh>@L["SRM"]</MudTh>
+            <MudTh>@L["Location"]</MudTh>
+            <MudTh>@L["Starttime"]</MudTh>
+            <MudTh>@L["Endtime"]</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Queuetime">@context.Created</MudTd>
-            <MudTd DataLabel="Masterpallet">@context.Palletno</MudTd>
+            <MudTd DataLabel="PalletGo">@context.Palletno</MudTd>
             <MudTd DataLabel="Worktype">@context.Puttype</MudTd>
             <MudTd DataLabel="SRM">@context.Storagearea</MudTd>
             <MudTd DataLabel="Location">@context.Storagebin</MudTd>
@@ -118,7 +129,7 @@ else
             if (allCorrect.ToList().Count > 0)
             {
                 mPalletcode = str;
-                msgAction = "Enter Masterpallet";
+                msgAction = "Enter PalletGo";
                 elevation = 1;
             }
             else
@@ -135,17 +146,17 @@ else
             if (allCorrect.ToList().Count > 0)
             {
                 //InQueue
-                ObjInboundService.SetStorageComplete(str,mPalletcode);
+                ObjInboundService.SetStorageComplete(str, mPalletcode);
                 elevation = 2;
                 msgAction = "Storage successfully";
                 mPalletcode = "";
             }
             else
             {
-                if (mPalletcode.Length>0)
+                if (mPalletcode.Length > 0)
                 {
                     elevation = 1;
-                    msgAction = "Please enter Masterpallet";
+                    msgAction = "Please enter PalletGo";
                 }
                 else
                 {
@@ -179,7 +190,7 @@ else
             return true;
         if (element.Storagebin.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if ($"{element.Storagearea} ".Contains(searchString))
+        if ($"{element.Storagearea}".Contains(searchString))
             return true;
         return false;
     }
