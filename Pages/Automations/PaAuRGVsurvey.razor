@@ -1,0 +1,191 @@
+﻿@page "/wcs/rgv01"
+
+@using GoWMS.Server.Controllers;
+@using GoWMS.Server.Models.Wcs;
+
+@inject WcsService ObjWcsService;
+@inject NavigationManager navigationManager
+
+
+@if (Elements != null)
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary">Machine - @mPagecaption</MudText>
+
+    <MudGrid>
+        <MudItem xs="12">
+            <br />
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true" Class="my-2">@McInfo</MudAlert>
+        </MudItem>
+        <MudItem xs="12">
+
+            @{if (@McstatusAlarm)
+                {
+                    <MudAlert Severity="Severity.Error"
+                              Variant="Variant.Filled"
+                              Dense="true"
+                              Style="@($"color:{FocColor}; background:{BakColor};")">
+                        @McstatusNo - @McstatusDesc
+                    </MudAlert>
+
+                }
+                else
+                {
+
+                    <MudAlert Severity="Severity.Normal"
+                              Variant="Variant.Filled"
+                              Dense="true"
+                              Style="@($"color:{FocColor}; background:{BakColor};")">
+                        @McstatusNo - @McstatusDesc
+                    </MudAlert>
+                }
+            }
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="6">
+            <MudSelect T="string" Label="GATE FROM" HelperText="Pick the Gate" MultiSelection="false" @bind-Value="valueFM">
+                @foreach (var part in Elements)
+                {
+                    <MudSelectItem T="string" Value=@part.Mccode>@part.Mccode</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="6">
+            <MudSelect T="string" Label="GATE TO" HelperText="Pick the Gate" MultiSelection="false" @bind-Value="valueTO">
+                @foreach (var part in Elements)
+                {
+                    <MudSelectItem T="string" Value=@part.Mccode>@part.Mccode</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid>
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.TransferWithinAStation" Color="Color.Primary" OnClick="@(()=>SetPotocal())">MOVE</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FirstPage" Color="Color.Secondary" OnClick="@(()=>SetComand(2))">HOME-FONT</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.LastPage" Color="Color.Secondary" OnClick="@(()=>SetComand(12))">HOME-BACK</MudButton>
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DirectionsRun" Color="Color.Success" OnClick="@(()=>SetComand(1))">RUN</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="@(()=>SetComand(90))">STOP</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AlarmOff" Color="Color.Warning" OnClick="@(()=>SetComand(9))">ACKNOWLEDGE</MudButton>
+        </MudItem>
+
+    </MudGrid>
+
+    @*  <MudGrid>
+              <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DirectionsRun" Color="Color.Success" OnClick="@(()=>SetComand(1))">RUN</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="@(()=>SetComand(90))">STOP</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AlarmOff" Color="Color.Warning" OnClick="@(()=>SetComand(9))">ACKNOWLEDGE</MudButton>
+            </MudItem>
+        </MudGrid>*@
+}
+
+
+@code {
+    public string Mccode { get; set; } = "RGV01";
+    public Int32 McstatusNo { get; set; }
+    public bool McstatusAlarm { get; set; }
+    public string McstatusDesc { get; set; }
+    public string FocColor { get; set; }
+    public string BakColor { get; set; }
+    public string McInfo { get; set; }
+    private HashSet<Vset_gate_rgv> selectedItems = new HashSet<Vset_gate_rgv>();
+    private IEnumerable<Vset_gate_rgv> Elements = new List<Vset_gate_rgv>();
+
+    List<Vmachine> ElementsBuff = new List<Vmachine>();
+
+    private int value { get; set; } = 0;
+    private HashSet<int> options { get; set; } = new HashSet<int>() { 0 };
+
+    private string valueFM { get; set; } = "Nothing selected";
+    private string valueTO { get; set; } = "Nothing selected";
+
+    private string mPagecaption { get; set; } = "-";
+
+
+    private int CommandMC { get; set; } = 0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        mPagecaption = Mccode;
+
+        Elements = await Task.Run(() => ObjWcsService.GetGateRgv());
+
+        await Task.Run(() => ExecuteStatus());
+
+    }
+
+    async void ExecuteStatus()
+    {
+
+        //ElementsBuff = ObjWcsService.GetAllMachine();
+        ElementsBuff = await Task.Run(() => ObjWcsService.GetAllMachine());
+
+
+        var listStatus = ElementsBuff.Where(a => a.Mccode == Mccode).ToList();
+
+        foreach (var item in listStatus)
+        {
+
+            McstatusNo = item.St_no.Value;
+            McstatusAlarm = item.Is_alert.Value;
+            McstatusDesc = item.Desc_th.ToString();
+            McInfo = item.Information.ToString();
+            FocColor = item.Focecolor.ToString();
+            BakColor = item.Backcolor.ToString();
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+
+    void SetPotocal()
+    {
+
+        var queryFM = (from c in Elements
+                       where c.Mccode == valueFM
+                       select new { c.St_no, c.Mccode }).Single();
+
+        var queryTO = (from c in Elements
+                       where c.Mccode == valueTO
+                       select new { c.St_no, c.Mccode }).Single();
+
+
+        int Gateno_FM = queryFM.St_no.Value;
+        int Gateno_TO = queryTO.St_no.Value;
+
+
+
+
+
+
+
+
+
+        if (Gateno_FM != null && Gateno_TO != null)
+        {
+
+            bool bRet;
+            Int32 iCmd = 10;
+
+            bRet = ObjWcsService.CreatePotocalMC(Mccode, Gateno_FM, Gateno_TO, 1, "WGC-SURVEY", 0, iCmd);
+
+
+
+
+        }
+
+    }
+
+    void SetComand(Int32 iCmd)
+    {
+        bool bRet;
+        bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
+    }
+
+
+}

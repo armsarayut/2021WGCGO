@@ -1,0 +1,144 @@
+﻿@page "/pa/m6_1"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Public
+
+
+@inject PublicService ObjPublicService
+@inject ReportService UserlogService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+<MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Class6_1,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
+                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
+                    <MudMenuItem>Excel</MudMenuItem>
+                    <MudMenuItem>Pdf</MudMenuItem>
+                </MudMenu>
+            </MudTooltip>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Created)">DATETIME</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Menu_Name)">MENU</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Action_Desc)">ACTION</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Usid)">ACTOR</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Client_ip)">IPADDRESS</MudTableSortLabel></MudTh>
+
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="DATETIME">@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel="MENU">@context.Menu_Name</MudTd>
+            <MudTd DataLabel="ACTION">@context.Action_Desc</MudTd>
+            <MudTd DataLabel="ACTOR">@context.Usid</MudTd>
+            <MudTd DataLabel="IPADDRESS">@context.Client_ip</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string msgAction = "Enter Palletcode";
+    private string mMenudesc = "Audit trail";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Class6_1 selectedItem = null;
+    private HashSet<Class6_1> selectedItems = new HashSet<Class6_1>();
+    private IEnumerable<Class6_1> Elements = new List<Class6_1>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        PublicService objCS = new PublicService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllMenu6_1());
+        this.InsertAuditrial("View", mMenudesc);
+    }
+
+    private void setstr(string str)
+    {
+        if (mPalletcode.Length <= 0)
+        {
+            mPalletcode = str;
+            msgAction = "Enter Pack ID";
+            elevation = 3;
+        }
+        else
+        {
+            if (str == mPalletcode)
+            {
+                elevation = 2;
+                msgAction = "Mapping successfully";
+                //ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+                mPalletcode = "";
+            }
+            else
+            {
+                mPackid = str;
+                //ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+            }
+        }
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            //Console.WriteLine("Done the thing: " + MyValue);
+            //stxtInput = MyValue;
+            setstr(palletcode);
+
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Class6_1 element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Menu_Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Action_Desc.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Usid.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Client_ip}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
+    }
+
+}

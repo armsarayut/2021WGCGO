@@ -1,0 +1,84 @@
+﻿@using GoWMS.Server.Controllers;
+@using GoWMS.Server.Models.Wcs;
+
+@inject WcsService ObjWcsService;
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+
+
+        <MudSelect Label="Command " HelperText="Pick the Command" @bind-SelectedValues="selectedItems">
+            @foreach (var cmd in Elements)
+            {
+                <MudSelectItem Value="@cmd">@cmd.St_no - @cmd.St_desc_th</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudTextField T="string" Label="Reason"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string Mccode { get; set; }
+
+    private HashSet<Vmachine_command> selectedItems = new HashSet<Vmachine_command>();
+    private IEnumerable<Vmachine_command> Elements = new List<Vmachine_command>();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await Task.Run(() => ObjWcsService.GetCommandMachine(Mccode));
+    }
+
+    void Submit()
+    {
+        if (selectedItems != null)
+        {
+            bool bRet;
+            Int32 iCmd = 0;
+            foreach (var item in selectedItems)
+            {
+                iCmd = item.St_no.Value;
+            }
+            bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
+            if (bRet)
+            {
+                Snackbar.Add("Set Command OK", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Set Command Failed", Severity.Error);
+            }
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+
+    }
+
+    void Cancel() => MudDialog.Cancel();
+
+
+    void SetCommand()
+    {
+        if (selectedItems != null)
+        {
+            bool bRet;
+            Int32 iCmd = 0;
+            foreach (var item in selectedItems)
+            {
+                iCmd = item.St_no.Value;
+
+            }
+            bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
+        }
+    }
+
+}

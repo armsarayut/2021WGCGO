@@ -9,6 +9,8 @@ using System.Text;
 using GoWMS.Server.Controllers;
 using GoWMS.Server.Models;
 using GoWMS.Server.Models.Mas;
+using NpgsqlTypes;
+using Serilog;
 
 namespace GoWMS.Server.Data
 {
@@ -274,6 +276,46 @@ namespace GoWMS.Server.Data
                 con.Close();
             }
             return lstobj;
+        }
+
+        public Boolean ValidateMasterpallet(string spallet)
+        {
+            Boolean bret = false;
+
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                try
+                {
+                    StringBuilder Sql = new StringBuilder();
+                    Sql.AppendLine("select *");
+                    Sql.AppendLine("from wms.mas_pallet_go");
+                    Sql.AppendLine("where palletno = @palletno");
+
+                    NpgsqlCommand cmd = new NpgsqlCommand(Sql.ToString(), con)
+                    {
+                        CommandType = CommandType.Text
+                    };
+
+                    con.Open();
+
+                    cmd.Parameters.AddWithValue("@palletno", NpgsqlDbType.Varchar, spallet);
+
+                    NpgsqlDataReader rdr = cmd.ExecuteReader();
+                    while (rdr.Read())
+                    {
+                        bret = true;
+                    }
+                }
+                catch (NpgsqlException ex)
+                {
+                    Log.Error(ex.ToString());
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+            return bret;
         }
 
     }

@@ -20,5 +20,22 @@ namespace GoWMS.Server.Data
             return $"{Directory.GetCurrentDirectory()}{@"\wwwroot\fonts\ARIALUNI.TTF"}";
         }
 
+        public static string FormatN0 { get; set; } = "{0:N0}";
+        public static string FormatN2 { get; set; } = "{0:N2}";
+        public static string FormatD2 { get; set; } = "{0:D2}";
+        public static string FormatD3 { get; set; } = "{0:D3}";
+        public static string FormatD4 { get; set; } = "{0:D4}";
+        public static string FormatD5 { get; set; } = "{0:D5}";
+        public static string FormatD6 { get; set; } = "{0:D6}";
+        public static string FormatD7 { get; set; } = "{0:D7}";
+        public static string FormatD8 { get; set; } = "{0:D8}";
+        public static string FormatD9 { get; set; } = "{0:D9}";
+        public static string FormatDT { get; set; } = "yyyy-MM-dd HH:mm:ss";
+        public static string FormatDTHM { get; set; } = "yyyy-MM-dd HH:mm";
+        public static string FormatT { get; set; } = "HH:mm:ss";
+        public static string FormatTHM { get; set; } = "HH:mm";
+        public static string FormatD { get; set; } = "yyyy-MM-dd";
+        public static string TableHeight { get; set; } = "600px";
+
     }
 }

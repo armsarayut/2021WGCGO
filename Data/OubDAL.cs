@@ -359,6 +359,7 @@ namespace GoWMS.Server.Data
                         Lotno = rdr["lotno"].ToString(),
                         Batchno = rdr["batchno"].ToString(),
                         Sono = rdr["job"].ToString(),
+                        Quantity= rdr["quantity"] == DBNull.Value ? null : (int?)rdr["quantity"],
                         Palletno = rdr["pallet_no"].ToString(),
                         Sodate  = rdr["created"] == DBNull.Value ? null : (DateTime?)rdr["created"]
 

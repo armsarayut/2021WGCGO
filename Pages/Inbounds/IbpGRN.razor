@@ -52,15 +52,15 @@ else
         <MudTh>@L["BatchNo"]</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="DNDate">@Convert.ToDateTime(context.Docdate).ToShortDateString()</MudTd>
-        <MudTd DataLabel="DNNo">@context.Pono</MudTd>
-        <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
-        <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
-        <MudTd DataLabel="Qty">@context.Quantity</MudTd>
-        <MudTd DataLabel="Unit">@context.Unit</MudTd>
-        <MudTd DataLabel="Weight">@context.Weight</MudTd>
-        <MudTd DataLabel="LotNo">@context.Docno</MudTd>
-        <MudTd DataLabel="BatchNo">@context.Docnote</MudTd>
+        <MudTd DataLabel="@L["DNDate"]">@Convert.ToDateTime(context.Docdate).ToString(VarGlobals.FormatD)</MudTd>
+        <MudTd DataLabel="@L["DNNo"]">@context.Pono</MudTd>
+        <MudTd DataLabel="@L["ItemCode"]">@context.Itemcode</MudTd>
+        <MudTd DataLabel="@L["ItemName"]">@context.Itemname</MudTd>
+        <MudTd DataLabel="@L["Qty"]" Style="text-align: right" >@string.Format(VarGlobals.FormatN0, context.Quantity)</MudTd>
+        <MudTd DataLabel="@L["Unit"]">@context.Unit</MudTd>
+        <MudTd DataLabel="@L["Weight"]" Style="text-align: right">@string.Format(VarGlobals.FormatN2, context.Weight) </MudTd>
+        <MudTd DataLabel="@L["LotNo"]">@context.Docno</MudTd>
+        <MudTd DataLabel="@L["BatchNo"]">@context.Docnote</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />

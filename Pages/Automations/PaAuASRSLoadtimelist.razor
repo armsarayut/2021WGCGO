@@ -1,0 +1,175 @@
+﻿@page "/wcs/asrsloadtime"
+
+@using GoWMS.Server.Controllers;
+@using GoWMS.Server.Models.Wcs;
+@using GoWMS.Server.Data;
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Reports
+
+@inject WcsService ObjWcsService;
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+
+@if (Elements != null)
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary">@mPagecaption</MudText>
+    <MudGrid>
+
+        <MudItem Class="d-flex flex-row">
+            <MudItem>
+                <MudDatePicker Class="" Label="From Date" @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
+            </MudItem>
+            <MudItem>
+                <MudTimePicker Class="px-2" Label="From Time" @bind-Time="fromTime" />
+            </MudItem>
+        </MudItem>
+        <MudItem Class="d-flex flex-row">
+            <MudItem>
+                <MudDatePicker Class="" Label="To Date" @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
+            </MudItem>
+            <MudItem>
+                <MudTimePicker Class="px-2" Label="To Time" @bind-Time="toTime" />
+            </MudItem>
+        </MudItem>
+        <MudItem Class="d-flex flex-row align-self-end">
+            <MudButton OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium">Search</MudButton>
+        </MudItem>
+    </MudGrid>
+    <MudGrid Class="py-2">
+        <MudTable Items="@Elements"
+                  FixedHeader="@fixed_header"
+                  FixedFooter="@fixed_footer"
+                  Height="@(fixed_header || fixed_footer ? "500px" : "")"
+                  Dense="@dense"
+                  Hover="@hover"
+                  Bordered="@bordered" Striped="@striped" Filter="new Func<AsrsLoadtime, bool>(FilterFunc)" Style="width:100%;">
+            <ToolBarContent>
+                <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
+                    <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
+                        <MudMenuItem @onclick="@DownloadExcelDocument">EXCEL</MudMenuItem>
+                        <MudMenuItem>PDF</MudMenuItem>
+                    </MudMenu>
+                </MudTooltip>
+
+                <MudToolBarSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>PALLET</MudTh>
+                <MudTh>TASKCODE</MudTh>
+                <MudTh>TASKTYPE</MudTh>
+                <MudTh>SRM</MudTh>
+                <MudTh>SOURCE</MudTh>
+                <MudTh>DESTINATION</MudTh>
+                <MudTh>START</MudTh>
+                <MudTh>END</MudTh>
+                <MudTh>TIME</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+
+                <MudTd DataLabel="PALLET">@context.Lpncode</MudTd>
+                <MudTd DataLabel="TASKCODE">@context.Work_code</MudTd>
+                <MudTd DataLabel="TASKTYPE">@context.Work_text_th</MudTd>
+                <MudTd DataLabel="SRM">@string.Format(VarGlobals.FormatD2, context.Srm_no)</MudTd>
+                <MudTd DataLabel="SOURCE">@string.Format(VarGlobals.FormatD9, context.Srm_from)</MudTd>
+                <MudTd DataLabel="DESTINATION">@string.Format(VarGlobals.FormatD9, context.Srm_to)</MudTd>
+                <MudTd DataLabel="START">@Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)</MudTd>
+                <MudTd DataLabel="END">@Convert.ToDateTime(context.Etime).ToString(VarGlobals.FormatDT)</MudTd>
+                <MudTd DataLabel="TIME">@context.Loadtime</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 10, 20, 50, 100 }" />
+            </PagerContent>
+        </MudTable>
+    </MudGrid>
+
+}
+
+
+@code {
+    private string mPagecaption { get; set; } = "ASRS Loadtime";
+
+    private IEnumerable<AsrsLoadtime> Elements = new List<AsrsLoadtime>();
+
+    DateTime? fromDate = DateTime.Today;
+    TimeSpan? fromTime = DateTime.Now.AddHours(-1).TimeOfDay;
+    DateTime? toDate = DateTime.Today;
+    TimeSpan? toTime = DateTime.Now.TimeOfDay;
+
+
+
+    DateTime? fromDateTime = DateTime.Today;
+    DateTime? toDateTime = DateTime.Today.AddDays(1);
+
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        WcsService objCS = new WcsService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+
+        fromDateTime = fromDate.Value.Date + fromTime.Value;
+        toDateTime = toDate.Value.Date + toTime.Value;
+
+
+        Elements = await Task.Run(() => objCS.GetAsrsloadtime(fromDateTime.Value, toDateTime.Value));
+    }
+
+    bool FilterFunc(AsrsLoadtime element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Lpncode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    async void OnclickSearch()
+    {
+        DbGetData();
+        StateHasChanged();
+    }
+
+    void DbGetData()
+    {
+        //timePortionDateTimePicker.Value
+
+        DateTime newDateTimeFM = fromDate.Value.Date + fromTime.Value;
+        DateTime newDateTimeTO = toDate.Value.Date + toTime.Value;
+
+
+        // DateTime newDateTime = fromDate.Value.Date.Add(TimeSpan.Parse(fromTime.Value.ToShortTimeString()));
+
+
+
+        Elements = ObjWcsService.GetAsrsloadtime(newDateTimeFM, newDateTimeTO);
+
+
+    }
+
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            AsrsloadtimeRptExcel excelReport = new AsrsloadtimeRptExcel();
+            List<AsrsLoadtime> listExcelReport = new List<AsrsLoadtime>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+}

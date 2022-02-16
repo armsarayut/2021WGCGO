@@ -53,15 +53,6 @@ else
             <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Save" Style="background-color: darkblue; color: white; width: 120px; height: 30px;" OnClick=@SelectOrder>
                 StartPick
             </MudButton>
-
-            @*
-                <MudButton OnClick="DownloadExcelDocument" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                    Excel
-                </MudButton>
-                <MudButton OnClick="DownloadPdfDocument" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                    PDF
-                </MudButton>
-            *@
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
@@ -98,89 +89,25 @@ else
             <MudTh>@L["PalletGo"]</MudTh>
         </HeaderContent>
         <GroupHeaderTemplate>
-            <MudTh Class="mud-table-cell-custom-group" colspan="5">@($"{context.GroupName}: {context.Key}")</MudTh>
+            <MudTh Class="mud-table-cell-custom-group" colspan="10">@($"{context.GroupName}: {context.Key}")</MudTh>
         </GroupHeaderTemplate>
         <RowTemplate>
-            <MudTd DataLabel="SoNo">@context.SO_NO</MudTd>
-            <MudTd DataLabel="ItemCode">@context.ITEM_CODE</MudTd>
-            <MudTd DataLabel="Customer">@context.CUSTOMER_CODE</MudTd>
-            <MudTd DataLabel="Seq">@context.DN_SEQ</MudTd>
-            <MudTd DataLabel="LotNo">@context.LOT_NO</MudTd>
-            <MudTd DataLabel="BatchNo">@context.BATCH_NO</MudTd>
-            <MudTd DataLabel="Packeting">@context.PACKETING_CODE</MudTd>
-            <MudTd DataLabel="Qty">@context.DN_QTY</MudTd>
-            <MudTd DataLabel="Unit">@context.DN_UM</MudTd>
-            <MudTd DataLabel="PaletGo">@context.PALLET_GO</MudTd>
+            <MudTd DataLabel="@L["SoNo"]">@context.SO_NO</MudTd>
+            <MudTd DataLabel="@L["ItemCode"]">@context.ITEM_CODE</MudTd>
+            <MudTd DataLabel="@L["Customer"]">@context.CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel="@L["Seq"]">@context.DN_SEQ</MudTd>
+            <MudTd DataLabel="@L["LotNo"]">@context.LOT_NO</MudTd>
+            <MudTd DataLabel="@L["BatchNo"]">@context.BATCH_NO</MudTd>
+            <MudTd DataLabel="@L["Packeting"]">@context.PACKETING_CODE</MudTd>
+            <MudTd DataLabel="@L["Qty"]">@context.DN_QTY</MudTd>
+            <MudTd DataLabel="@L["Unit"]">@context.DN_UM</MudTd>
+            <MudTd DataLabel="@L["PalletGo"]">@context.PALLET_GO</MudTd>
         </RowTemplate>
         <GroupFooterTemplate>
-            <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="5">Total Quantity: @context.Items.Sum((e) => e.DN_QTY)</MudTh>
+            <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="1">Total Quantity: @context.Items.Sum((e) => e.DN_QTY)</MudTh>
         </GroupFooterTemplate>
     </MudTable>
 
-
-
-
-
-    @*
-        <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
-            <ToolBarContent>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                    Excel
-                </MudButton>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                    PDF
-                </MudButton>
-                <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-
-            <HeaderContent>
-                <MudTh>SEQ_NO</MudTh>
-                <MudTh>BK_NO</MudTh>
-                <MudTh>DN_NO</MudTh>
-                <MudTh>DN_SEQ</MudTh>
-                <MudTh>ITEM_CODE</MudTh>
-                <MudTh>ITEM_NAME</MudTh>
-                <MudTh>DN_QTY</MudTh>
-                <MudTh>DN_UM</MudTh>
-                <MudTh>CUSTOMER_CODE</MudTh>
-                <MudTh>PACKETING_CODE</MudTh>
-                <MudTh>CUSTOMER_ITEM</MudTh>
-                <MudTh>SUBCUSTOMER_CODE</MudTh>
-                <MudTh>BOOKING_MODEL</MudTh>
-                <MudTh>REQUEST_DATE</MudTh>
-                <MudTh>PALLET_GO</MudTh>
-                <MudTh>STATUS_GO</MudTh>
-                <MudTh>CREATED_DATE</MudTh>
-                <MudTh>UPDATE_DATE</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-
-                <MudTd DataLabel="SEQ_NO">@context.SEQ_NO</MudTd>
-                <MudTd DataLabel="BK_NO">@context.BK_NO</MudTd>
-                <MudTd DataLabel="DN_NO">@context.DN_NO</MudTd>
-                <MudTd DataLabel="DN_SEQ">@context.DN_SEQ</MudTd>
-                <MudTd DataLabel="ITEM_CODE">@context.ITEM_CODE</MudTd>
-                <MudTd DataLabel="ITEM_NAME">@context.ITEM_NAME</MudTd>
-                <MudTd DataLabel="DN_QTY">@context.DN_QTY</MudTd>
-                <MudTd DataLabel="DN_UM">@context.DN_UM</MudTd>
-                <MudTd DataLabel="CUSTOMER_CODE">@context.CUSTOMER_CODE</MudTd>
-                <MudTd DataLabel="PACKETING_CODE">@context.PACKETING_CODE</MudTd>
-                <MudTd DataLabel="CUST_ITEM_CODE">@context.CUST_ITEM_CODE</MudTd>
-                <MudTd DataLabel="SUB_CUSTOMER_CODE">@context.SUB_CUSTOMER_CODE</MudTd>
-                <MudTd DataLabel="BOOKING_MODEL_NO">@context.BOOKING_MODEL_NO</MudTd>
-                <MudTd DataLabel="REQUEST_DATE">@context.REQUEST_DATE</MudTd>
-                <MudTd DataLabel="PALLET_GO">@context.PALLET_GO</MudTd>
-                <MudTd DataLabel="STATUS_GO">@context.STATUS_GO</MudTd>
-                <MudTd DataLabel="CREATED_DATE">@context.CREATED_DATE</MudTd>
-                <MudTd DataLabel="UPDATE_DATE_GO">@context.UPDATE_DATE_GO</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-
-            </PagerContent>
-        </MudTable>
-    *@
 }
 
 @code {
@@ -209,10 +136,17 @@ else
     private TableGroupDefinition<BOOKING_NOTE_ITEMS> _groupDefinition = new()
     {
         GroupName = "Order",
-        Indentation = false,
+        Indentation = true,
         Expandable = true,
         IsInitiallyExpanded = false,
-        Selector = (e) => e.SO_NO
+        Selector = (e) => e.SO_NO,
+        InnerGroup = new TableGroupDefinition<BOOKING_NOTE_ITEMS>()
+        {
+            GroupName = "PalletGo",
+            Expandable = true,
+            IsInitiallyExpanded = false,
+            Selector = (e) => e.PALLET_GO
+        }
     };
 
     protected override async Task OnInitializedAsync()
@@ -246,12 +180,19 @@ else
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
+        // For Sim Test
+        /*
+        string pallet = "WGC-001503";
+        string pack = "289";
+        string mat = "MP1095O";
+        string matDesc = "Organaic Maltodextrin Powder";
+        */
+        //var strRES = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { efidx = x.SEQ_NO, quantity = x.DN_QTY, packageid = pack, materialcode = mat, palletno = pallet, sono = x.SO_NO, customer = x.CUSTOMER_CODE, lotno = x.LOT_NO, batchno = x.BATCH_NO, matematerialdescription = matDesc, unit = x.DN_UM, deliverydate = x.REQUEST_DATE }).ToList();
+        //-------------------------
 
+        // For Production
         var strRES = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { efidx = x.SEQ_NO, quantity = x.DN_QTY, packageid = x.DN_SEQ, materialcode = x.ITEM_CODE, palletno = x.PALLET_GO, sono = x.SO_NO, customer = x.CUSTOMER_CODE, lotno = x.LOT_NO, batchno = x.BATCH_NO, matematerialdescription = x.ITEM_NAME, unit = x.DN_UM, deliverydate = x.REQUEST_DATE }).ToList();
-
-        //var strLON = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { SEQ_NO = x.SEQ_NO, SO_NO = x.SO_NO, DN_SEQ = x.DN_SEQ, ITEM_CODE = x.ITEM_CODE, PALLET_GO = x.PALLET_GO, DN_QTY = x.DN_QTY }).ToList();
-
-        //var jsonLON = JsonSerializer.Serialize(strLON, serializeOptions);
+        //-----------------
 
         var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
 

@@ -58,6 +58,7 @@ namespace GoWMS.Server
             services.AddServerSideBlazor();
             services.AddMudServices();
             services.AddSingleton<WeatherForecastService>();
+
             services.AddSingleton<CustomerService>();
             services.AddSingleton<ErpApiService>();
             services.AddSingleton<StoreinService>();
@@ -68,7 +69,16 @@ namespace GoWMS.Server
             services.AddSingleton<MasService>();
             services.AddSingleton<WgcService>();
             services.AddSingleton<StoreoutService>();
+            services.AddSingleton<ReportService>();
+            services.AddSingleton<PublicService>();
+            
+            services.AddSingleton<UtilityServices>();
             services.AddSingleton<DashService>();
+            services.AddSingleton<WcsService>();
+            services.AddSingleton<UserServices>();
+            services.AddSingleton<PublicFunServices>();
+
+
             services.AddScoped<BlazorAppContext>();
 
 

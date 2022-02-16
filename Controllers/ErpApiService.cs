@@ -119,6 +119,14 @@ namespace GoWMS.Server.Controllers
             return sret;
         }
 
+        public string SetPickingWgcAuduit(string jsonRes, ref Int32 iret, ref string sret)
+        {
+            objDAL.SetPickingWgcAuduit(jsonRes, ref iret, ref sret);
+            return sret;
+        }
+
+        
+
 
 
 

@@ -6,7 +6,7 @@
 @using System.Text.Json
 @inject InvService ObjService
 @inject IDialogService DialogService
-
+@inject PublicFunServices ObjFunService
 
 
 @inject WgcService ObjErpService
@@ -25,7 +25,7 @@ else
 
     @if (StkGroup)
     {
-<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]</MudText>
+        <MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]</MudText>
 
         <MudTable Items="@Elements"
                   FixedHeader="@fixed_header"
@@ -54,11 +54,11 @@ else
                 <MudTh>@L["PalletGo"]</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
-                <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
-                <MudTd DataLabel="Stock">@context.Quantity</MudTd>
-                <MudTd DataLabel="SEQ">@context.Pallettag</MudTd>
-                <MudTd DataLabel="PalletGo">@context.Pallteno</MudTd>
+                <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
+                <MudTd DataLabel=@L["ItemName"]>@context.Itemname</MudTd>
+                <MudTd DataLabel=@L["Stock"]>@string.Format(VarGlobals.FormatN0, context.Quantity)</MudTd>
+                <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
+                <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -69,7 +69,6 @@ else
     {
 
     }
-
 
     <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
         <MessageContent>
@@ -262,7 +261,9 @@ else
         };
 
         string cus = "MANUAL";
-        string so = "MO-" + DateTime.Now.ToString("yyMMddHHmmssffff");
+        //string so = "MO-" + DateTime.Now.ToString("yyMMddHHmmssffff");
+        string so = "MO-" + ObjFunService.GetRunning("sq002", 4);
+
         string lot = "-";
         string batch = "-";
         DateTime requestdate = DateTime.Today.Date;

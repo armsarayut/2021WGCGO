@@ -46,13 +46,23 @@ else
             <MudTh>@L["Endtime"]</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Queuetime">@context.Created</MudTd>
-            <MudTd DataLabel="PalletGo">@context.Palletno</MudTd>
-            <MudTd DataLabel="Worktype">@context.Puttype</MudTd>
-            <MudTd DataLabel="SRM">@context.Storagearea</MudTd>
-            <MudTd DataLabel="Location">@context.Storagebin</MudTd>
-            <MudTd DataLabel="Starttime">@context.Storagetime</MudTd>
-            <MudTd DataLabel="Endtime">@context.Completed</MudTd>
+            <MudTd DataLabel="@L["Queuetime"]">@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel="@L["PalletGo"]">@context.Palletno</MudTd>
+            <MudTd DataLabel="@L["Worktype"]">@context.Puttype</MudTd>
+            <MudTd DataLabel="@L["SRM"]">@context.Storagearea</MudTd>
+            <MudTd DataLabel="@L["Location"]">@context.Storagebin</MudTd>
+            <MudTd DataLabel="@L["Starttime"]">
+                @if (context.Storagetime != null)
+                    {
+                    @Convert.ToDateTime(context.Storagetime).ToString(VarGlobals.FormatDT)
+                    }
+            </MudTd>
+            <MudTd DataLabel="@L["Endtime"]">
+                @if (context.Completed != null)
+                    {
+                    @Convert.ToDateTime(context.Completed).ToString(VarGlobals.FormatDT)
+                    }
+            </MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />

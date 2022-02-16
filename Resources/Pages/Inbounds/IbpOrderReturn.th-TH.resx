@@ -123,6 +123,9 @@
   <data name="CUSTOMERCODE" xml:space="preserve">
     <value>รหัสลูกค้า</value>
   </data>
+  <data name="DATE" xml:space="preserve">
+    <value>วันที่</value>
+  </data>
   <data name="DNNO" xml:space="preserve">
     <value>เลขที่เอกสาร</value>
   </data>
@@ -138,6 +141,9 @@
   <data name="pageHeader" xml:space="preserve">
     <value>การคืน</value>
   </data>
+  <data name="PALLET" xml:space="preserve">
+    <value>พาเลท</value>
+  </data>
   <data name="PalletGo" xml:space="preserve">
     <value>พาเลทหลัก</value>
   </data>
@@ -146,6 +152,9 @@
   </data>
   <data name="SETRETURN" xml:space="preserve">
     <value>บันทึกคืน</value>
+  </data>
+  <data name="SONO" xml:space="preserve">
+    <value>ใบงาน</value>
   </data>
   <data name="UNIT" xml:space="preserve">
     <value>หน่วย</value>

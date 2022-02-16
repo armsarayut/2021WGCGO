@@ -94,7 +94,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="MasterPallet">@context.Lpncode</MudTd>
-            <MudTd DataLabel="PackID">@context.Package_Id</MudTd>
+            <MudTd DataLabel="SEQ">@context.Package_Id</MudTd>
             <MudTd DataLabel="Material">@context.Material_Code</MudTd>
             <MudTd DataLabel="Description">@context.Material_Description</MudTd>
             <MudTd DataLabel="Qty">@context.Gr_Quantity</MudTd>
@@ -202,9 +202,7 @@ else
                     msgAction = "Mapping successfully";
                     //ObjErpApiService.UpdateReceivingOrderbypallet(mPalletcode);
                     ObjErpApiService.SetMappedPallet(mPalletcode);
-
                     ObjWgcService.UpdatePalletNewDelivery_note(mPalletcode);
-
                     mPalletcode = "";
                 }
                 else

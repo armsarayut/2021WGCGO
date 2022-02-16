@@ -1,0 +1,194 @@
+﻿@page "/paau/asrsstatus"
+@using System.Runtime.Serialization;
+@using Newtonsoft.Json;
+@using GoWMS.Server.Controllers;
+@using GoWMS.Server.Models.Wcs;
+@using System.Net.NetworkInformation;
+
+@inject WcsService ObjWcsService;
+@implements IDisposable;
+@inject NavigationManager UriHelper
+@inject IJSRuntime jsRuntime
+@inject UtilityServices ObjUtitityservice
+@inject IDialogService DialogService
+
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPagecaption </MudText>
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Vmachine,bool>(FilterFunc)"
+              SortLabel="Sort By">
+        <ToolBarContent>
+            <MudIconButton OnClick="NavigateToNewTab" Icon="@Icons.Material.Filled.TouchApp" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI" />
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.Mccode)">MCCODE</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.Information)">INFO</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.St_no)">STATUS</MudTableSortLabel></MudTh>
+            <MudTh>ACTION</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="MC CODE">@context.Mccode</MudTd>
+            <MudTd DataLabel="INFO">@context.Information</MudTd>
+            <MudTd DataLabel="STATUS">
+                @{if (@context.Is_alert == true)
+                        {
+                        <MudAlert Severity="Severity.Error"
+                                  Variant="Variant.Filled"
+                                  Dense="true"
+                                  Style="@($"color:{context.Focecolor}; background:{context.Backcolor};")">
+                            @context.St_no - @context.Desc_th
+                        </MudAlert>
+                        }
+                        else
+                        {
+                        <MudAlert Severity="Severity.Normal"
+                                  Variant="Variant.Filled"
+                                  Dense="true"
+                                  Style="@($"color:{context.Focecolor}; background:{context.Backcolor};")">
+                            @context.St_no - @context.Desc_th
+                        </MudAlert>
+                        }
+                }
+            </MudTd>
+
+            <MudTd DataLabel="ACTION">
+
+                @if (@context.Is_cmd == true)
+                    {
+                    <MudFab @onclick="@(()=>OpenDialog(@context.Mccode))" Color="Color.Secondary" Icon="@Icons.Material.Filled.MenuOpen" Size="Size.Small" IconSize="Size.Small" />
+                    }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+
+@code {
+    private string mPagecaption = "ASRS-STATUS";
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private string McCommand { get; set; }
+    private string setMcCommand { get; set; } = "wcs/mccmd/";
+
+
+
+
+    List<Vmachine> Elements = new List<Vmachine>();
+
+
+
+
+
+
+
+    void IDisposable.Dispose()
+    {
+        //while (bgWorker.IsBusy == true)
+        //{ }
+        timer.Enabled = false;
+        timer.Dispose();
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        ExecuteStatus();
+
+        await Task.Run(() => InitialTimer());
+
+    }
+
+    async void ExecuteStatus()
+    {
+        Elements = ObjWcsService.GetAllMachine();
+    }
+
+    bool FilterFunc(Vmachine element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Mccode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Desc_th.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+
+    #region timer
+    System.Timers.Timer timer;
+    void InitialTimer()
+    {
+        timer = new System.Timers.Timer();
+        timer.Interval = 1000;
+        timer.Elapsed += TimerElapsed;
+        timer.Enabled = true;
+    }
+    void TimerElapsed(Object source, System.Timers.ElapsedEventArgs e)
+    {
+
+        if (timer.Interval <= 1000)
+            timer.Interval = 10000;
+
+        ExecuteStatus();
+        InvokeAsync(StateHasChanged);
+    }
+    #endregion
+
+    private void SetCommand(string mccode)
+    {
+
+        if (mccode.Length > 0)
+        {
+            McCommand = setMcCommand + mccode;
+            UriHelper.NavigateTo(McCommand);
+        }
+
+    }
+
+
+    public async Task NavigateToNewTab()
+    {
+        string url = "http://192.168.200.160:8080/";
+        await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+    }
+
+
+    private void OpenDialog(string mccode)
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseButton = true };
+        var parameters = new DialogParameters { ["Mccode"] = mccode };
+
+
+        var dialog = DialogService.Show<DialogKeyboardNavigationExample_Dialog>(mccode, parameters);
+
+
+    }
+
+}

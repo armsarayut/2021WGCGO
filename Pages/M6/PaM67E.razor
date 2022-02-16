@@ -1,0 +1,198 @@
+﻿@page "/pa/m6_7f"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Public
+
+
+@inject PublicService ObjPublicService
+@inject ReportService UserlogService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Class6_7_F,bool>(FilterFunc)"
+              @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
+                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
+                    <MudMenuItem>Excel</MudMenuItem>
+                    <MudMenuItem>Pdf</MudMenuItem>
+                </MudMenu>
+            </MudTooltip>
+            <MudSpacer />
+            <MudGrid>
+                <MudSpacer />   
+                <MudItem xs=6 >
+                    <MudDateRangePicker 
+                                        @ref="_picker" 
+                                        Label="Search Date" 
+                                        @bind-DateRange="_dateRange" 
+                                        DateFormat="@VarGlobals.FormatD">
+                        <PickerActions>
+                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Clear</MudButton>
+                            <MudButton OnClick="@(() => setFindDate(false))">Cancel</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="@(() => setFindDate(true))">Ok</MudButton>
+                        </PickerActions>
+                    </MudDateRangePicker>
+                </MudItem>  
+                <MudItem xs=6 >
+                    <MudTextField 
+                                  @bind-Value="searchString" 
+                                  Placeholder="Search" 
+                                  Adornment="Adornment.Start" 
+                                  AdornmentIcon="@Icons.Material.Filled.Search" 
+                                  IconSize="Size.Medium" 
+                                  Class="mt-0">
+                    </MudTextField>
+                </MudItem>
+            </MudGrid>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W_date)">DATE</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.Wtotal)">TOTAL</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W01)">STORE-IN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W05)">STORE-OUT</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W101)">EMPTY-IN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W102)">EMPTY-OUT</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W09)">MOVE</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="DATE">@Convert.ToDateTime(context.W_date).ToString(VarGlobals.FormatD)</MudTd>
+            <MudTd DataLabel="TOTAL">@context.Wtotal</MudTd>
+            <MudTd DataLabel="STORE-IN">@context.W01</MudTd>
+            <MudTd DataLabel="STORE-OUT">@context.W05</MudTd>
+            <MudTd DataLabel="EMPTY-IN">@context.W101</MudTd>
+            <MudTd DataLabel="EMPTY-OUT">@context.W102</MudTd>
+            <MudTd DataLabel="MOVE">@context.W09</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string msgAction = "Enter Palletcode";
+    private string mMenudesc = "TASK SUMMARY";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Class6_7_F selectedItem = null;
+    private HashSet<Class6_7_F> selectedItems = new HashSet<Class6_7_F>();
+    private IEnumerable<Class6_7_F> Elements = new List<Class6_7_F>();
+    private IEnumerable<Class6_7_F> Elementsource = new List<Class6_7_F>();
+
+    public int elevation = 0;
+
+    MudDateRangePicker _picker;
+    DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        PublicService objCS = new PublicService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elementsource = await Task.Run(() => objCS.GetAllMenu6_7F());
+        Elements = Elementsource;
+
+        this.InsertAuditrial("View", mMenudesc);
+    }
+
+    private void setstr(string str)
+    {
+        if (mPalletcode.Length <= 0)
+        {
+            mPalletcode = str;
+            msgAction = "Enter Pack ID";
+            elevation = 3;
+        }
+        else
+        {
+            if (str == mPalletcode)
+            {
+                elevation = 2;
+                msgAction = "Mapping successfully";
+                //ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+                mPalletcode = "";
+            }
+            else
+            {
+                mPackid = str;
+                //ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+            }
+        }
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            //Console.WriteLine("Done the thing: " + MyValue);
+            //stxtInput = MyValue;
+            setstr(palletcode);
+
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Class6_7_F element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        //if (element.Su_No.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //    return true;
+        // if (element.W_Count.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //     return true;
+        // if (element.Desc_Th.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //     return true;
+        //if ($"{element.Create_By}".Contains(searchString))
+        //    return true;
+        return false;
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
+    }
+
+     void setFindDate(bool bOk)
+    {
+        _picker.Close();
+
+        if (bOk)
+        {
+            DateTime dtStart = _dateRange.Start.Value;
+            DateTime dtEnd = _dateRange.End.Value;
+            Elements = Elementsource.Where(x => x.W_date >= dtStart.Date && x.W_date <= dtEnd.Date).ToList();
+            StateHasChanged();
+        }
+    }
+}

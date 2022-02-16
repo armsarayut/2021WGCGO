@@ -123,6 +123,9 @@
   <data name="CUSTOMERCODE" xml:space="preserve">
     <value>CUSTOMERCODE</value>
   </data>
+  <data name="DATE" xml:space="preserve">
+    <value>DATE</value>
+  </data>
   <data name="DNNO" xml:space="preserve">
     <value>DN NO</value>
   </data>
@@ -138,6 +141,9 @@
   <data name="pageHeader" xml:space="preserve">
     <value>Return</value>
   </data>
+  <data name="PALLET" xml:space="preserve">
+    <value>PALLET</value>
+  </data>
   <data name="PalletGo" xml:space="preserve">
     <value>PalletGo</value>
   </data>
@@ -146,6 +152,9 @@
   </data>
   <data name="SETRETURN" xml:space="preserve">
     <value>SET RETURN</value>
+  </data>
+  <data name="SONO" xml:space="preserve">
+    <value>SONO</value>
   </data>
   <data name="UNIT" xml:space="preserve">
     <value>UNIT</value>

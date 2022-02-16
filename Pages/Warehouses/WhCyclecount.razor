@@ -6,7 +6,7 @@
 @using System.Text.Json
 @inject InvService ObjService
 @inject IDialogService DialogService
-
+@inject PublicFunServices ObjFunService
 
 
 @inject WgcService ObjErpService
@@ -25,7 +25,7 @@ else
 
     @if (StkGroup)
     {
-<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]  </MudText>
+        <MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]  </MudText>
 
         <MudTable Items="@Elements"
                   FixedHeader="@fixed_header"
@@ -266,12 +266,41 @@ else
         };
 
         string cus = "MANUAL";
-        string so = "CY-" + DateTime.Now.ToString("yyMMddHHmmssffff");
+        //string so = "CY-" + DateTime.Now.ToString("yyMMddHHmmssffff");
+        string so = "CY-" + ObjFunService.GetRunning("sq002", 4);
+
         string lot = "-";
         string batch = "-";
         DateTime requestdate = DateTime.Today.Date;
 
-        var strRES = selectedItems.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
+        /*
+        var results = from p in selectedItems
+                      group p.Pallteno by p.Pallettag into g
+                      select new { Tag = g.Key, Pallet = g.ToList() };
+
+        var pallets = from student in selectedItems
+                      group student.Pallteno by student.Pallteno into StudentGroup
+                      orderby StudentGroup.Key
+                      select StudentGroup.Key;
+        */
+
+        var pallets = selectedItems.GroupBy(g => g.Pallteno).OrderBy(o => o.Key).Select(s => s.Key);
+
+        // var filteredOrders = Elements.Where(o => allowedStatus.Contains(o.StatusCode));
+
+        var filteredOrders = from order in Elements
+                             where pallets.Contains(order.Pallteno)
+                             select order;
+
+
+        var strRES = filteredOrders.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
+
+        //var strRES = selectedItems.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
+
+
+
+
+
 
         //var strLON = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { SEQ_NO = x.SEQ_NO, SO_NO = x.SO_NO, DN_SEQ = x.DN_SEQ, ITEM_CODE = x.ITEM_CODE, PALLET_GO = x.PALLET_GO, DN_QTY = x.DN_QTY }).ToList();
 
@@ -282,7 +311,7 @@ else
         var iReturn = 0;
         var sReturn = "Call";
 
-        ObjApiService.SetPickWgcmanual(jsonRES, ref iReturn, ref sReturn);
+        ObjApiService.SetPickingWgcAuduit(jsonRES, ref iReturn, ref sReturn);
 
         if (selectedItems.Count > 0)
         {

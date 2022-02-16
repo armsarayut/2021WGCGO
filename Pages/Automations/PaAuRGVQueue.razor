@@ -1,0 +1,120 @@
+﻿@page "/paau/rgvqueue"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
+
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Inb
+@using GoWMS.Server.Models.Wcs
+
+@inject WcsService ObjWcsService
+
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Tas_Rgvworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
+                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
+                    <MudMenuItem>Excel</MudMenuItem>
+                    <MudMenuItem>Pdf</MudMenuItem>
+                </MudMenu>
+            </MudTooltip>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Ctime)">QUEUING</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Lpncode)">PALLET</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Work_Code)">TASKTYPE</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_No)">RGV</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_From)">SOURCE</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_To)">DESTINATION</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Stime)">STARTED</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="QUEUING">@Convert.ToDateTime(context.Ctime).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel="PALLET">@context.Lpncode</MudTd>
+            <MudTd DataLabel="TASKTYPE">@context.Work_Code</MudTd>
+            <MudTd DataLabel="RGV">@context.Rgv_No</MudTd>
+            <MudTd DataLabel="SOURCE">@context.Rgv_From</MudTd>
+            <MudTd DataLabel="DESTINATION">@context.Rgv_To</MudTd>
+            <MudTd DataLabel="STARTED">
+                @if (context.Stime != null)
+                    {
+                    @Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)
+                    }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string mPageHeader = "ASRS-QUEUE";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Tas_Rgvworks selectedItem = null;
+    private HashSet<Tas_Rgvworks> selectedItems = new HashSet<Tas_Rgvworks>();
+    private IEnumerable<Tas_Rgvworks> Elements = new List<Tas_Rgvworks>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WcsService objCS = new WcsService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetRGVWorks());
+    }
+
+    private void setstr(string str)
+    {
+
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Tas_Rgvworks element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Lpncode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Work_Code} {element.Work_Status}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+}

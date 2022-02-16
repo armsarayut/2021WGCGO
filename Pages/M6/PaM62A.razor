@@ -1,0 +1,145 @@
+﻿@page "/pa/m6_2a"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Public
+
+
+@inject PublicService ObjPublicService
+@inject ReportService UserlogService
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
+    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Class6_2_A,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
+                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
+                    <MudMenuItem>Excel</MudMenuItem>
+                    <MudMenuItem>Pdf</MudMenuItem>
+                </MudMenu>
+            </MudTooltip>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Created)">DATETIME</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Item_Code)">ITEMCODE</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Item_Name)">ITEMNAME</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Su_No)">SEQ</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Order_No)">ORDERNO</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Result_Qty)">QTY</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="DATETIME">@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel="ITEMCODE">@context.Item_Code</MudTd>
+            <MudTd DataLabel="ITEMNAME">@context.Item_Name</MudTd>
+            <MudTd DataLabel="SEQ">@context.Su_No</MudTd>
+            <MudTd DataLabel="ORDERNO">@context.Order_No</MudTd>
+            <MudTd DataLabel="QTY">@string.Format(VarGlobals.FormatN2, context.Result_Qty)</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private string msgAction = "Enter Palletcode";
+    private string mMenudesc = "Order Receive";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Class6_2_A selectedItem = null;
+    private HashSet<Class6_2_A> selectedItems = new HashSet<Class6_2_A>();
+    private IEnumerable<Class6_2_A> Elements = new List<Class6_2_A>();
+
+    public int elevation = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        PublicService objCS = new PublicService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetAllMenu6_2A());
+        this.InsertAuditrial("View", mMenudesc);
+    }
+
+    private void setstr(string str)
+    {
+        if (mPalletcode.Length <= 0)
+        {
+            mPalletcode = str;
+            msgAction = "Enter Pack ID";
+            elevation = 3;
+        }
+        else
+        {
+            if (str == mPalletcode)
+            {
+                elevation = 2;
+                msgAction = "Mapping successfully";
+                //ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+                mPalletcode = "";
+            }
+            else
+            {
+                mPackid = str;
+                //ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+            }
+        }
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            //Console.WriteLine("Done the thing: " + MyValue);
+            //stxtInput = MyValue;
+            setstr(palletcode);
+
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Class6_2_A element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Su_No.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Item_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Item_Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Create_By}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    public void Dispose()
+    {
+
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
+    }
+
+}

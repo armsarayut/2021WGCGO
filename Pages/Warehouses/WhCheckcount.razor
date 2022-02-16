@@ -1,0 +1,401 @@
+﻿@page "/wh/cyc"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Public
+@using System.Threading
+
+@inject WhService ObjWhService
+@inject WcsService ObjWcsService
+@inject MasService ObjMasService
+@inject UserServices OpjUserService
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
+
+<MudGrid>
+    <MudItem xs="12">
+        <div class="form-group">
+            <input style="width: 100%; height: 40px" type="text" class="form-control" @bind-value="stringputkey" @onkeyup="@DoTheThing" placeholder="Input scan" />
+        </div>
+    </MudItem>
+</MudGrid>
+
+@if (Elements == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudHidden Breakpoint="Breakpoint.Xs">
+        <MudTable Items="@Elements"
+                  Dense="@dense"
+                  Hover="@hover"
+                  Bordered="@bordered"
+                  Striped="@striped"
+                  Filter="new Func<Sap_StoreoutInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Pallet:[@mPalletcode]</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Bcount)">STATE</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Su_No)">PACKID</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Item_Code)">MATERIAL</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Stock_Qty)">QTY</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Unit)">UNIT</MudTableSortLabel></MudTh>
+                <MudTh>ACTION</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="STATE">
+                    @{if (@context.Bcount == true)
+                            {
+                            <MudCheckBox Checked="true" Size="Size.Medium" Color="Color.Tertiary" ReadOnly="true">@context.Movement_Type</MudCheckBox>
+                            }
+                            else
+                            {
+                            <MudCheckBox Checked="false" Size="Size.Medium" Color="Color.Secondary" ReadOnly="true">@context.Movement_Type</MudCheckBox>
+                            }
+                    }
+                </MudTd>
+                <MudTd Class="clm-row-small" DataLabel="PACKID">@context.Su_No</MudTd>
+                <MudTd Class="clm-row-small" DataLabel="MATERIAL">@context.Item_Code</MudTd>
+                <MudTd Class="clm-row-small" DataLabel="QTY">@string.Format(VarGlobals.FormatN2, context.Stock_Qty)</MudTd>
+                <MudTd Class="clm-row-small" DataLabel="UNIT">@context.Unit</MudTd>
+                <MudTd Class="clm-row-small" DataLabel="">
+                    <MudFab @onclick="@(()=>CountMap(@context.Su_No))" Color="Color.Primary" Icon="@Icons.Material.Filled.Check" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>DeleteMap(@context.Su_No))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Clear" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>ResetMap(@context.Su_No))" Color="Color.Warning" Icon="@Icons.Material.Filled.Restore" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+            </PagerContent>
+        </MudTable>
+    </MudHidden>
+
+    <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
+        <MudTable Items="@Elements"
+                  Dense="@dense"
+                  Hover="@hover"
+                  Bordered="@bordered"
+                  Striped="@striped"
+                  Filter="new Func<Sap_StoreoutInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Pallet:[@mPalletcode]</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Bcount)">STATE</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Su_No)">PACKID</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Sap_StoreoutInfo, object>(x=>x.Stock_Qty)">QTY</MudTableSortLabel></MudTh>
+                <MudTh>ACTION</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="STATE">
+                    @{if (@context.Bcount == true)
+                            {
+                            <MudCheckBox Checked="true" Size="Size.Medium" Color="Color.Tertiary" ReadOnly="true">@context.Movement_Type</MudCheckBox>
+                            }
+                            else
+                            {
+                            <MudCheckBox Checked="false" Size="Size.Medium" Color="Color.Secondary" ReadOnly="true">@context.Movement_Type</MudCheckBox>
+                            }
+                    }
+                </MudTd>
+                <MudTd DataLabel="PACKID">@context.Su_No</MudTd>
+                <MudTd DataLabel="QTY">@context.Stock_Qty</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(()=>CountMap(@context.Su_No))" Color="Color.Primary" Icon="@Icons.Material.Filled.Check" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>DeleteMap(@context.Su_No))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Clear" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>ResetMap(@context.Su_No))" Color="Color.Warning" Icon="@Icons.Material.Filled.Restore" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+
+            </RowTemplate>
+
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+            </PagerContent>
+        </MudTable>
+    </MudHidden>
+}
+
+@code {
+    private string mPageHeader = "Counting Stock";
+    private string mPagedesc { get; set; } = "Counting Stock";
+    private string mPagename { get; set; } = "/wh/cyc";
+    private string msgAction = "Enter MasterPallet";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = null;
+    public string stringput { get; set; } = "";
+    public string stringputkey { get; set; } = null;
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private string searchString = "";
+    private Sap_StoreoutInfo selectedItem = null;
+    private HashSet<Sap_StoreoutInfo> selectedItems = new HashSet<Sap_StoreoutInfo>();
+    private IEnumerable<Sap_StoreoutInfo> Elements = new List<Sap_StoreoutInfo>();
+
+    private IEnumerable<Sap_StoreoutInfo> MapPalletItem = new List<Sap_StoreoutInfo>();
+
+    private IEnumerable<Sap_StoreoutInfo> MasterPallets = new List<Sap_StoreoutInfo>();
+
+    public int elevation = 0;
+
+    public int cOld = 0;
+    public int cNew = 0;
+
+    public string StringKeyPressed = "AAA";
+
+    string KeyPressed = "";
+    string EventInfo = "";
+
+    private Auduits enumValue { get; set; }
+    public enum Auduits { Checked, Remove, Reset };
+
+
+    private void KeyboardEventHandler(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            //KeyPressed = "";
+            //EventInfo = "";
+            StringKeyPressed = "";
+            KeyPressed = "Key Pressed is " + args.Key;
+            EventInfo = "Event Type " + args.Type;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        WhService objCS = new WhService();
+        cOld = Elements.Count();
+
+        //MasterPallets = await Task.Run(() => ObjMasService.GetAllMasterPallets());
+
+        //MasterPallets = ObjMasService.GetAllMasterPallets();
+
+        Elements = await Task.Run(() => objCS.GetPicklist(mPalletcode));
+
+        cNew = Elements.Count();
+
+        //Elements = await Task.Run(() => objCS.GetReceivivgOrder());
+    }
+
+    private bool FilterFunc(Sap_StoreoutInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Pallet_No.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Su_No.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Item_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Item_Name}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    async Task DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+
+            string pallettemp = stringputkey;
+            await Task.Run(() => setstr(pallettemp));
+            this.stringputkey = null;
+            this.mPackid = null;
+            /*
+            cOld = Elements.Count();
+
+            Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
+
+                cNew = Elements.Count();
+
+                if (cOld == cNew)
+                {
+                Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
+                }
+                else
+                {
+                if (mPalletcode.Length > 0)
+                    {
+                    Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
+            }
+            }
+            */
+            this.StateHasChanged();
+        }
+    }
+
+    async Task setstr(string str)
+    {
+        if (mPalletcode.Length <= 0)
+        {
+
+            Boolean bValidate = false;
+            bValidate = await Task.Run(() => ObjMasService.ValidateMasterpallet(str.ToUpper()));
+
+
+            if (bValidate)
+            {
+                mPalletcode = str.ToUpper();
+                msgAction = "Enter PackID";
+                elevation = 1;
+                Snackbar.Add("Enter PackID", Severity.Normal);
+
+                Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
+
+            }
+            else
+            {
+                mPalletcode = "";
+                elevation = 4;
+                msgAction = "Masterpallet find not found";
+                Snackbar.Add("Masterpallet find not found", Severity.Warning);
+
+            }
+        }
+        else
+        {
+            if (str.ToUpper() == mPalletcode)
+            {
+                if (Elements.ToList().Count > 0)
+                {
+                    elevation = 2;
+                    msgAction = "Mapping successfully";
+
+                    //ObjErpApiService.SetMappedPallet(mPalletcode);
+
+                    // Set Update Count
+                    bool bCheck = ObjWhService.UpdateCount(Elements.ToList());
+
+                    // Set SAP Complete
+                    if (bCheck)
+                    {
+                        bCheck = ObjWhService.SapComplete(mPalletcode);
+                        if (bCheck)
+                        {
+                            //bCheck = ObjWcsService.CreateCommandMC("G04", 88);
+                            mPalletcode = "";
+                            Snackbar.Add("Audit successfully", Severity.Success);
+                        }
+                        else
+                        {
+                            Snackbar.Add("Complete Error", Severity.Error);
+                        }
+                    }
+                    else
+                    {
+                        Snackbar.Add("Adjust Stick Error", Severity.Error);
+                    }
+                }
+                else
+                {
+                    Snackbar.Add("Please enter PackID", Severity.Info);
+                }
+            }
+            else
+            {
+                mPackid = str;
+                MapPalletItem = null;
+
+                // find packid from list
+                //var allCorrect = Elements.Where(a => a.Su_No.ToUpper() == str.ToUpper()).FirstOrDefault();
+
+                var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == str.ToUpper());
+
+                //----------------------
+
+                if (iCorrect >= 0)
+                {
+                    Elements.ToList()[iCorrect].Bcount = true;
+                    Elements.ToList()[iCorrect].Movement_Type = "CYC";
+                    Elements.ToList()[iCorrect].Request_Qty = 0;
+                    Snackbar.Add("Count PackID: [" + mPackid + "] is OK", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+                }
+
+            }
+        }
+    }
+
+    private void DeleteMap(string pack)
+    {
+        /**/
+
+        var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+        //----------------------
+
+        if (iCorrect >= 0)
+        {
+            Elements.ToList()[iCorrect].Bcount = true;
+            Elements.ToList()[iCorrect].Movement_Type = "Z01";
+            Elements.ToList()[iCorrect].Request_Qty = Elements.ToList()[iCorrect].Stock_Qty;
+            Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+        }
+        this.StateHasChanged();
+
+    }
+
+    private void CountMap(string pack)
+    {
+        /**/
+
+        var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+        //----------------------
+
+        if (iCorrect >= 0)
+        {
+            Elements.ToList()[iCorrect].Bcount = true;
+            Elements.ToList()[iCorrect].Movement_Type = "CYC";
+            Elements.ToList()[iCorrect].Request_Qty = 0;
+            Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+        }
+        this.StateHasChanged();
+
+    }
+
+    private void ResetMap(string pack)
+    {
+        /**/
+
+        var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+        //----------------------
+
+        if (iCorrect >= 0)
+        {
+            Elements.ToList()[iCorrect].Bcount = false;
+            Elements.ToList()[iCorrect].Movement_Type = "CYC";
+            Elements.ToList()[iCorrect].Request_Qty = 0;
+            Snackbar.Add("Reset PackID: [" + pack + "] is OK", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+        }
+        this.StateHasChanged();
+
+    }
+
+}

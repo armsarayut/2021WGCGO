@@ -47,7 +47,7 @@ else
             <RowTemplate>
                 <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
                 <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
-                <MudTd DataLabel="Stock">@context.Quantity</MudTd>
+                <MudTd DataLabel="Stock">@string.Format(VarGlobals.FormatN0, @context.Quantity)</MudTd>
                 <MudTd DataLabel="Lot">@context.Docno</MudTd>
                 <MudTd DataLabel="SEQ">@context.Pallettag</MudTd>
                 <MudTd DataLabel="PalletGo">@context.Pallteno</MudTd>
@@ -81,7 +81,7 @@ else
             <RowTemplate>
                 <MudTd DataLabel="ItemCode">@context.Item_code</MudTd>
                 <MudTd DataLabel="ItemName">@context.Item_name</MudTd>
-                <MudTd DataLabel="TotalStock">@context.Totalstock</MudTd>
+                <MudTd DataLabel="TotalStock">@string.Format(VarGlobals.FormatN0, @context.Totalstock) </MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />

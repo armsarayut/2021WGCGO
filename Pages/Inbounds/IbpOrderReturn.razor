@@ -16,6 +16,19 @@
 @inject ErpApiService ObjErpApiService
 @inject IStringLocalizer<IbpOrderReturn> L
 
+
+<style>
+    .mud-table-cell-custom-group {
+        font-weight: 500;
+    }
+
+    .mud-table-cell-custom-group-footer {
+        padding-bottom: 50px;
+        text-align: right;
+    }
+</style>
+
+
 <MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
 
 <MudGrid>
@@ -47,58 +60,86 @@ else
     @if (StkGroup)
     {
 
-        <MudTable Items="@Elements"
-                  FixedHeader="@fixed_header"
-                  FixedFooter="@fixed_footer"
-                  Height="@(fixed_header || fixed_footer ?"400px":"")"
-                  MultiSelection="true"
-                  Dense="@dense"
-                  Hover="@hover"
-                  Bordered="@bordered"
-                  Striped="@striped"
-                  Filter="new Func<Oub_CustomerReturn,bool>(FilterFunc)"
-                  @bind-SelectedItems="selectedItems">
-            <ToolBarContent>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Save" Style="background-color: mediumseagreen; color: white; width: 160px; height: 30px;" OnClick=@SelectOrderPick>
-                    @L["SETRETURN"]
-                </MudButton>
-                <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
 
-            <HeaderContent>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Dnno)">@L["DNNO"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Lotno)">@L["Lot"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Batchno)">@L["Batch"]</MudTableSortLabel></MudTh>
+<MudTable Hover="@hover"
+          Breakpoint="Breakpoint.Sm"
+          Height="@(fixed_header || fixed_footer ?"400px":"")"
+          MultiSelection=@_multiSelect
+          FixedHeader="@fixed_header"
+          Items="@Elements"
+          GroupBy="@_groupDefinition"
+          GroupHeaderStyle="background-color:var(--mud-palette-background-white)"
+          GroupFooterClass="mb-4"
+          Dense="@dense"
+          FixedFooter="@fixed_footer"
+          Bordered="@bordered"
+          Striped="@striped"
+          HorizontalScrollbar="true"
+          Filter="new Func<Oub_CustomerReturn,bool>(FilterFunc)" @bind-SelectedItems="selectedItems">
+    <ToolBarContent>
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Save" Style="background-color: mediumseagreen; color: white; width: 160px; height: 30px;" OnClick=@SelectOrderPick>
+            @L["SETRETURN"]
+        </MudButton>
+        <MudToolBarSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
 
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Customer_code)">@L["CUSTOMERCODE"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_description)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Unit)">@L["UNIT"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Package_id)">@L["SEQ"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sono)">SONO</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Palletno)">PALLET</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sodate)">DATE</MudTableSortLabel></MudTh>
+    <ColGroup>
+        @if (_multiSelect)
+                {
+            <col style="width: 60px;" />
+                }
+        @if (_groupDefinition.Expandable)
+                {
+            <col style="width: 60px;" />
+                }
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh Style="width: 150px;"><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Dnno)">@L["DNNO"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Lotno)">@L["Lot"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Batchno)">@L["Batch"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Customer_code)">@L["CUSTOMERCODE"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_description)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Unit)">@L["UNIT"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Package_id)">@L["SEQ"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sono)">@L["SONO"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Palletno)">@L["PALLET"]</MudTableSortLabel></MudTh>
+        <MudTh Style="width: 190px;"><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sodate)">@L["DATE"]</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <GroupHeaderTemplate>
+        <MudTh Class="mud-table-cell-custom-group" colspan="11">@($"{context.GroupName}: {context.Key} ") Total: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.Quantity))</MudTh>
+    </GroupHeaderTemplate>
+    <RowTemplate>
+        <MudTd DataLabel="@L["DNNO"]">@context.Dnno</MudTd>
+        <MudTd DataLabel="@L["Lot"]">@context.Lotno</MudTd>
+        <MudTd DataLabel="@L["Batch"]">@context.Batchno</MudTd>
+        <MudTd DataLabel="@L["CUSTOMERCODE"]">@context.Customer_code</MudTd>
+        <MudTd DataLabel="@L["ITEMCODE"]">@context.Material_code</MudTd>
+        <MudTd DataLabel="@L["ITEMNAME"]">@context.Material_description</MudTd>
+        <MudTd DataLabel="@L["UNIT"]">@context.Unit</MudTd>
+        <MudTd DataLabel="@L["SEQ"]">@context.Package_id</MudTd>
+        <MudTd DataLabel="@L["SONO"]">@context.Sono</MudTd>
+        <MudTd DataLabel="@L["PALLET"]">@context.Palletno</MudTd>
+        <MudTd DataLabel="@L["DATE"]">@Convert.ToDateTime(context.Sodate).ToString(VarGlobals.FormatD)</MudTd>
+    </RowTemplate>
+    <GroupFooterTemplate>
+        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="11">Total Quantity: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.Quantity)) </MudTh>
+    </GroupFooterTemplate>
 
-            </HeaderContent>
+</MudTable>
 
-            <RowTemplate>
-                <MudTd DataLabel="DNNO">@context.Dnno</MudTd>
-                <MudTd DataLabel="LOTNO">@context.Lotno</MudTd>
-                <MudTd DataLabel="BATCHNO">@context.Batchno</MudTd>
-                <MudTd DataLabel="CUSTOMERCODE">@context.Customer_code</MudTd>
-                <MudTd DataLabel="ITEMCODE">@context.Material_code</MudTd>
-                <MudTd DataLabel="ITEMNAME">@context.Material_description</MudTd>
-                <MudTd DataLabel="UNIT">@context.Unit</MudTd>
-                <MudTd DataLabel="SEQ">@context.Package_id</MudTd>
-                <MudTd DataLabel="SONO">@context.Sono</MudTd>
-                <MudTd DataLabel="PALLET">@context.Palletno</MudTd>
-                <MudTd DataLabel="DATE">@Convert.ToDateTime(context.Sodate).ToShortDateString()</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-            </PagerContent>
-        </MudTable>
+
     }
     else
     {
@@ -162,6 +203,29 @@ else
 
     protected List<string> References { get; set; } = new List<string>();
 
+    private TableGroupDefinition<Oub_CustomerReturn> _groupDefinition = new()
+    {
+        GroupName = "ITEM",
+        Indentation = true,
+        Expandable = true,
+        IsInitiallyExpanded = false,
+        Selector = (e) => e.Material_code,
+        InnerGroup = new TableGroupDefinition<Oub_CustomerReturn>()
+        {
+            GroupName = "DNNO",
+            Expandable = true,
+            IsInitiallyExpanded = false,
+            Selector = (e) => e.Dnno,
+            InnerGroup = new TableGroupDefinition<Oub_CustomerReturn>()
+            {
+                GroupName = "PALLET",
+                Expandable = true,
+                IsInitiallyExpanded = false,
+                Selector = (e) => e.Palletno
+            }
+        }
+    };
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -213,43 +277,43 @@ else
 
 
 
-    /*
-    var result = selectedItems.GroupBy(t => t.Material_code)
-    .Select(t => new
-    {
-    Itemcode = t.Key,
-    Qty = t.Sum(ta => ta.Quantity),
-    }).ToList();
-
-    System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
-    Int16 i = 0;
-
-    foreach (var rec in result)
+        /*
+        var result = selectedItems.GroupBy(t => t.Material_code)
+        .Select(t => new
         {
-        i++;
-        strPopup.Append(i.ToString() + ". รายการ : ");
-    strPopup.Append(rec.Itemcode.ToString());
-    strPopup.Append(" จำนวน : ");
-    strPopup.AppendLine(rec.Qty.ToString());
-    }
+        Itemcode = t.Key,
+        Qty = t.Sum(ta => ta.Quantity),
+        }).ToList();
 
-    System.Text.StringBuilder popup = new System.Text.StringBuilder();
-    popup.AppendLine("รายการที่ขอตรวจสอบ");
-    popup.Append(strPopup.ToString());
+        System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
+        Int16 i = 0;
 
-    string sContentText = popup.ToString();
+        foreach (var rec in result)
+            {
+            i++;
+            strPopup.Append(i.ToString() + ". รายการ : ");
+        strPopup.Append(rec.Itemcode.ToString());
+        strPopup.Append(" จำนวน : ");
+        strPopup.AppendLine(rec.Qty.ToString());
+        }
 
-    var parameters = new DialogParameters();
-    parameters.Add("ContentText", sContentText);
-    parameters.Add("ButtonText", "Yes");
-    parameters.Add("Color", Color.Success);
+        System.Text.StringBuilder popup = new System.Text.StringBuilder();
+        popup.AppendLine("รายการที่ขอตรวจสอบ");
+        popup.Append(strPopup.ToString());
 
-    var formModal = DialogService.Show<DialogTemplateExample_Dialog>("Confirm", parameters);
+        string sContentText = popup.ToString();
 
-    var resultModal = await Task.Run(() => formModal.Result);
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", sContentText);
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Success);
 
-    var formModal1 = await Task.Run(() => DialogService.ShowMessageBox("AA", "XX"));
-        */
+        var formModal = DialogService.Show<DialogTemplateExample_Dialog>("Confirm", parameters);
+
+        var resultModal = await Task.Run(() => formModal.Result);
+
+        var formModal1 = await Task.Run(() => DialogService.ShowMessageBox("AA", "XX"));
+            */
 
     }
 
@@ -300,7 +364,7 @@ else
 
         switch (SelectedOption)
         {
-            case"OPT3":
+            case "OPT3":
 
                 break;
             default:
@@ -337,9 +401,9 @@ else
                 Document_Number = x.Dnno
                 ,
                 Gr_Quantity_Kg = 1
-            }).ToList(); 
+            }).ToList();
 
-            if (strRES.Count>0)
+            if (strRES.Count > 0)
             {
                 string sPallet = null;
 
@@ -374,7 +438,7 @@ else
                     Document_Number = x.Dnno
                     ,
                     Gr_Quantity_Kg = 1
-                }).ToList();  
+                }).ToList();
 
                 foreach (var sel in strRESOpt2)
                 {
@@ -443,9 +507,9 @@ else
                 Document_Number = x.Dnno
                 ,
                 Gr_Quantity_Kg = 1
-            }).ToList(); 
+            }).ToList();
 
-            if (strRES.Count>0)
+            if (strRES.Count > 0)
             {
                 string sDocno = null;
 
@@ -480,7 +544,7 @@ else
                     Document_Number = x.Dnno
                     ,
                     Gr_Quantity_Kg = 1
-                }).ToList();  
+                }).ToList();
 
                 foreach (var sel in strRESOpt2)
                 {
@@ -549,7 +613,7 @@ else
                 Document_Number = x.Dnno
                  ,
                 Gr_Quantity_Kg = 1
-            }).ToList(); 
+            }).ToList();
 
             foreach (var sel in strRES)
             {
@@ -597,16 +661,16 @@ else
             if (MapPalletItem.Count > 0)
             {
                 // Loop Pallet
-                var groupPallet = MapPalletItem  
-                .GroupBy(pla => pla.Lpncode)  
-                .OrderBy(pla => pla.Key)  
-                .Select(g => new { palletgo = g.Key});
+                var groupPallet = MapPalletItem
+                .GroupBy(pla => pla.Lpncode)
+                .OrderBy(pla => pla.Key)
+                .Select(g => new { palletgo = g.Key });
 
                 bool bRetCreate = true;
 
                 foreach (var scr in groupPallet)
                 {
-                    stringputpalletgo=scr.palletgo;
+                    stringputpalletgo = scr.palletgo;
 
                     if (stringputpalletgo.Length > 0)
                     {
@@ -643,34 +707,34 @@ else
         }
         else
         {
-             if (MapPalletItem.Count > 0)
+            if (MapPalletItem.Count > 0)
+            {
+                if (stringputpalletgo.Length > 0)
                 {
-                    if (stringputpalletgo.Length > 0)
+                    try
                     {
-                        try
-                        {
-                            Task<string> retString;
+                        Task<string> retString;
 
-                            retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), stringputpalletgo);
+                        retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), stringputpalletgo);
 
-                            ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
+                        ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
 
-                            Snackbar.Add("Pallet created", Severity.Success);
+                        Snackbar.Add("Pallet created", Severity.Success);
 
-                        }
-                        catch (Exception exp)
-                        {
-                            Snackbar.Add(exp.Message.ToString(), Severity.Error);
-                        }
                     }
-                    else
+                    catch (Exception exp)
                     {
-                        Snackbar.Add("Please enter PalletGO", Severity.Warning);
+                        Snackbar.Add(exp.Message.ToString(), Severity.Error);
                     }
                 }
+                else
+                {
+                    Snackbar.Add("Please enter PalletGO", Severity.Warning);
+                }
+            }
         }
 
-       
+
 
         Elements = ObjStoreoutService.GetAllCustomerReturn();
         this.StateHasChanged();

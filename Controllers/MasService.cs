@@ -54,5 +54,13 @@ namespace GoWMS.Server.Controllers
             return retlist;
         }
 
+        public Boolean ValidateMasterpallet(string spallet)
+        {
+            Boolean bret = false;
+            bret = objDAL.ValidateMasterpallet(spallet);
+            return bret;
+        }
+
+       
     }
 }
