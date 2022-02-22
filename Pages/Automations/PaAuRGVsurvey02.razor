@@ -1,15 +1,19 @@
-﻿@page "/wcs/rgv02"
+﻿@page "/4/4_4_2"
 
 @using GoWMS.Server.Controllers;
 @using GoWMS.Server.Models.Wcs;
+@using GoWMS.Server.Models;
 
-@inject WcsService ObjWcsService;
+@inject IStringLocalizer<PaAuRGVsurvey02> L
+
+@inject WcsService ObjWcsService
+@inject UserServices OpjUserService
 @inject NavigationManager navigationManager
-
+@attribute [Authorize]
 
 @if (Elements != null)
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary">Machine - @mPagecaption</MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
     <MudGrid>
         <MudItem xs="12">
@@ -42,7 +46,7 @@
         </MudItem>
 
         <MudItem xs="12" sm="6" md="6">
-            <MudSelect T="string" Label="GATE FROM" HelperText="Pick the Gate" MultiSelection="false" @bind-Value="valueFM">
+            <MudSelect T="string" Label=@L["GATEFROM"] HelperText=@L["PicktheGate"] MultiSelection="false" @bind-Value="valueFM">
                 @foreach (var part in Elements)
                 {
                     <MudSelectItem T="string" Value=@part.Mccode>@part.Mccode</MudSelectItem>
@@ -51,7 +55,7 @@
         </MudItem>
 
         <MudItem xs="12" sm="6" md="6">
-            <MudSelect T="string" Label="GATE TO" HelperText="Pick the Gate" MultiSelection="false" @bind-Value="valueTO">
+            <MudSelect T="string" Label=@L["GATETO"] HelperText=@L["PicktheGate"] MultiSelection="false" @bind-Value="valueTO">
                 @foreach (var part in Elements)
                 {
                     <MudSelectItem T="string" Value=@part.Mccode>@part.Mccode</MudSelectItem>
@@ -62,30 +66,27 @@
 
     <MudGrid>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.TransferWithinAStation" Color="Color.Primary" OnClick="@(()=>SetPotocal())">MOVE</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FirstPage" Color="Color.Secondary" OnClick="@(()=>SetComand(2))">HOME-FONT</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.LastPage" Color="Color.Secondary" OnClick="@(()=>SetComand(12))">HOME-BACK</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.TransferWithinAStation" Color="Color.Primary" OnClick="@(()=>SetPotocal())">@L["MOVE"]</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FirstPage" Color="Color.Secondary" OnClick="@(()=>SetComand(2))">@L["HOME-FONT"]</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.LastPage" Color="Color.Secondary" OnClick="@(()=>SetComand(12))">@L["HOME-BACK"]</MudButton>
         </MudItem>
         <MudItem xs="12">
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DirectionsRun" Color="Color.Success" OnClick="@(()=>SetComand(1))">RUN</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="@(()=>SetComand(90))">STOP</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AlarmOff" Color="Color.Warning" OnClick="@(()=>SetComand(9))">ACKNOWLEDGE</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DirectionsRun" Color="Color.Success" OnClick="@(()=>SetComand(1))">@L["RUN"]</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="@(()=>SetComand(90))">@L["STOP"]</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AlarmOff" Color="Color.Warning" OnClick="@(()=>SetComand(9))">@L["ACKNOWLEDGE"]</MudButton>
         </MudItem>
 
     </MudGrid>
 
-    @*  <MudGrid>
-              <MudItem xs="12">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DirectionsRun" Color="Color.Success" OnClick="@(()=>SetComand(1))">RUN</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="@(()=>SetComand(90))">STOP</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AlarmOff" Color="Color.Warning" OnClick="@(()=>SetComand(9))">ACKNOWLEDGE</MudButton>
-            </MudItem>
-        </MudGrid>*@
 }
 
 
 @code {
+    public string pageheader { get; set; } = "4.4.2.RGV02-Survey";
     public string Mccode { get; set; } = "RGV02";
+    public string mPagedesc { get; set; } = "4.4.2.RGV02-Survey";
+    private string mPagename { get; set; } = "/4/4_4_2";
+
     public Int32 McstatusNo { get; set; }
     public bool McstatusAlarm { get; set; }
     public string McstatusDesc { get; set; }
@@ -108,6 +109,7 @@
 
     private int CommandMC { get; set; } = 0;
 
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,6 +118,11 @@
         Elements = await Task.Run(() => ObjWcsService.GetGateRgv());
 
         await Task.Run(() => ExecuteStatus());
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
 
     }
 

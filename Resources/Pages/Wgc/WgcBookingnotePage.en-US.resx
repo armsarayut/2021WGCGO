@@ -141,11 +141,20 @@
   <data name="Qty" xml:space="preserve">
     <value>Qty</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
   <data name="Seq" xml:space="preserve">
     <value>Seq</value>
   </data>
   <data name="SoNo" xml:space="preserve">
     <value>SoNo</value>
+  </data>
+  <data name="StartPick" xml:space="preserve">
+    <value>Start Pick</value>
+  </data>
+  <data name="TotalQuantity" xml:space="preserve">
+    <value>Total Quantity</value>
   </data>
   <data name="Unit" xml:space="preserve">
     <value>Unit</value>

@@ -1,12 +1,24 @@
-﻿@page "/inb-wcsqueue"
+﻿@page "/1/1_3"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
+
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inb
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Reports
 
 @inject InboundService ObjInboundService
+@inject UserServices OpjUserService
+@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<IbpWcsQueue> L
-
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -15,24 +27,29 @@
 }
 else
 {
-<MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
-    <MudTable Items="@Elements" 
-              FixedHeader="@fixed_header" 
-              FixedFooter="@fixed_footer" 
-              Height="@(fixed_header || fixed_footer ?"600px":"")" 
-              Dense="@dense" 
-              Hover="@hover" 
-              Bordered="@bordered" 
-              Striped="@striped" 
-              Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)" 
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["Excel"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Inb_Putaway_Go,bool>(FilterFunc)"
               @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
-                @L["Excel"]
-            </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
-                @L["PDF"]
-            </MudButton>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
@@ -71,8 +88,12 @@ else
 }
 
 @code {
-    private string mPageHeader = "Master Queuing";
+    private string pageheader = "1.3.Master Queuing";
     private string msgAction = "Enter Palletcode";
+
+    public string mPagedesc { get; set; } = "1.3.Master Queuing";
+    private string mPagename { get; set; } = "/1/1_3";
+
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
     private string palletcode { get; set; }
@@ -88,12 +109,17 @@ else
     private IEnumerable<Inb_Putaway_Go> Elements = new List<Inb_Putaway_Go>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
         InboundService objCS = new InboundService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllInbPutawayGos());
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -123,6 +149,40 @@ else
         if ($"{element.Puttype} {element.Storageno} {element.Storagearea} {element.Storagebin} {element.Efstatus}".Contains(searchString))
             return true;
         return false;
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            IbpWcsQueueRptExcel excelReport = new IbpWcsQueueRptExcel();
+            List<Inb_Putaway_Go> listExcelReport = new List<Inb_Putaway_Go>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            IbpWcsQueueRptPdf pdfReport = new IbpWcsQueueRptPdf();
+            List<Inb_Putaway_Go> listPdfReport = new List<Inb_Putaway_Go>();
+            listPdfReport = Elements.ToList();
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
     }
 
 }

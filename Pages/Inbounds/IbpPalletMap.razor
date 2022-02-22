@@ -11,9 +11,11 @@
 @inject ErpApiService ObjErpApiService
 @inject MasService ObjMasService
 @inject WgcService ObjWgcService
+@inject UserServices OpjUserService
 @inject IStringLocalizer<IbpPalletMap> L
+@attribute [Authorize]
 
-<MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
+<MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
 <MudGrid>
     <MudItem xs="12">
@@ -43,40 +45,25 @@
         <div class="form-group">
             <input style="width: 100%; height: 40px" type="text" class="form-control" @bind-value="@stringput" @onkeyup="@KeyUp" placeholder="Input scan" />
         </div>
-
-
-        @*<input type="text" @bind="@StringKeyPressed" @onkeydown="KeyboardEventHandler " @onkeypress=" KeyboardEventHandler " @onkeyup="KeyboardEventHandler " />
-            <MudTextFieldString @bind-Text="@StringKeyPressed" @onkeyup="KeyboardEventHandler"> </MudTextFieldString>
-            <MudTextField Value="@StringKeyPressed" @onkeyup="KeyboardEventHandler" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary" />
-            <MudTextField
-                @bind-Value="@StringKeyPressed" @onchange="" @onkeyup="KeyboardEventHandler" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.QrCodeScanner" AdornmentColor="Color.Secondary">
-            </MudTextField>*@
     </MudItem>
 
 </MudGrid>
 
 <br />
 
-
-
-
-@*<MudText Typo="Typo.h6" Color="Color.Secondary" Class="mb-4">Master Pallet : [ @mPalletcode ]</MudText>
-    <MudSkeleton Animation="Animation.False" />*@
-@*<MudText Typo="Typo.h6" Color="Color.Info" Class="mb-4">PackID : [ @mPackid ]</MudText>*@
 @if (Elements == null)
 {
-    // <p><em>Loading...</em></p>
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else
 {
 
-    <MudTable Items="@Elements" 
-              Dense="@dense" 
-              Hover="@hover" 
-              Bordered="@bordered" 
-              Striped="@striped" 
-              Filter="new Func<Api_Receivingorders_Go,bool>(FilterFunc)" 
+    <MudTable Items="@Elements"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Api_Receivingorders_Go,bool>(FilterFunc)"
               @bind-SelectedItem="selectedItem">
         <ToolBarContent>
             <MudText Typo="Typo.h6">@L["MasterPallet"] : [ @mPalletcode ]</MudText>
@@ -110,7 +97,11 @@ else
 }
 
 @code {
-    private string mPageHeader = "Master Mapping";
+    public string mPagedesc { get; set; } = "1.1.Receiving Order";
+    private string mPagename { get; set; } = "/1/1_1";
+
+
+    private string pageheader = "Master Mapping";
     private string msgAction = "Enter MasterPallet";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -129,6 +120,7 @@ else
     private IEnumerable<Mas_Pallet_Go> MasterPallets = new List<Mas_Pallet_Go>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     public string StringKeyPressed = "AAA";
 
@@ -152,7 +144,8 @@ else
         ErpApiService objCS = new ErpApiService();
         Elements = await Task.Run(() => objCS.GetAllApiRecevingorderGosypallet(mPalletcode));
         MasterPallets = ObjMasService.GetAllMasterPallets();
-        //Elements = await Task.Run(() => objCS.GetReceivivgOrder());
+
+
     }
 
     private void setstr(string str)

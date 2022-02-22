@@ -1,38 +1,46 @@
-﻿@page "/wcs/asrsloadtime"
+﻿@page "/5/5_5_6"
 
 @using GoWMS.Server.Controllers;
 @using GoWMS.Server.Models.Wcs;
 @using GoWMS.Server.Data;
+@using GoWMS.Server.Models;
 @using GoWMS.Server.Pdf
 @using GoWMS.Server.Reports
 
-@inject WcsService ObjWcsService;
+@inject IStringLocalizer<PaAuASRSLoadtimelist> L
+
+@inject WcsService ObjWcsService
+@inject UserServices OpjUserService
 @inject NavigationManager navigationManager
 @inject IJSRuntime JSRuntime
+@attribute [Authorize]
 
 @if (Elements != null)
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary">@mPagecaption</MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
     <MudGrid>
 
         <MudItem Class="d-flex flex-row">
             <MudItem>
-                <MudDatePicker Class="" Label="From Date" @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
+                <MudDatePicker Class="" Label=@L["FromDate"] @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
             </MudItem>
             <MudItem>
-                <MudTimePicker Class="px-2" Label="From Time" @bind-Time="fromTime" />
+                <MudTimePicker Class="px-2" Label=@L["FromTime"] @bind-Time="fromTime" />
             </MudItem>
         </MudItem>
         <MudItem Class="d-flex flex-row">
             <MudItem>
-                <MudDatePicker Class="" Label="To Date" @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
+                <MudDatePicker Class="" Label=@L["ToDate"] @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
             </MudItem>
             <MudItem>
-                <MudTimePicker Class="px-2" Label="To Time" @bind-Time="toTime" />
+                <MudTimePicker Class="px-2" Label=@L["ToTime"] @bind-Time="toTime" />
             </MudItem>
         </MudItem>
         <MudItem Class="d-flex flex-row align-self-end">
-            <MudButton OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium">Search</MudButton>
+            <MudButton OnClick="OnclickSearch" 
+                       Variant="Variant.Filled" 
+                       Color="Color.Primary" 
+                       StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium">@L["Search"]</MudButton>
         </MudItem>
     </MudGrid>
     <MudGrid Class="py-2">
@@ -46,36 +54,36 @@
             <ToolBarContent>
                 <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
                     <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                        <MudMenuItem @onclick="@DownloadExcelDocument">EXCEL</MudMenuItem>
-                        <MudMenuItem>PDF</MudMenuItem>
+                        <MudMenuItem @onclick="@DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                        <MudMenuItem>@L["PDF"]</MudMenuItem>
                     </MudMenu>
                 </MudTooltip>
 
                 <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="searchString" Placeholder=@L["Search"] Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>PALLET</MudTh>
-                <MudTh>TASKCODE</MudTh>
-                <MudTh>TASKTYPE</MudTh>
-                <MudTh>SRM</MudTh>
-                <MudTh>SOURCE</MudTh>
-                <MudTh>DESTINATION</MudTh>
-                <MudTh>START</MudTh>
-                <MudTh>END</MudTh>
-                <MudTh>TIME</MudTh>
+                <MudTh>@L["PALLET"]</MudTh>
+                <MudTh>@L["TASKCODE"]</MudTh>
+                <MudTh>@L["TASKTYPE"]</MudTh>
+                <MudTh>@L["SRM"]</MudTh>
+                <MudTh>@L["SOURCE"]</MudTh>
+                <MudTh>@L["DESTINATION"]</MudTh>
+                <MudTh>@L["START"]</MudTh>
+                <MudTh>@L["END"]</MudTh>
+                <MudTh>@L["TIME"]</MudTh>
             </HeaderContent>
             <RowTemplate>
 
-                <MudTd DataLabel="PALLET">@context.Lpncode</MudTd>
-                <MudTd DataLabel="TASKCODE">@context.Work_code</MudTd>
-                <MudTd DataLabel="TASKTYPE">@context.Work_text_th</MudTd>
-                <MudTd DataLabel="SRM">@string.Format(VarGlobals.FormatD2, context.Srm_no)</MudTd>
-                <MudTd DataLabel="SOURCE">@string.Format(VarGlobals.FormatD9, context.Srm_from)</MudTd>
-                <MudTd DataLabel="DESTINATION">@string.Format(VarGlobals.FormatD9, context.Srm_to)</MudTd>
-                <MudTd DataLabel="START">@Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)</MudTd>
-                <MudTd DataLabel="END">@Convert.ToDateTime(context.Etime).ToString(VarGlobals.FormatDT)</MudTd>
-                <MudTd DataLabel="TIME">@context.Loadtime</MudTd>
+                <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
+                <MudTd DataLabel=@L["TASKCODE"]>@context.Work_code</MudTd>
+                <MudTd DataLabel=@L["TASKTYPE"]>@context.Work_text_th</MudTd>
+                <MudTd DataLabel=@L["SRM"]>@string.Format(VarGlobals.FormatD2, context.Srm_no)</MudTd>
+                <MudTd DataLabel=@L["SOURCE"]>@string.Format(VarGlobals.FormatD9, context.Srm_from)</MudTd>
+                <MudTd DataLabel=@L["DESTINATION"]>@string.Format(VarGlobals.FormatD9, context.Srm_to)</MudTd>
+                <MudTd DataLabel=@L["START"]>@Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)</MudTd>
+                <MudTd DataLabel=@L["END"]>@Convert.ToDateTime(context.Etime).ToString(VarGlobals.FormatDT)</MudTd>
+                <MudTd DataLabel=@L["TIME"]>@context.Loadtime</MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[] { 10, 20, 50, 100 }" />
@@ -87,7 +95,10 @@
 
 
 @code {
-    private string mPagecaption { get; set; } = "ASRS Loadtime";
+    private string pageheader { get; set; } = "5.5.6.ASRS-Loadtime";
+
+    public string mPagedesc { get; set; } = "5.5.6.ASRS-Loadtime";
+    private string mPagename { get; set; } = "/5/5_5_6";
 
     private IEnumerable<AsrsLoadtime> Elements = new List<AsrsLoadtime>();
 
@@ -109,6 +120,7 @@
     private bool fixed_footer = true;
     private string searchString = "";
 
+    private ResultReturn resultReturn = null;
 
 
     protected override async Task OnInitializedAsync()
@@ -121,6 +133,11 @@
 
 
         Elements = await Task.Run(() => objCS.GetAsrsloadtime(fromDateTime.Value, toDateTime.Value));
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     bool FilterFunc(AsrsLoadtime element)
@@ -163,7 +180,7 @@
             AsrsloadtimeRptExcel excelReport = new AsrsloadtimeRptExcel();
             List<AsrsLoadtime> listExcelReport = new List<AsrsLoadtime>();
             listExcelReport = Elements.ToList();
-            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
             await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
         }
         catch (Exception e)

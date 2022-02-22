@@ -11,7 +11,7 @@ namespace GoWMS.Server.Reports
     public class WhShelfListPageRptPdf : PdfPageEvents
     {
         #region Attributes
-        readonly string reportCaption = "Location - Report";
+        readonly string reportCaption = "2.3.Location - Report";
         readonly Boolean bPageLanscape = false;
         #endregion
 

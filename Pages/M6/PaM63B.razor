@@ -1,12 +1,14 @@
-﻿@page "/pa/m6_3b"
+﻿@page "/5/5_3_2"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Public
 
-
+@inject IStringLocalizer<PaM63B> L
 @inject PublicService ObjPublicService
 @inject ReportService UserlogService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -16,30 +18,45 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Class6_3_B,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Class6_3_B,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
-                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                    <MudMenuItem>Excel</MudMenuItem>
-                    <MudMenuItem>Pdf</MudMenuItem>
-                </MudMenu>
-            </MudTooltip>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
 
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Item_Code)">ITEMCODE</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Item_Name)">ITEMNAME</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Totalstock)">STOCK </MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Countpallet)">PACK </MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Item_Code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Item_Name)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Totalstock)">@L["STOCK"] </MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_3_B, object>(x=>x.Countpallet)">@L["PACK"] </MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="ITEMCODE">@context.Item_Code</MudTd>
-            <MudTd DataLabel="ITEMNAME">@context.Item_Name</MudTd>
-            <MudTd DataLabel="STOCK">@string.Format(VarGlobals.FormatN2, context.Totalstock)</MudTd>
-            <MudTd DataLabel="PACK">@context.Countpallet</MudTd>
+            <MudTd DataLabel=@L["ITEMCODE"]>@context.Item_Code</MudTd>
+            <MudTd DataLabel=@L["ITEMNAME"]>@context.Item_Name</MudTd>
+            <MudTd DataLabel=@L["STOCK"]>@string.Format(VarGlobals.FormatN2, context.Totalstock)</MudTd>
+            <MudTd DataLabel=@L["PACK"]>@context.Countpallet</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -49,8 +66,11 @@ else
 }
 
 @code {
+    public string mPagedesc { get; set; } = "5.3.2.Inventory summary";
+    private string mPagename { get; set; } = "/5/5_3_2";
+
     private string msgAction = "Enter Palletcode";
-    private string mMenudesc = "Order Receive Summary";
+    private string mMenudesc = "5.3.2.Inventory summary";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
     private string palletcode { get; set; }
@@ -66,13 +86,17 @@ else
     private IEnumerable<Class6_3_B> Elements = new List<Class6_3_B>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
         PublicService objCS = new PublicService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllMenu6_3B());
         this.InsertAuditrial("View", mMenudesc);
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -138,5 +162,37 @@ else
     {
         bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
     }
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 }

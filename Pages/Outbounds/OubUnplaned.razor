@@ -1,4 +1,4 @@
-﻿@page "/oub-unplaned"
+﻿@page "/3/3_4"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -12,7 +12,9 @@
 @inject WgcService ObjErpService
 @inject ISnackbar Snackbar
 @inject ErpApiService ObjApiService
+@inject UserServices OpjUserService
 @inject IStringLocalizer<OubUnplaned> L
+@attribute [Authorize]
 
 
 @if (Elements == null)
@@ -25,7 +27,14 @@ else
 
     @if (StkGroup)
     {
-        <MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]</MudText>
+<MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+
+<MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
+               Color="Color.Primary"
+               OnClick=@OnButtonOrderSelected>@L["START"]</MudButton>
+            <MudSpacer />
+        </MudAppBar>
 
         <MudTable Items="@Elements"
                   FixedHeader="@fixed_header"
@@ -39,11 +48,12 @@ else
                   Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)"
                   @bind-SelectedItems="selectedItems">
             <ToolBarContent>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.SaveAlt" Style="background-color: mediumseagreen; color: white; width: 160px; height: 30px;" OnClick=@OnButtonOrderSelected>
-                    START
-                </MudButton>
                 <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="searchString" 
+                              Placeholder=@L["Search"] 
+                              Adornment="Adornment.Start" 
+                              AdornmentIcon="@Icons.Material.Filled.Search" 
+                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
 
             <HeaderContent>
@@ -90,8 +100,10 @@ else
 
     private bool _dense = false;
     private bool _multiSelect = true;
+    public string mPagedesc { get; set; } = "3.4.Unplanned";
+    private string mPagename { get; set; } = "/3/3_4";
 
-    private string mPageHeader = "Unplanned";
+    private string pageheader = "3.4.Unplanned";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -114,6 +126,7 @@ else
     string mboxmessage { get; set; } = "";
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     public bool StkGroup { get; set; }
 
@@ -128,19 +141,16 @@ else
         Elements = await Task.Run(() => objCS.GetStockListInfo());
 
         OnSelectChange();
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     protected void OnSelectChange()
     {
         StkGroup = !StkGroup;
-        if (StkGroup)
-        {
-            mPageHeader = "Unplaned";
-        }
-        else
-        {
-            mPageHeader = "Stock Group";
-        }
+       
     }
 
 
@@ -247,7 +257,7 @@ else
                 SelectOrderPick();
             }
 
-            StateHasChanged();
+            this.StateHasChanged();
         }
 
     }
@@ -289,7 +299,10 @@ else
             }
             else
             {
+                RefreshData();
+
                 Snackbar.Add("Order picking created", Severity.Success);
+
             }
         }
         else
@@ -297,5 +310,16 @@ else
             Snackbar.Add("Please select order picking", Severity.Warning);
         }
     }
+
+    private async Task RefreshData()
+    {
+        Elements = await ObjService.GetStockListInfo();
+        selectedItems = null;
+    }
+
+
+
+
+
 
 }

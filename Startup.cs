@@ -13,7 +13,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using GoWMS.Server.Data;
 using BlazorTable;
+using Blazored.Modal;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
+
 
 // ******
 // BLAZOR COOKIE Auth Code (begin)
@@ -28,8 +30,7 @@ using Microsoft.AspNetCore.Localization;
 // ******
 
 using System.Globalization;
-
-
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace GoWMS.Server
 {
@@ -47,6 +48,8 @@ namespace GoWMS.Server
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
+
             // Add Controllers for WebAPI
             services.AddControllers();
 
@@ -56,7 +59,6 @@ namespace GoWMS.Server
             services.AddResponseCaching();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddMudServices();
             services.AddSingleton<WeatherForecastService>();
 
             services.AddSingleton<CustomerService>();
@@ -78,6 +80,7 @@ namespace GoWMS.Server
             services.AddSingleton<UserServices>();
             services.AddSingleton<PublicFunServices>();
 
+            services.AddBlazoredModal();
 
             services.AddScoped<BlazorAppContext>();
 
@@ -91,9 +94,10 @@ namespace GoWMS.Server
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                     .AddCookie(options =>
                     {
-                        options.Cookie.Name = "gowmsauth";
+                        options.Cookie.Name = "gowmsaeiauth";
                         options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
                         options.EventsType = typeof(Controllers.CookieAuthenticationEvents);
+                        
 
                     });
             services.AddScoped<Controllers.CookieAuthenticationEvents>();
@@ -144,14 +148,6 @@ namespace GoWMS.Server
                 app.UseHsts();
             }
 
-            //app.UseRequestLocalization();
-            //var localizations = new RequestLocalizationOptions()
-            //    .SetDefaultCulture("en-US")
-            //    .AddSupportedCultures("en-US", "th-TH")
-            //    .AddSupportedUICultures("en-US", "th-TH");
-
-            //app.UseRequestLocalization(localizations);
-
             app.UseResponseCaching();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -159,11 +155,12 @@ namespace GoWMS.Server
             app.UseRequestLocalization(GetlocalizationOptions());
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapBlazorHub();
+                endpoints.MapBlazorHub(options => { options.Transports = HttpTransportType.LongPolling; });
                 endpoints.MapFallbackToPage("/_Host");
             });
 

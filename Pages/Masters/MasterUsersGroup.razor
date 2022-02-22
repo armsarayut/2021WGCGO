@@ -1,0 +1,191 @@
+﻿@page "/7/7_3"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Mas
+
+@inject IStringLocalizer<MasterUsersGroup> L
+
+@inject UserServices OpjUserService
+@inject IDialogService DialogService
+@attribute [Authorize]
+
+@if (Elements == null)
+{
+    //<p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Usergroups,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+              SortLabel=@L["SortBy"]>
+        <ToolBarContent>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Usergroups, object>(x=>x.Created)">@L["CREATED"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Usergroups, object>(x=>x.Ugdesc)">@L["GROUP"]</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel=@L["CREATED"]>@context.Created</MudTd>
+            <MudTd DataLabel=@L["GROUP"]>@context.Ugdesc</MudTd>
+
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    public string mPagedesc { get; set; } = "7.3.Group";
+    private string mPagename { get; set; } = "/7/7_3";
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    private readonly string pageheader = "7.3.Group";
+
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Usergroups selectedItem = null;
+    private HashSet<Usergroups> selectedItems = new HashSet<Usergroups>();
+    private IEnumerable<Usergroups> Elements = new List<Usergroups>();
+    public int elevation = 0;
+    private ResultReturn resultReturn = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserServices objCS = new UserServices();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+        Elements = await Task.Run(() => objCS.GetUsergroups());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+    }
+
+    private void setstr(string str)
+    {
+        //if (mPalletcode.Length <= 0)
+        //{
+        //    mPalletcode = str;
+        //    msgAction = "Enter Pack ID";
+        //    elevation = 3;
+        //}
+        //else
+        //{
+        //    if (str == mPalletcode)
+        //    {
+        //        elevation = 2;
+        //        msgAction = "Mapping successfully";
+        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+        //        mPalletcode = "";
+        //    }
+        //    else
+        //    {
+        //        mPackid = str;
+        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+        //    }
+        //}
+        //CustomerService objGR = new CustomerService();
+        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Usergroups element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Ugdesc.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private void OpenDialog(string mpass, string musername, string memail)
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseButton = true };
+        var parameters = new DialogParameters();
+        parameters.Add("MPassword", mpass);
+        parameters.Add("MUsername", musername);
+        parameters.Add("MEmail", memail);
+
+        var dialog = DialogService.Show<DialogResetUser>("USER EDIT", parameters);
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+}

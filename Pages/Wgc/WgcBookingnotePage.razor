@@ -1,4 +1,4 @@
-﻿@page "/wgc-bookingnoteselect"
+﻿@page "/3/3_1"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -10,7 +10,9 @@
 @inject WgcService ObjErpService
 @inject ISnackbar Snackbar
 @inject ErpApiService ObjApiService
+@inject UserServices OpjUserService
 @inject IStringLocalizer<WgcBookingnotePage> L
+@attribute [Authorize]
 
 <style>
     .mud-table-cell-custom-group {
@@ -31,90 +33,98 @@
 }
 else
 {
-<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"] </MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
+                   Color="Color.Primary"
+                   OnClick=@SelectOrder>@L["StartPick"]</MudButton>
+                <MudSpacer />
+            </MudAppBar>
 
-    <MudTable Hover="@hover"
-              Breakpoint="Breakpoint.Sm"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
-              MultiSelection=@_multiSelect
-              FixedHeader="@fixed_header"
-              Items="@Elements"
-              GroupBy="@_groupDefinition"
-              GroupHeaderStyle="background-color:var(--mud-palette-background-white)"
-              GroupFooterClass="mb-4"
-              Dense="@dense"
-              FixedFooter="@fixed_footer"
-              Bordered="@bordered"
-              Striped="@striped"
-              Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItems="selectedItems">
-        <ToolBarContent>
+            <MudTable Hover="@hover"
+                      Breakpoint="Breakpoint.Sm"
+                      Height="@(fixed_header || fixed_footer ?"600px":"")"
+                      MultiSelection=@_multiSelect
+                      FixedHeader="@fixed_header"
+                      Items="@Elements"
+                      GroupBy="@_groupDefinition"
+                      GroupHeaderStyle="background-color:var(--mud-palette-background-white)"
+                      GroupFooterClass="mb-4"
+                      Dense="@dense"
+                      FixedFooter="@fixed_footer"
+                      Bordered="@bordered"
+                      Striped="@striped"
+                      Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItems="selectedItems">
+                <ToolBarContent>
+                    <MudToolBarSpacer />
+                    <MudTextField @bind-Value="searchString" 
+                                  Placeholder=@L["Search"] 
+                                  Adornment="Adornment.Start" 
+                                  AdornmentIcon="@Icons.Material.Filled.Search" 
+                                  IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
 
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Save" Style="background-color: darkblue; color: white; width: 120px; height: 30px;" OnClick=@SelectOrder>
-                StartPick
-            </MudButton>
-            <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
+                <ColGroup>
+                    @if (_multiSelect)
+                        {
+                        <col style="width: 60px;" />
+                        }
+                    @if (_groupDefinition.Expandable)
+                        {
+                        <col style="width: 60px;" />
+                        }
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh>@L["SoNo"]</MudTh>
+                    <MudTh>@L["ItemCode"]</MudTh>
+                    <MudTh>@L["Customer"]</MudTh>
+                    <MudTh>@L["Seq"]</MudTh>
+                    <MudTh>@L["LotNo"]</MudTh>
+                    <MudTh>@L["BatchNo"]</MudTh>
+                    <MudTh>@L["Packeting"]</MudTh>
+                    <MudTh>@L["Qty"]</MudTh>
+                    <MudTh>@L["Unit"]</MudTh>
+                    <MudTh>@L["PalletGo"]</MudTh>
+                </HeaderContent>
+                <GroupHeaderTemplate>
+                    <MudTh Class="mud-table-cell-custom-group" colspan="10">@($"{context.GroupName}: {context.Key}")</MudTh>
+                </GroupHeaderTemplate>
+                <RowTemplate>
+                    <MudTd DataLabel="@L["SoNo"]">@context.SO_NO</MudTd>
+                    <MudTd DataLabel="@L["ItemCode"]">@context.ITEM_CODE</MudTd>
+                    <MudTd DataLabel="@L["Customer"]">@context.CUSTOMER_CODE</MudTd>
+                    <MudTd DataLabel="@L["Seq"]">@context.DN_SEQ</MudTd>
+                    <MudTd DataLabel="@L["LotNo"]">@context.LOT_NO</MudTd>
+                    <MudTd DataLabel="@L["BatchNo"]">@context.BATCH_NO</MudTd>
+                    <MudTd DataLabel="@L["Packeting"]">@context.PACKETING_CODE</MudTd>
+                    <MudTd DataLabel="@L["Qty"]">@context.DN_QTY</MudTd>
+                    <MudTd DataLabel="@L["Unit"]">@context.DN_UM</MudTd>
+                    <MudTd DataLabel="@L["PalletGo"]">@context.PALLET_GO</MudTd>
+                </RowTemplate>
+                <GroupFooterTemplate>
+                    <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="1">@L["TotalQuantity"]: @context.Items.Sum((e) => e.DN_QTY)</MudTh>
+                </GroupFooterTemplate>
+            </MudTable>
 
-        <ColGroup>
-            @if (_multiSelect)
-                {
-                <col style="width: 60px;" />
-                }
-            @if (_groupDefinition.Expandable)
-                {
-                <col style="width: 60px;" />
-                }
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-        </ColGroup>
-        <HeaderContent>
-            <MudTh>@L["SoNo"]</MudTh>
-            <MudTh>@L["ItemCode"]</MudTh>
-            <MudTh>@L["Customer"]</MudTh>
-            <MudTh>@L["Seq"]</MudTh>
-            <MudTh>@L["LotNo"]</MudTh>
-            <MudTh>@L["BatchNo"]</MudTh>
-            <MudTh>@L["Packeting"]</MudTh>
-            <MudTh>@L["Qty"]</MudTh>
-            <MudTh>@L["Unit"]</MudTh>
-            <MudTh>@L["PalletGo"]</MudTh>
-        </HeaderContent>
-        <GroupHeaderTemplate>
-            <MudTh Class="mud-table-cell-custom-group" colspan="10">@($"{context.GroupName}: {context.Key}")</MudTh>
-        </GroupHeaderTemplate>
-        <RowTemplate>
-            <MudTd DataLabel="@L["SoNo"]">@context.SO_NO</MudTd>
-            <MudTd DataLabel="@L["ItemCode"]">@context.ITEM_CODE</MudTd>
-            <MudTd DataLabel="@L["Customer"]">@context.CUSTOMER_CODE</MudTd>
-            <MudTd DataLabel="@L["Seq"]">@context.DN_SEQ</MudTd>
-            <MudTd DataLabel="@L["LotNo"]">@context.LOT_NO</MudTd>
-            <MudTd DataLabel="@L["BatchNo"]">@context.BATCH_NO</MudTd>
-            <MudTd DataLabel="@L["Packeting"]">@context.PACKETING_CODE</MudTd>
-            <MudTd DataLabel="@L["Qty"]">@context.DN_QTY</MudTd>
-            <MudTd DataLabel="@L["Unit"]">@context.DN_UM</MudTd>
-            <MudTd DataLabel="@L["PalletGo"]">@context.PALLET_GO</MudTd>
-        </RowTemplate>
-        <GroupFooterTemplate>
-            <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="1">Total Quantity: @context.Items.Sum((e) => e.DN_QTY)</MudTh>
-        </GroupFooterTemplate>
-    </MudTable>
-
-}
+        }
 
 @code {
     private bool _dense = true;
     private bool _multiSelect = true;
+    public string mPagedesc { get; set; } = "3.1.Order Booking";
+    private string mPagename { get; set; } = "/3/3_1";
 
-    private string mPageHeader = "Order Booking";
+    private string pageheader { get; set; } = "3.1.Order Booking";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -131,6 +141,7 @@ else
     private IEnumerable<BOOKING_NOTE_ITEMS> Elements = new List<BOOKING_NOTE_ITEMS>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
 
     private TableGroupDefinition<BOOKING_NOTE_ITEMS> _groupDefinition = new()
@@ -154,6 +165,10 @@ else
         WgcService objCS = new WgcService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllApiNewBookingnoteWgc());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
 

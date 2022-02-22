@@ -259,6 +259,7 @@ namespace GoWMS.Server.Data
                     CommandType = CommandType.Text
                 };
                 con.Open();
+
                 lRet= Convert.ToInt64(cmd.ExecuteScalar());
                 
                 con.Close();

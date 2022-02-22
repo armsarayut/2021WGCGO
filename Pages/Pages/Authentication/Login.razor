@@ -1,24 +1,46 @@
 ﻿@page "/"
 @page "/pages/authentication/login"
 @layout LoginLayout
+@using GoWMS.Server.Data;
+@using GoWMS.Server.Controllers
+@using NETCore.Encrypt;
+
+@inject IJSRuntime JSRunTime
+@using System.Security.Claims
+@using Microsoft.Extensions.Configuration
+@using GoWMS.Server.Models;
+@inject IConfiguration Configuration
+@inject UserServices ObjUserService
+@inject ISnackbar Snackbar
+
+@inject NavigationManager navigationManager
 
 <MudText Typo="Typo.h4" GutterBottom="true">Sign In to GoWMS</MudText>
 
 <MudText>Don't have an account? <MudLink Href="/pages/authentication/register">Sign Up</MudLink></MudText>
 
-<MudTextField T="string" Value="@("admin@gowms.com")" Label="E-mail" Variant="Variant.Outlined" Class="my-6"></MudTextField>
+<MudTextField T="string" @bind-Value="@Userword" Label="UserID" Variant="Variant.Outlined" Class="my-6"></MudTextField>
 
 <MudTextField @bind-Value="@Password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+@*
+    <div Class="d-flex justify-space-between align-center">
+        <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1 my-3"></MudCheckBox>
+        <MudLink Href="/pages/authentication/forgot-password">Forgot pwd?</MudLink>
+    </div>
+*@
+<br />
 
-<div Class="d-flex justify-space-between align-center">
-    <MudCheckBox T="bool" Label="Remember me?" Color="Color.Primary" Class="ml-n1 my-3"></MudCheckBox>
-    <MudLink Href="/pages/authentication/forgot-password">Forgot pwd?</MudLink>
-</div>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" Link="/dashboard" Size="Size.Large" FullWidth="true">Sign In</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth="true" OnClick="@btnLogin_Click">Sign In</MudButton>
+
+@*
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Link="/dashboard" Size="Size.Large" FullWidth="true">Sign In</MudButton>
+*@
 
 @code {
-    string Password { get; set; } = "@dm1nistr@t0r";
+    string Password { get; set; } = "@ei0u2020";
+    string Userword { get; set; } = "guest@gowms.com";
+    private IEnumerable<Userinfo> UserElements = new List<Userinfo>();
 
     bool PasswordVisibility;
     InputType PasswordInput = InputType.Password;
@@ -38,5 +60,82 @@
             PasswordInputIcon = Icons.Material.Filled.Visibility;
             PasswordInput = InputType.Text;
         }
+    }
+
+
+    private async Task btnLogin_Click()
+    {
+
+        if (Password.Length > 0 && Userword.Length > 0)
+        {
+            var key = Configuration.GetSection("Appkey")["Pass"].ToString();
+            //var encrypted = Security.EncryptString(Password, key);
+            var encrypted = EncryptProvider.DESEncrypt(Password, key);
+
+            UserElements = await Task.Run(() => ObjUserService.GetUser(Userword, encrypted));
+
+            if (UserElements.Count() > 0)
+            {
+                var grouid = UserElements.Select(x => x.Usgid).FirstOrDefault();
+
+                VarGlobals.User.GroupID = grouid.Value;
+
+                var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
+                await authModule.InvokeVoidAsync("SignIn", Userword, encrypted, grouid.ToString(), "/gowms");
+                var authModules = authModule;
+            }
+            else
+            {
+                Snackbar.Add("The " + Userword + " user was not found in the system.", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Please Enter User and Password", Severity.Error);
+        }
+
+
+        //navigationManager.NavigateTo("/dashboard" );
+
+        //SetUser();
+
+    }
+
+    private async void btnLogout_Click()
+    {
+        var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
+        await authModule.InvokeVoidAsync("SignOut", "/");
+    }
+
+    void SetUser()
+    {
+        //GoWMS.Server.Data.CurrentUserName = Userword;
+        //GoWMS.Server.Data.VarGlobals.
+
+        VarGlobals.CurrentUserName = Userword;
+
+        /*
+        Action<VarGlobals> mduOptions = (opt =>
+        {
+            opt.CurrentUserName = Userword;
+        });
+        */
+        var srcString = Password;
+        var key = "czsqO+DxnA1EcyurkKdllA==";
+
+        var encrypted = EncryptProvider.DESEncrypt(srcString, key);
+        var decrypted = EncryptProvider.DESDecrypt(encrypted, key);
+
+        VarGlobals.User.UserID = 1;
+        VarGlobals.User.UserName = Userword;
+        VarGlobals.User.DeepID = 1;
+        VarGlobals.User.GroupID = 1;
+
+        navigationManager.NavigateTo("/gowms");
+
+        // navigationManager.NavigateTo("/");
+
+        //navigationManager.NavigateTo("");
+
     }
 }

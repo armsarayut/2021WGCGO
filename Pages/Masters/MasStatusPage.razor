@@ -1,10 +1,13 @@
-﻿@page "/mas-status"
+﻿@page "/6/6_3"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Mas
 
+@inject IStringLocalizer<MasStatusPage> L
 @inject MasService ObjService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -14,26 +17,43 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Mas_Status_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Mas_Status_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+              SortLabel=@L["SortBy"]>
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
-            </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
-            </MudButton>
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh>Statusno</MudTh>
-            <MudTh>Description</MudTh>
+            <MudTh>@L["Statusno"]</MudTh>
+            <MudTh>@L["Description"]</MudTh>
 
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Statusno">@context.Statcode</MudTd>
-            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel=@L["Statusno"]>@context.Statcode</MudTd>
+            <MudTd DataLabel=@L["Description"]>@context.Description</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -42,10 +62,12 @@ else
 }
 
 @code {
+    public string mPagedesc { get; set; } = "6.3.Status";
+    private string mPagename { get; set; } = "/6/6_3";
 
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
 
-    private readonly string pageheader = "Status";
+    private readonly string pageheader = "6.3.Status";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -61,12 +83,17 @@ else
     private HashSet<Mas_Status_Go> selectedItems = new HashSet<Mas_Status_Go>();
     private IEnumerable<Mas_Status_Go> Elements = new List<Mas_Status_Go>();
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
         MasService objCS = new MasService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllMasterStatus());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -114,5 +141,39 @@ else
         if (element.Description.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
     }
 }

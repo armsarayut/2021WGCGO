@@ -1,4 +1,4 @@
-﻿@page "/oub-picklist"
+﻿@page "/3/3_3"
 @using System
 @using System.IO
 @using System.Linq
@@ -10,12 +10,15 @@
 @using GoWMS.Server.Pdf
 @using GoWMS.Server.Data
 @using GoWMS.Server.Reports
+@using GoWMS.Server.Models
 @using GoWMS.Server.Models.Oub
 @using GoWMS.Server.Controllers
 
 @inject IJSRuntime JSRuntime
 @inject StoreoutService ObjService
+@inject UserServices OpjUserService
 @inject IStringLocalizer<OubPicklist> L
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -24,19 +27,26 @@
 }
 else
 {
-<MudText Typo="Typo.h6" Color="Color.Primary">@L["pageHeader"]</MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["Excel"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+
     <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Sap_Storeout,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-
-            <MudButton OnClick="DownloadExcelDocument" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
-                @L["Excel"]
-            </MudButton>
-            <MudButton Class="ml-1" OnClick="DownloadPdfDocument" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
-                @L["PDF"]
-            </MudButton>
-
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh>@L["QUEUEDATE"]</MudTh>
@@ -51,15 +61,15 @@ else
         </HeaderContent>
         <RowTemplate>
 
-            <MudTd DataLabel="QUEUEDATE">@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
-            <MudTd DataLabel="SONO">@context.Order_No</MudTd>
-            <MudTd DataLabel="REQUESTDATE">@Convert.ToDateTime(context.Delivery_Date).ToString(VarGlobals.FormatD)</MudTd>
-            <MudTd DataLabel="ITEMCODE">@context.Item_Code</MudTd>
-            <MudTd DataLabel="ITEMNAME">@context.Item_Name</MudTd>
-            <MudTd DataLabel="PALLETGO">@context.Pallet_No</MudTd>
-            <MudTd DataLabel="DNSEQ">@context.Su_No</MudTd>
-            <MudTd DataLabel="QTY">@string.Format(VarGlobals.FormatN0, context.Request_Qty)</MudTd>
-            <MudTd DataLabel="UNIT">@context.Unit</MudTd>
+            <MudTd DataLabel=@L["QUEUEDATE"]>@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel=@L["SONO"]>@context.Order_No</MudTd>
+            <MudTd DataLabel=@L["REQUESTDATE"]>@Convert.ToDateTime(context.Delivery_Date).ToString(VarGlobals.FormatD)</MudTd>
+            <MudTd DataLabel=@L["ITEMCODE"]>@context.Item_Code</MudTd>
+            <MudTd DataLabel=@L["ITEMNAME"]>@context.Item_Name</MudTd>
+            <MudTd DataLabel=@L["PALLETGO"]>@context.Pallet_No</MudTd>
+            <MudTd DataLabel=@L["DNSEQ"]>@context.Su_No</MudTd>
+            <MudTd DataLabel=@L["QTY"]>@string.Format(VarGlobals.FormatN0, context.Request_Qty)</MudTd>
+            <MudTd DataLabel=@L["UNIT"]>@context.Unit</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -68,8 +78,10 @@ else
 }
 
 @code {
-    private string mPagecaption { get; set; } = "Queue Picking";
+    private string pageheader { get; set; } = "3.3.Queue Picking";
     private bool _processing = false;
+    public string mPagedesc { get; set; } = "3.3.Queue Picking";
+    private string mPagename { get; set; } = "/3/3_3";
 
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
@@ -88,11 +100,17 @@ else
 
     public int elevation = 0;
 
+    private ResultReturn resultReturn = null;
+
     protected override async Task OnInitializedAsync()
     {
         StoreoutService objCS = new StoreoutService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllSapStoreout());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -154,7 +172,7 @@ else
             IbpOrderQueueRptExcel excelReport = new IbpOrderQueueRptExcel();
             List<Sap_Storeout> listExcelReport = new List<Sap_Storeout>();
             listExcelReport = Elements.ToList();
-            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
             //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
         }
         catch (Exception e)
@@ -172,7 +190,7 @@ else
             IbpOrderQueueRptPdf pdfReport = new IbpOrderQueueRptPdf();
             List<Sap_Storeout> listPdfReport = new List<Sap_Storeout>();
             listPdfReport = Elements.ToList();
-            var fileName = $"{mPagecaption.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
             //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
 
         }

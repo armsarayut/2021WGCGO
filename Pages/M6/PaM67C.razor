@@ -1,12 +1,14 @@
-﻿@page "/pa/m6_7c"
+﻿@page "/5/5_5_4"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Public
 
-
+@inject IStringLocalizer<PaM67C> L
 @inject PublicService ObjPublicService
 @inject ReportService UserlogService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -16,6 +18,15 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
@@ -27,28 +38,21 @@ else
               Filter="new Func<Class6_7_C,bool>(FilterFunc)"
               @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
-                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                    <MudMenuItem>Excel</MudMenuItem>
-                    <MudMenuItem>Pdf</MudMenuItem>
-                </MudMenu>
-            </MudTooltip>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_C, object>(x=>x.W_Hour)">DATETIME</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_C, object>(x=>x.W_Count)">TASKCOUNT</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_C, object>(x=>x.W_Hour)">@L["DATETIME"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_C, object>(x=>x.W_Count)">@L["TASKCOUNT"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="DATETIME">@Convert.ToDateTime(context.W_Hour).ToString(VarGlobals.FormatDTHM)</MudTd>
-            <MudTd DataLabel="TASKCOUNT">@context.W_Count</MudTd>
-            @*
-                <MudTd DataLabel="">@context.Desc_Th</MudTd>
-                <MudTd DataLabel="">@context.Desc_En</MudTd>
-                <MudTd DataLabel="">@Convert.ToDateTime(context.Created).ToShortDateString()</MudTd>
-            *@
+            <MudTd DataLabel=@L["DATETIME"]>@Convert.ToDateTime(context.W_Hour).ToString(VarGlobals.FormatDTHM)</MudTd>
+            <MudTd DataLabel=@L["TASKCOUNT"]>@context.W_Count</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -57,8 +61,11 @@ else
 }
 
 @code {
+    public string mPagedesc { get; set; } = "5.5.4.ASRS-Outbound/hour";
+    private string mPagename { get; set; } = "/5/5_5_4";
+
     private string msgAction = "Enter Palletcode";
-    private string mMenudesc = "Outbound Counter";
+    private string mMenudesc = "5.5.4.ASRS-Outbound/hour";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
     private string palletcode { get; set; }
@@ -74,6 +81,7 @@ else
     private IEnumerable<Class6_7_C> Elements = new List<Class6_7_C>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,6 +89,10 @@ else
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllMenu6_7C());
         this.InsertAuditrial("View", mMenudesc);
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -146,5 +158,37 @@ else
     {
         bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
     }
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 }

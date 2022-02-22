@@ -1,11 +1,23 @@
-﻿@page "/wh-capacity"
+﻿@page "/2/2_2"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
+
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using Microsoft.EntityFrameworkCore
-@inject WhService ObjService
-@inject IStringLocalizer<WhStorageCapacityP> L
+@using GoWMS.Server.Reports
 
+@inject WhService ObjService
+@inject UserServices OpjUserService
+@inject IJSRuntime JSRuntime
+@inject IStringLocalizer<WhStorageCapacityP> L
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -14,15 +26,19 @@
 }
 else
 {
-<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"] </MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader</MudText>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["Excel"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+
     <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<WhStorageCapacity,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
-                @L["Excel"]
-            </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
-                @L["PDF"]
-            </MudButton>
             <MudToolBarSpacer />
             <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
@@ -55,11 +71,12 @@ else
 
 @code {
 
-
-
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
 
-    private readonly string pageheader = "Capacity";
+    public string mPagedesc { get; set; } = "2.2.Capacity";
+    private string mPagename { get; set; } = "/2/2_2";
+
+    private string pageheader { get; set; } = "2.2.Capacity";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -76,12 +93,18 @@ else
     private IEnumerable<WhStorageCapacity> Elements = new List<WhStorageCapacity>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
         WhService objCS = new WhService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetWhStorageCapacities());
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -132,6 +155,29 @@ else
         return false;
     }
 
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
 
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 
 }

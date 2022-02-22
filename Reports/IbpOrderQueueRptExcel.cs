@@ -13,12 +13,12 @@ namespace GoWMS.Server.Reports
     public class IbpOrderQueueRptExcel
     {
         MemoryStream _memoryStream = new MemoryStream();
-        List<Inb_Goodreceive_Go> _Inb_Goodreceive_Go_s = new List<Inb_Goodreceive_Go>();
+        //List<Inb_Goodreceive_Go> _Inb_Goodreceive_Go_s = new List<Inb_Goodreceive_Go>();
         public byte[] Report(List<Inb_Goodreceive_Go> Inb_Goodreceive_Go_s)
         {
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.AddWorksheet("Good Receive");
+                var worksheet = workbook.AddWorksheet("1.2");
                 #region Excel Report Header
                 var imagePath = VarGlobals.Imagelogoreport();
                 worksheet.Column(1).Width = 18;
@@ -26,7 +26,7 @@ namespace GoWMS.Server.Reports
                 var image = worksheet.AddPicture(imagePath).MoveTo(worksheet.Cell("A1")); //this will throw an error
                 image.ScaleWidth(.7);
                 image.ScaleHeight(.7);
-                worksheet.Cell("B1").Value = "Good Receive" + " Report";
+                worksheet.Cell("B1").Value = "1.2.Good Receive" + " Report";
                 worksheet.Cell("B1").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
                 worksheet.Cell("B2").Value = $"PrintDate : {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}";
                 #endregion Excel
@@ -34,11 +34,11 @@ namespace GoWMS.Server.Reports
                 #region Excel Report Data
                 var rptRows = 4;
                 worksheet.Cell(rptRows, 1).Value = "QueuDate";
-                worksheet.Cell(rptRows, 2).Value = "Masterpallet";
-                worksheet.Cell(rptRows, 3).Value = "Ducument";
-                worksheet.Cell(rptRows, 4).Value = "PackID";
-                worksheet.Cell(rptRows, 5).Value = "Material";
-                worksheet.Cell(rptRows, 6).Value = "Description";
+                worksheet.Cell(rptRows, 2).Value = "Pallet";
+                worksheet.Cell(rptRows, 3).Value = "DNNo";
+                worksheet.Cell(rptRows, 4).Value = "DNSeq";
+                worksheet.Cell(rptRows, 5).Value = "Itemcode";
+                worksheet.Cell(rptRows, 6).Value = "ItemName";
                 worksheet.Cell(rptRows, 7).Value = "Qty";
                 worksheet.Cell(rptRows, 8).Value = "Unit";
 
@@ -47,8 +47,8 @@ namespace GoWMS.Server.Reports
                     rptRows++;
                     worksheet.Cell(rptRows, 1).Value = rpt.Created;
                     worksheet.Cell(rptRows, 2).Value = rpt.Pallteno;
-                    worksheet.Cell(rptRows, 3).Value = rpt.Docno;
-                    worksheet.Cell(rptRows, 4).Value = rpt.Itemtag;
+                    worksheet.Cell(rptRows, 3).Value = rpt.Pono;
+                    worksheet.Cell(rptRows, 4).Value = rpt.Pallettag;
                     worksheet.Cell(rptRows, 5).Value = rpt.Itemcode;
                     worksheet.Cell(rptRows, 6).Value = rpt.Itemname;
                     worksheet.Cell(rptRows, 7).Value = rpt.Quantity;

@@ -126,14 +126,89 @@
   <data name="3.Outbound" xml:space="preserve">
     <value>3.Outbound</value>
   </data>
+  <data name="4.1.ASRS-STATUS" xml:space="preserve">
+    <value>4.1.ASRS-Status</value>
+  </data>
+  <data name="4.2.ASRS-QUEUE" xml:space="preserve">
+    <value>4.2.ASRS-Queue</value>
+  </data>
+  <data name="4.3.RGV-QUEUE" xml:space="preserve">
+    <value>4.3.RGV-Queue</value>
+  </data>
+  <data name="4.4-RGV-SURVEY" xml:space="preserve">
+    <value>4.4.RGV-Queue</value>
+  </data>
+  <data name="4.4.1.RGV01-SURVEY" xml:space="preserve">
+    <value>4.4.1.RGV01-Survey</value>
+  </data>
+  <data name="4.4.2.RGV02-SURVEY" xml:space="preserve">
+    <value>4.4.2.RGV02-Queue</value>
+  </data>
   <data name="4.Automation" xml:space="preserve">
     <value>4.Automation</value>
+  </data>
+  <data name="5.1.Audit trail" xml:space="preserve">
+    <value>5.1.Audit trail</value>
+  </data>
+  <data name="5.2-Inbound" xml:space="preserve">
+    <value>5.2.Inbound</value>
+  </data>
+  <data name="5.2.1.Order Receive" xml:space="preserve">
+    <value>5.2.1.Order Receive</value>
+  </data>
+  <data name="5.2.2.Order Receive Summary" xml:space="preserve">
+    <value>5.2.2.Order Receive Summary</value>
+  </data>
+  <data name="5.3-Inventory" xml:space="preserve">
+    <value>5.3.Inventory</value>
+  </data>
+  <data name="5.3.1.Inventory location" xml:space="preserve">
+    <value>5.3.1.Inventory location</value>
+  </data>
+  <data name="5.3.2.Inventory summary" xml:space="preserve">
+    <value>5.3.2.Inventory summary</value>
+  </data>
+  <data name="5.3.3.Inventory aging" xml:space="preserve">
+    <value>5.3.3.Inventory aging</value>
+  </data>
+  <data name="5.4-Outbound" xml:space="preserve">
+    <value>5.4.Outbound</value>
+  </data>
+  <data name="5.4.1.Order picking" xml:space="preserve">
+    <value>5.4.1.Order picking</value>
+  </data>
+  <data name="5.4.2.Order picking summary" xml:space="preserve">
+    <value>5.4.2.Order picking summary</value>
+  </data>
+  <data name="5.5-Machine" xml:space="preserve">
+    <value>5.5.Machine</value>
+  </data>
+  <data name="5.5.1.ASRS-History" xml:space="preserve">
+    <value>5.5.1.ASRS-History</value>
+  </data>
+  <data name="5.5.2.ASRS-Error summary" xml:space="preserve">
+    <value>5.5.2.ASRS-Error summary</value>
+  </data>
+  <data name="5.5.3.ASRS-Inbound/hour" xml:space="preserve">
+    <value>5.5.3.ASRS-Inbound/hour</value>
+  </data>
+  <data name="5.5.4.ASRS-Outbound/hour" xml:space="preserve">
+    <value>5.5.4.ASRS-Outbound/hour</value>
+  </data>
+  <data name="5.5.5.ASRS-End of day" xml:space="preserve">
+    <value>5.5.5.ASRS-End of day</value>
+  </data>
+  <data name="5.5.6.ASRS-LOADTIME" xml:space="preserve">
+    <value>5.5.6.ASRS-LOADTIME</value>
+  </data>
+  <data name="5.6.ASRS Throughput" xml:space="preserve">
+    <value>5.6.ASRS Throughput</value>
   </data>
   <data name="5.Report" xml:space="preserve">
     <value>5.Report</value>
   </data>
   <data name="6.Setup" xml:space="preserve">
-    <value>6.Setup</value>
+    <value>6.Master</value>
   </data>
   <data name="7.Admin" xml:space="preserve">
     <value>7.Admin</value>
@@ -145,19 +220,19 @@
     <value>9.ERP</value>
   </data>
   <data name="AdmGroup" xml:space="preserve">
-    <value>Group</value>
+    <value>7.3.Group</value>
   </data>
   <data name="AdmPrivileges" xml:space="preserve">
-    <value>Privileges</value>
+    <value>7.1.Privileges</value>
   </data>
   <data name="AdmUser" xml:space="preserve">
-    <value>User</value>
+    <value>7.2.User</value>
   </data>
   <data name="AuditTrail" xml:space="preserve">
     <value>Audit Trail</value>
   </data>
   <data name="Capacity" xml:space="preserve">
-    <value>Capacity</value>
+    <value>2.2.Capacity</value>
   </data>
   <data name="Conveyor" xml:space="preserve">
     <value>Conveyor</value>
@@ -165,44 +240,47 @@
   <data name="CountCheck" xml:space="preserve">
     <value>Count Check</value>
   </data>
+  <data name="Counting" xml:space="preserve">
+    <value>2.5.Counting</value>
+  </data>
   <data name="CountSuggesstion" xml:space="preserve">
     <value>Count Suggestion</value>
   </data>
   <data name="CycleCount" xml:space="preserve">
-    <value>Cycle Count</value>
+    <value>2.4.Cycle Count</value>
   </data>
   <data name="Dashboard" xml:space="preserve">
     <value>Dashboard</value>
   </data>
   <data name="ErpBookingNote" xml:space="preserve">
-    <value>Booking Note</value>
+    <value>9.1.Booking Note</value>
   </data>
   <data name="ErpBookingOrder" xml:space="preserve">
     <value>Booking Order</value>
   </data>
   <data name="ErpCustomers" xml:space="preserve">
-    <value>Customers</value>
+    <value>9.4.Customers</value>
   </data>
   <data name="ErpDeliveryNote" xml:space="preserve">
-    <value>DeliveryNote</value>
+    <value>9.2.DeliveryNote</value>
   </data>
   <data name="ErpItems" xml:space="preserve">
-    <value>Items</value>
+    <value>9.3.Items</value>
   </data>
   <data name="ErpPackeing" xml:space="preserve">
-    <value>Packeing</value>
+    <value>9.5.Packeing</value>
   </data>
   <data name="GoodReceive" xml:space="preserve">
-    <value>Good Receive</value>
+    <value>1.2.Good Receive</value>
   </data>
   <data name="History" xml:space="preserve">
     <value>History</value>
   </data>
   <data name="HlpHelpdesk" xml:space="preserve">
-    <value>Helpdesk</value>
+    <value>8.2.Helpdesk</value>
   </data>
   <data name="HlpUserguide" xml:space="preserve">
-    <value>User'guide</value>
+    <value>8.1.User'guide</value>
   </data>
   <data name="HoldStock" xml:space="preserve">
     <value>Hold Stock</value>
@@ -214,7 +292,7 @@
     <value>Inventory</value>
   </data>
   <data name="Location" xml:space="preserve">
-    <value>Location</value>
+    <value>2.3.Location</value>
   </data>
   <data name="Machine" xml:space="preserve">
     <value>Machine</value>
@@ -223,13 +301,13 @@
     <value>Master Mapping</value>
   </data>
   <data name="MasterQueuing" xml:space="preserve">
-    <value>Master Queuing</value>
+    <value>1.3.Master Queuing</value>
   </data>
   <data name="OrderBooking" xml:space="preserve">
-    <value>Order Booking</value>
+    <value>3.1.Order Booking</value>
   </data>
   <data name="OrderPicking" xml:space="preserve">
-    <value>Order Picking</value>
+    <value>3.2.Order Picking</value>
   </data>
   <data name="Outbound" xml:space="preserve">
     <value>Outbound</value>
@@ -238,16 +316,16 @@
     <value>Picking</value>
   </data>
   <data name="QueuePicking" xml:space="preserve">
-    <value>Queue Picking</value>
+    <value>3.3.Queue Picking</value>
   </data>
   <data name="ReceivingOrder" xml:space="preserve">
-    <value>Receiving Order</value>
+    <value>1.1.Receiving Order</value>
   </data>
   <data name="ReleaseStock" xml:space="preserve">
     <value>Release Stock</value>
   </data>
   <data name="Return" xml:space="preserve">
-    <value>Return</value>
+    <value>1.4.Return</value>
   </data>
   <data name="RGV" xml:space="preserve">
     <value>RGV</value>
@@ -286,28 +364,28 @@
     <value>Outbound Counting</value>
   </data>
   <data name="SetMaterial" xml:space="preserve">
-    <value>Material</value>
+    <value>6.1.Item</value>
   </data>
   <data name="SetPallet" xml:space="preserve">
-    <value>Pallet</value>
+    <value>6.4.Pallet</value>
   </data>
   <data name="SetReason" xml:space="preserve">
-    <value>Reason</value>
+    <value>6.3.Reason</value>
   </data>
   <data name="SetStatus" xml:space="preserve">
-    <value>Status</value>
+    <value>6.3.Status</value>
   </data>
   <data name="SetStore" xml:space="preserve">
-    <value>Store</value>
+    <value>6.5.Store</value>
   </data>
   <data name="SetWorktype" xml:space="preserve">
-    <value>Worktype</value>
+    <value>6.2.Worktype</value>
   </data>
   <data name="SRM" xml:space="preserve">
     <value>SRM</value>
   </data>
   <data name="StockList" xml:space="preserve">
-    <value>Stocklist</value>
+    <value>2.1.Stocklist</value>
   </data>
   <data name="Storage" xml:space="preserve">
     <value>Storage</value>
@@ -316,6 +394,6 @@
     <value>Transfer</value>
   </data>
   <data name="Unplanned" xml:space="preserve">
-    <value>Unplanned</value>
+    <value>3.4.Unplanned</value>
   </data>
 </root>

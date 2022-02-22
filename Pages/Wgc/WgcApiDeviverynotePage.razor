@@ -1,10 +1,14 @@
-﻿@page "/wgc-deliverynote"
+﻿@page "/9/9_2"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Wgc
 
+@inject IStringLocalizer<WgcApiDeviverynotePage> L
+
 @inject WgcService ObjErpService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -13,74 +17,81 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
-    <MudTable Items="@Elements" 
-    FixedHeader="@fixed_header" 
-    FixedFooter="@fixed_footer" 
-    Height="@(fixed_header || fixed_footer ?"600px":"")" 
-    Dense="@dense" 
-    Hover="@hover" 
-    Bordered="@bordered" 
-    Striped="@striped" 
-    HorizontalScrollbar="true"
-    Filter="new Func<DELIVERY_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              HorizontalScrollbar="true"
+              Filter="new Func<DELIVERY_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
-            </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
-            </MudButton>
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" 
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh>SEQ_NO</MudTh>
-            <MudTh>DN_NO</MudTh>
-            <MudTh>DN_DATE</MudTh>
-            <MudTh>ITEM_CODE</MudTh>
-            <MudTh>ITEM_NAME</MudTh>
-            <MudTh>DN_QTY</MudTh>
-            <MudTh>DN_UM</MudTh>
-            <MudTh>CUSTOMER_CODE</MudTh>
-            <MudTh>PACKETING_CODE</MudTh>
-            <MudTh>LOT_NO</MudTh>
-            <MudTh>CUSTOMER_ITEM</MudTh>
-            <MudTh>STICKER_CODE</MudTh>
-            <MudTh>SCREEN_CODE</MudTh>
-            <MudTh>SUBCUSTOMER_CODE</MudTh>
-            <MudTh>PALLET_GO</MudTh>
-            <MudTh>STATUS_GO</MudTh>
-            <MudTh>CREATED_DATE</MudTh>
-            <MudTh>UPDATE_DATE</MudTh>
-            <MudTh>REMARK</MudTh>
-            <MudTh>REMARK INV</MudTh>
-            <MudTh>STATUS</MudTh>
+            <MudTh>@L["SEQ_NO"]</MudTh>
+            <MudTh>@L["DN_NO"]</MudTh>
+            <MudTh>@L["DN_DATE"]</MudTh>
+            <MudTh>@L["ITEM_CODE"]</MudTh>
+            <MudTh>@L["ITEM_NAME"]</MudTh>
+            <MudTh>@L["DN_QTY"]</MudTh>
+            <MudTh>@L["DN_UM"]</MudTh>
+            <MudTh>@L["CUSTOMER_CODE"]</MudTh>
+            <MudTh>@L["PACKETING_CODE"]</MudTh>
+            <MudTh>@L["LOT_NO"]</MudTh>
+            <MudTh>@L["CUSTOMER_ITEM"]</MudTh>
+            <MudTh>@L["STICKER_CODE"]</MudTh>
+            <MudTh>@L["SCREEN_CODE"]</MudTh>
+            <MudTh>@L["SUBCUSTOMER_CODE"]</MudTh>
+            <MudTh>@L["PALLET_GO"]</MudTh>
+            <MudTh>@L["STATUS_GO"]</MudTh>
+            <MudTh>@L["CREATED_DATE"]</MudTh>
+            <MudTh>@L["UPDATE_DATE"]</MudTh>
+            <MudTh>@L["REMARK"]</MudTh>
+            <MudTh>@L["REMARK_INV"]</MudTh>
+            <MudTh>@L["STATUS"]</MudTh>
         </HeaderContent>
         <RowTemplate>
 
-            <MudTd DataLabel="SEQ_NO">@context.SEQ_NO</MudTd>
-            <MudTd DataLabel="DN_NO">@context.DN_NO</MudTd>
-            <MudTd DataLabel="DN_DATE">@context.DN_DATE</MudTd>
-            <MudTd DataLabel="ITEM_CODE">@context.ITEM_CODE</MudTd>
-            <MudTd DataLabel="ITEM_NAME">@context.ITEM_NAME</MudTd>
-            <MudTd DataLabel="DN_QTY">@context.DN_QTY</MudTd>
-            <MudTd DataLabel="DN_UM">@context.DN_UM</MudTd>
-            <MudTd DataLabel="CUSTOMER_CODE">@context.CUSTOMER_CODE</MudTd>
-            <MudTd DataLabel="PACKETING_CODE">@context.PACKETING_CODE</MudTd>
-            <MudTd DataLabel="LOT_NO">@context.LOT_NO</MudTd>
-            <MudTd DataLabel="CUST_ITEM_CODE">@context.CUST_ITEM_CODE</MudTd>
-            <MudTd DataLabel="STICKER_CODE">@context.STICKER_CODE</MudTd>
-            <MudTd DataLabel="SCREEN_CODE">@context.SCREEN_CODE</MudTd>
-            <MudTd DataLabel="SUB_CUSTOMER_CODE">@context.SUB_CUSTOMER_CODE</MudTd>
-            <MudTd DataLabel="PALLET_GO">@context.PALLET_GO</MudTd>
-            <MudTd DataLabel="STATUS_GO">@context.STATUS_GO</MudTd>
-            <MudTd DataLabel="CREATED_DATE">@context.CREATED_DATE</MudTd>
-            <MudTd DataLabel="UPDATE_DATE_GO">@context.UPDATE_DATE_GO</MudTd>
-            <MudTd DataLabel="REMARK">@context.REMARKS</MudTd>
-            <MudTd DataLabel="REMARK INV">@context.REMARKS_INV</MudTd>
-            <MudTd DataLabel="STATUS">@context.STATUS</MudTd>
+            <MudTd DataLabel=@L["SEQ_NO"]>@context.SEQ_NO</MudTd>
+            <MudTd DataLabel=@L["DN_NO"]>@context.DN_NO</MudTd>
+            <MudTd DataLabel=@L["DN_DATE"]>@context.DN_DATE</MudTd>
+            <MudTd DataLabel=@L["ITEM_CODE"]>@context.ITEM_CODE</MudTd>
+            <MudTd DataLabel=@L["ITEM_NAME"]>@context.ITEM_NAME</MudTd>
+            <MudTd DataLabel=@L["DN_QTY"]>@context.DN_UM</MudTd>
+            <MudTd DataLabel=@L["CUSTOMER_CODE"]>@context.CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel=@L["PACKETING_CODE"]>@context.PACKETING_CODE</MudTd>
+            <MudTd DataLabel=@L["LOT_NO"]>@context.LOT_NO</MudTd>
+            <MudTd DataLabel=@L["CUST_ITEM_CODE"]>@context.CUST_ITEM_CODE</MudTd>
+            <MudTd DataLabel=@L["STICKER_CODE"]>@context.STICKER_CODE</MudTd>
+            <MudTd DataLabel=@L["SCREEN_CODE"]>@context.SCREEN_CODE</MudTd>
+            <MudTd DataLabel=@L["SUB_CUSTOMER_CODE"]>@context.SUB_CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel=@L["PALLET_GO"]>@context.PALLET_GO</MudTd>
+            <MudTd DataLabel=@L["STATUS_GO"]>@context.STATUS_GO</MudTd>
+            <MudTd DataLabel=@L["CREATED_DATE"]>@context.CREATED_DATE</MudTd>
+            <MudTd DataLabel=@L["UPDATE_DATE_GO"]>@context.UPDATE_DATE_GO</MudTd>
+            <MudTd DataLabel=@L["REMARK"]>@context.REMARKS</MudTd>
+            <MudTd DataLabel=@L["REMARK INV"]>@context.REMARKS_INV</MudTd>
+            <MudTd DataLabel=@L["STATUS"]>@context.STATUS</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -90,7 +101,10 @@ else
 }
 
 @code {
-    private string mPageHeader = "Delivery Note";
+    public string mPagedesc { get; set; } = "9.2.DeliveryNote";
+    private string mPagename { get; set; } = "/9/9_2";
+
+    private string pageheader { get; set; } = "9.2.DeliveryNote";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -107,12 +121,17 @@ else
     private IEnumerable<DELIVERY_NOTE_ITEMS> Elements = new List<DELIVERY_NOTE_ITEMS>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
         WgcService objCS = new WgcService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllApiDeliverynoteWgc());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
 
@@ -127,6 +146,40 @@ else
         if ($"{element.ITEM_CODE} {element.SEQ_NO} {element.JOB_NO}".Contains(searchString))
             return true;
         return false;
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
     }
 
 }

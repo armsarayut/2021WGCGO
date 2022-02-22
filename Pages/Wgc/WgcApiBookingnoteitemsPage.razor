@@ -1,10 +1,14 @@
-﻿@page "/wgc-bookingnote"
+﻿@page "/9/9_1"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Wgc
 
+@inject IStringLocalizer<WgcApiBookingnoteitemsPage> L
+
 @inject WgcService ObjErpService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -13,59 +17,74 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPageHeader </MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
+
+    <MudTable Items="@Elements" FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense" Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped" Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
-            </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
-            </MudButton>
+
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" 
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh>SEQ_NO</MudTh>
-            <MudTh>BK_NO</MudTh>
-            <MudTh>DN_NO</MudTh>
-            <MudTh>DN_SEQ</MudTh>
-            <MudTh>ITEM_CODE</MudTh>
-            <MudTh>ITEM_NAME</MudTh>
-            <MudTh>DN_QTY</MudTh>
-            <MudTh>DN_UM</MudTh>
-            <MudTh>CUSTOMER_CODE</MudTh>
-            <MudTh>PACKETING_CODE</MudTh>
-            <MudTh>CUSTOMER_ITEM</MudTh>
-            <MudTh>SUBCUSTOMER_CODE</MudTh>
-            <MudTh>BOOKING_MODEL</MudTh>
-            <MudTh>REQUEST_DATE</MudTh>
-            <MudTh>PALLET_GO</MudTh>
-            <MudTh>STATUS_GO</MudTh>
-            <MudTh>CREATED_DATE</MudTh>
-            <MudTh>UPDATE_DATE</MudTh>
+            <MudTh>@L["SEQ_NO"]</MudTh>
+            <MudTh>@L["BK_NO"]</MudTh>
+            <MudTh>@L["DN_NO"]</MudTh>
+            <MudTh>@L["DN_SEQ"]</MudTh>
+            <MudTh>@L["ITEM_CODE"]</MudTh>
+            <MudTh>@L["ITEM_NAME"]</MudTh>
+            <MudTh>@L["DN_QTY"]</MudTh>
+            <MudTh>@L["DN_UM"]</MudTh>
+            <MudTh>@L["CUSTOMER_CODE"]</MudTh>
+            <MudTh>@L["PACKETING_CODE"]</MudTh>
+            <MudTh>@L["CUSTOMER_ITEM"]</MudTh>
+            <MudTh>@L["SUBCUSTOMER_CODE"]</MudTh>
+            <MudTh>@L["BOOKING_MODEL"]</MudTh>
+            <MudTh>@L["REQUEST_DATE"]</MudTh>
+            <MudTh>@L["PALLET_GO"]</MudTh>
+            <MudTh>@L["STATUS_GO"]</MudTh>
+            <MudTh>@L["CREATED_DATE"]</MudTh>
+            <MudTh>@L["UPDATE_DATE"]</MudTh>
         </HeaderContent>
         <RowTemplate>
 
-            <MudTd DataLabel="SEQ_NO">@context.SEQ_NO</MudTd>
-            <MudTd DataLabel="BK_NO">@context.BK_NO</MudTd>
-            <MudTd DataLabel="DN_NO">@context.DN_NO</MudTd>
-            <MudTd DataLabel="DN_SEQ">@context.DN_SEQ</MudTd>
-            <MudTd DataLabel="ITEM_CODE">@context.ITEM_CODE</MudTd>
-            <MudTd DataLabel="ITEM_NAME">@context.ITEM_NAME</MudTd>
-            <MudTd DataLabel="DN_QTY">@context.DN_QTY</MudTd>
-            <MudTd DataLabel="DN_UM">@context.DN_UM</MudTd>
-            <MudTd DataLabel="CUSTOMER_CODE">@context.CUSTOMER_CODE</MudTd>
-            <MudTd DataLabel="PACKETING_CODE">@context.PACKETING_CODE</MudTd>
-            <MudTd DataLabel="CUST_ITEM_CODE">@context.CUST_ITEM_CODE</MudTd>
-            <MudTd DataLabel="SUB_CUSTOMER_CODE">@context.SUB_CUSTOMER_CODE</MudTd>
-            <MudTd DataLabel="BOOKING_MODEL_NO">@context.BOOKING_MODEL_NO</MudTd>
-            <MudTd DataLabel="REQUEST_DATE">@context.REQUEST_DATE</MudTd>
-            <MudTd DataLabel="PALLET_GO">@context.PALLET_GO</MudTd>
-            <MudTd DataLabel="STATUS_GO">@context.STATUS_GO</MudTd>
-            <MudTd DataLabel="CREATED_DATE">@context.CREATED_DATE</MudTd>
-            <MudTd DataLabel="UPDATE_DATE_GO">@context.UPDATE_DATE_GO</MudTd>
+            <MudTd DataLabel=@L["SEQ_NO"]>@context.SEQ_NO</MudTd>
+            <MudTd DataLabel=@L["BK_NO"]>@context.BK_NO</MudTd>
+            <MudTd DataLabel=@L["DN_NO"]>@context.DN_NO</MudTd>
+            <MudTd DataLabel=@L["DN_SEQ"]>@context.DN_SEQ</MudTd>
+            <MudTd DataLabel=@L["ITEM_CODE"]>@context.ITEM_CODE</MudTd>
+            <MudTd DataLabel=@L["ITEM_NAME"]>@context.ITEM_NAME</MudTd>
+            <MudTd DataLabel=@L["DN_QTY"]>@context.DN_QTY</MudTd>
+            <MudTd DataLabel=@L["DN_UM"]>@context.DN_UM</MudTd>
+            <MudTd DataLabel=@L["CUSTOMER_CODE"]>@context.CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel=@L["PACKETING_CODE"]>@context.PACKETING_CODE</MudTd>
+            <MudTd DataLabel=@L["CUST_ITEM_CODE"]>@context.CUST_ITEM_CODE</MudTd>
+            <MudTd DataLabel=@L["SUB_CUSTOMER_CODE"]>@context.SUB_CUSTOMER_CODE</MudTd>
+            <MudTd DataLabel=@L["BOOKING_MODEL_NO"]>@context.BOOKING_MODEL_NO</MudTd>
+            <MudTd DataLabel=@L["REQUEST_DATE"]>@context.REQUEST_DATE</MudTd>
+            <MudTd DataLabel=@L["PALLET_GO"]>@context.PALLET_GO</MudTd>
+            <MudTd DataLabel=@L["STATUS_GO"]>@context.STATUS_GO</MudTd>
+            <MudTd DataLabel=@L["CREATED_DATE"]>@context.CREATED_DATE</MudTd>
+            <MudTd DataLabel=@L["UPDATE_DATE_GO"]>@context.UPDATE_DATE_GO</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -75,7 +94,10 @@ else
 }
 
 @code {
-    private string mPageHeader = "Booking Note";
+    public string mPagedesc { get; set; } = "9.1.Booking Note";
+    private string mPagename { get; set; } = "/9/9_1";
+
+    private string pageheader { get; set; } = "9.1.Booking Note";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -92,12 +114,18 @@ else
     private IEnumerable<BOOKING_NOTE_ITEMS> Elements = new List<BOOKING_NOTE_ITEMS>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
         WgcService objCS = new WgcService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllApiBookingnoteWgc());
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
 
@@ -114,4 +142,37 @@ else
         return false;
     }
 
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 }

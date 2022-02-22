@@ -1,12 +1,15 @@
-﻿@page "/oub-pickbatch"
+﻿@page "/3/3_2"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Oub
 
+
 @inject StoreoutService ObjService
+@inject UserServices OpjUserService
 @inject ISnackbar Snackbar
 @inject IStringLocalizer<OubPickBatch> L
+@attribute [Authorize]
 
 <style>
     .mud-table-cell-custom-group {
@@ -22,124 +25,71 @@
 @if (Elements == null)
 {
     //<p><em>Loading...</em></p>
-<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else
 {
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
-<MudGrid>
-    <MudItem xs="12" sm="6" md="4">
-        <MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]</MudText>
-    </MudItem>
-</MudGrid>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
+                   Color="Color.Primary"
+                   OnClick=@SetOrderpicking>@L["Start ASRS"]</MudButton>
+                <MudSpacer />
+            </MudAppBar>
 
-<MudGrid>
-    <MudItem xs="12" sm="6" md="4">
-        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Save" Style="background-color: limegreen; color: white; width: 300px; height: 30px;" OnClick=@SetOrderpicking>
-            Test Start ASRS
-        </MudButton>
-    </MudItem>
-</MudGrid>
+            <MudTable Hover="true"
+                      Breakpoint="Breakpoint.Sm"
+                      Height="500px" FixedHeader="true"
+                      Items="@Elements"
+                      GroupBy="@_groupDefinition"
+                      GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
+                      GroupFooterClass="mb-4"
+                      Dense="_dense"
+                      SelectedItems="@selectedItems"
+                      MultiSelection="_multiSelect">
+                <ColGroup>
+                    @if (_multiSelect)
+                    {
+                        <col style="width: 60px;" />
+                    }
+                    @if (_groupDefinition.Expandable)
+                    {
+                        <col style="width: 60px;" />
+                    }
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh>@L["REQUESTDATE"]</MudTh>
+                    <MudTh>@L["DNSEQ"]</MudTh>
+                    <MudTh>@L["ITEMCODE"]</MudTh>
+                    <MudTh>@L["ITEMNAME"]</MudTh>
+                    <MudTh>@L["QTY"]</MudTh>
+                    <MudTh>@L["UNIT"]</MudTh>
+                    <MudTh>@L["PALLET"]</MudTh>
+                </HeaderContent>
+                <GroupHeaderTemplate>
+                    <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.GroupName} : {context.Key}") @L["Total"]: @context.Items.Sum((e) => e.Request_Qty)</MudTh>
+                </GroupHeaderTemplate>
+                <RowTemplate>
+                    <MudTd DataLabel=>@L["REQUESTDATE"]>@Convert.ToDateTime(context.Delivery_Date).ToString(VarGlobals.FormatD)</MudTd>
+                    <MudTd DataLabel=@L["DNSEQ"]>@context.Su_No</MudTd>
+                    <MudTd DataLabel=@L["ITEMCODE"]>@context.Item_Code</MudTd>
+                    <MudTd DataLabel=@L["ITEMNAME"]>@context.Item_Name</MudTd>
+                    <MudTd DataLabel=@L["QTY"]>@string.Format(VarGlobals.FormatN0, context.Request_Qty)</MudTd>
+                    <MudTd DataLabel=@L["UNIT"]>@context.Unit</MudTd>
+                    <MudTd DataLabel=@L["PALLET"]>@context.Pallet_No</MudTd>
+                </RowTemplate>
+                <GroupFooterTemplate>
+                    <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="6">@L["Total"]: @context.Items.Sum((e) => e.Request_Qty)</MudTh>
+</GroupFooterTemplate>
+            </MudTable>
 
-
-@*<MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Api_Listofmaterialsneeds_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
-        <ToolBarContent>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FileExcel" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                Excel
-            </MudButton>
-            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Custom.FileFormats.FilePdf" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                PDF
-            </MudButton>
-            <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-
-        <HeaderContent>
-            <MudTh>MoBarcode</MudTh>
-            <MudTh>Job</MudTh>
-            <MudTh>JobCode</MudTh>
-            <MudTh>Material</MudTh>
-            <MudTh>Description</MudTh>
-            <MudTh>Quantity</MudTh>
-            <MudTh>Unit</MudTh>
-            <MudTh>CusCode</MudTh>
-            <MudTh>CusName</MudTh>
-            <MudTh>ProductCode</MudTh>
-            <MudTh>ProductName</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="MoBarcode">@context.Mo_Barcode</MudTd>
-            <MudTd DataLabel="Job">@context.Job</MudTd>
-            <MudTd DataLabel="JobCode">@context.Job_Code</MudTd>
-            <MudTd DataLabel="Material">@context.Material_Code</MudTd>
-            <MudTd DataLabel="Description">@context.Material_Description</MudTd>
-            <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
-            <MudTd DataLabel="Unit">@context.Unit</MudTd>
-            <MudTd DataLabel="CusCode">@context.Customer_Code</MudTd>
-            <MudTd DataLabel="CusName">@context.Customer_Description</MudTd>
-            <MudTd DataLabel="ProductCode">@context.Finished_Product</MudTd>
-            <MudTd DataLabel="ProductName">@context.Finished_Product_Description</MudTd>
-        </RowTemplate>
-
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-        </PagerContent>
-    </MudTable>*@
-
-
-
-
-<MudTable Hover="true" 
-          Breakpoint="Breakpoint.Sm" 
-          Height="500px" FixedHeader="true"
-          Items="@Elements"
-          GroupBy="@_groupDefinition"
-          GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
-          GroupFooterClass="mb-4"
-          Dense="_dense"
-          SelectedItems="@selectedItems"
-          MultiSelection="_multiSelect">
-    <ColGroup>
-        @if (_multiSelect)
-            {
-        <col style="width: 60px;" />
-            }
-        @if (_groupDefinition.Expandable)
-            {
-        <col style="width: 60px;" />
-            }
-        <col />
-        <col />
-        <col />
-        <col />
-        <col />
-    </ColGroup>
-    <HeaderContent>
-        <MudTh>@L["REQUESTDATE"]</MudTh>
-        <MudTh>@L["DNSEQ"]</MudTh>
-        <MudTh>@L["ITEMCODE"]</MudTh>
-        <MudTh>@L["ITEMNAME"]</MudTh>
-        <MudTh>@L["QTY"]</MudTh>
-        <MudTh>@L["UNIT"]</MudTh>
-    </HeaderContent>
-    <GroupHeaderTemplate>
-        @*<MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowBtnPress())">Set Wave</MudButton></MudTd>*@
-        <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.GroupName} : {context.Key}") Total: @context.Items.Sum((e) => e.Request_Qty)</MudTh>
-    </GroupHeaderTemplate>
-    <RowTemplate>
-        <MudTd DataLabel="REQUESTDATE">@Convert.ToDateTime(context.Delivery_Date).ToString(VarGlobals.FormatD)</MudTd>
-        <MudTd DataLabel="DNSEQ">@context.Su_No</MudTd>
-        <MudTd DataLabel="ITEMCODE">@context.Item_Code</MudTd>
-        <MudTd DataLabel="ITEMNAME">@context.Item_Name</MudTd>
-        <MudTd DataLabel="QTY">@string.Format(VarGlobals.FormatN0, context.Request_Qty)</MudTd>
-        <MudTd DataLabel="UNIT">@context.Unit</MudTd>
-    </RowTemplate>
-    <GroupFooterTemplate>
-        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="6">Total: @context.Items.Sum((e) => e.Request_Qty)</MudTh>
-    </GroupFooterTemplate>
-</MudTable>
-
-}
+        }
 
 @code {
 
@@ -148,7 +98,10 @@ else
 
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
 
-    private readonly string pageheader = "Order Picking";
+    public string mPagedesc { get; set; } = "3.2.Order Picking";
+    private string mPagename { get; set; } = "/3/3_2";
+
+    private readonly string pageheader = "3.2.Order Picking";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -164,12 +117,17 @@ else
     private HashSet<Sap_Storeout> selectedItems = new HashSet<Sap_Storeout>();
     private IEnumerable<Sap_Storeout> Elements = new List<Sap_Storeout>();
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
         StoreoutService objCS = new StoreoutService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetSapStoreoutSetBatch());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)

@@ -9,14 +9,16 @@ using System.Threading.Tasks;
 
 namespace GoWMS.Server.Controllers
 {
+
     [ApiController]
     public class AuthController : ControllerBase
     {
         private static readonly AuthenticationProperties COOKIE_SESSION = new AuthenticationProperties();
         private static readonly AuthenticationProperties COOKIE_EXPIRES = new AuthenticationProperties()
         {
-            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(90),
             IsPersistent = true,
+            AllowRefresh = true
         };
 
         /// <summary />
@@ -28,11 +30,11 @@ namespace GoWMS.Server.Controllers
             {
                 new Claim(ClaimTypes.Email, value.Email),
                 new Claim(ClaimTypes.Name, value.Email),
-                new Claim(ClaimTypes.Role, "Administrator"),
+                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim(ClaimTypes.GroupSid, value.GroupID.ToString()),
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-           
             var authProperties = COOKIE_EXPIRES;
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
@@ -59,5 +61,8 @@ namespace GoWMS.Server.Controllers
         public string Email { get; set; }
         /// <summary />
         public string Password { get; set; }
+        public long GroupID { get; set; }
+
     }
 }
+

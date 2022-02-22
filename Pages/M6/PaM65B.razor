@@ -1,12 +1,14 @@
-﻿@page "/pa/m6_5b"
+﻿@page "/5/5_5_2"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Public
 
-
+@inject IStringLocalizer<PaM65B> L
 @inject PublicService ObjPublicService
 @inject ReportService UserlogService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -16,6 +18,15 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
@@ -27,29 +38,27 @@ else
               Filter="new Func<Class6_5_B,bool>(FilterFunc)"
               @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
-                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                    <MudMenuItem>Excel</MudMenuItem>
-                    <MudMenuItem>Pdf</MudMenuItem>
-                </MudMenu>
-            </MudTooltip>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Mccode)">MC</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Cunt)">COUNT</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Desc_Th)">DESCRIPTION(TH)</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Desc_En)">DESCRIPTION(EN)</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Created)">DATE</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Mccode)">@L["MC"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Cunt)">@L["COUNT"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Desc_Th)">@L["DESCRIPTION(TH)"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Desc_En)">@L["DESCRIPTION(EN)"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_5_B, object>(x=>x.Created)">@L["DATE"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="MC">@context.Mccode</MudTd>
-            <MudTd DataLabel="COUNT">@context.Cunt</MudTd>
-            <MudTd DataLabel="DESCRIPTION(TH)">@context.Desc_Th</MudTd>
-            <MudTd DataLabel="DESCRIPTION(EN)">@context.Desc_En</MudTd>
-            <MudTd DataLabel="DATE">@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatD)</MudTd>
+            <MudTd DataLabel=@L["MC"]>@context.Mccode</MudTd>
+            <MudTd DataLabel=@L["COUNT"]>@context.Cunt</MudTd>
+            <MudTd DataLabel=@L["DESCRIPTION(TH)"]>@context.Desc_Th</MudTd>
+            <MudTd DataLabel=@L["DESCRIPTION(EN)"]>@context.Desc_En</MudTd>
+            <MudTd DataLabel=@L["DATE"]>@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatD)</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -58,8 +67,11 @@ else
 }
 
 @code {
+    public string mPagedesc { get; set; } = "5.5.2.ASRS-Error summary";
+    private string mPagename { get; set; } = "/5/5_5_2";
+
     private string msgAction = "Enter Palletcode";
-    private string mMenudesc = "Machine: Error Summary";
+    private string mMenudesc = "5.5.2.ASRS-Error summary";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
     private string palletcode { get; set; }
@@ -75,6 +87,7 @@ else
     private IEnumerable<Class6_5_B> Elements = new List<Class6_5_B>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,6 +95,10 @@ else
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetAllMenu6_5B());
         this.InsertAuditrial("View", mMenudesc);
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -147,5 +164,37 @@ else
     {
         bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
     }
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
 }

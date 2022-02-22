@@ -1,4 +1,4 @@
-﻿@page "/wh-cyclecount"
+﻿@page "/2/2_4"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -12,20 +12,28 @@
 @inject WgcService ObjErpService
 @inject ISnackbar Snackbar
 @inject ErpApiService ObjApiService
+@inject UserServices OpjUserService
 @inject IStringLocalizer<WhCyclecount> L
+@attribute [Authorize]
 
 
 @if (Elements == null)
 {
-    // <p><em>Loading...</em></p>
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else
 {
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
+                   Color="Color.Primary"
+                   OnClick=@OnButtonOrderSelected>@L["START"]</MudButton>
+                <MudSpacer />
+    </MudAppBar>
 
     @if (StkGroup)
     {
-        <MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"]  </MudText>
+
 
         <MudTable Items="@Elements"
                   FixedHeader="@fixed_header"
@@ -39,11 +47,13 @@ else
                   Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)"
                   @bind-SelectedItems="selectedItems">
             <ToolBarContent>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.SaveAlt" Style="background-color: mediumseagreen; color: white; width: 160px; height: 30px;" OnClick=@OnButtonOrderSelected>
-                    @L["START"]
-                </MudButton>
+                
                 <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="searchString"
+                              Placeholder=@L["Search"]
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
 
             <HeaderContent>
@@ -57,12 +67,12 @@ else
 
 
             <RowTemplate>
-                <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
-                <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
-                <MudTd DataLabel="Stock">@context.Quantity</MudTd>
-                <MudTd DataLabel="Lot">@context.Docno</MudTd>
-                <MudTd DataLabel="SEQ">@context.Pallettag</MudTd>
-                <MudTd DataLabel="PalletGo">@context.Pallteno</MudTd>
+                <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
+                <MudTd DataLabel=@L["ItemName"]>@context.Itemname</MudTd>
+                <MudTd DataLabel=@L["Stock"]>@context.Quantity</MudTd>
+                <MudTd DataLabel=@L["Lot"]>@context.Docno</MudTd>
+                <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
+                <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -73,7 +83,6 @@ else
     {
 
     }
-
 
     <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
         <MessageContent>
@@ -96,7 +105,10 @@ else
     private bool _dense = false;
     private bool _multiSelect = true;
 
-    private string mPageHeader = "Cycle Count";
+    public string mPagedesc { get; set; } = "2.4.Cycle Count";
+    private string mPagename { get; set; } = "/2/2_4";
+
+    private string pageheader = "2.4.Cycle Count";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -119,6 +131,7 @@ else
     string mboxmessage { get; set; } = "";
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     public bool StkGroup { get; set; }
 
@@ -133,19 +146,17 @@ else
         Elements = await Task.Run(() => objCS.GetStockListInfo());
 
         OnSelectChange();
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     protected void OnSelectChange()
     {
         StkGroup = !StkGroup;
-        if (StkGroup)
-        {
-            mPageHeader = "Cycle Count";
-        }
-        else
-        {
-            mPageHeader = "Stock Group";
-        }
+
     }
 
     private bool FilterFunc(Inv_Stock_GoInfo element)

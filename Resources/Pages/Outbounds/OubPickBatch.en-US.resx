@@ -129,11 +129,20 @@
   <data name="pageHeader" xml:space="preserve">
     <value>Order Picking</value>
   </data>
+  <data name="PALLET" xml:space="preserve">
+    <value>PALLET</value>
+  </data>
   <data name="QTY" xml:space="preserve">
     <value>QTY</value>
   </data>
   <data name="REQUESTDATE" xml:space="preserve">
     <value>REQUESTDATE</value>
+  </data>
+  <data name="Start ASRS" xml:space="preserve">
+    <value>Start ASRS</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
   </data>
   <data name="UNIT" xml:space="preserve">
     <value>UNIT</value>

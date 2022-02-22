@@ -1,9 +1,12 @@
-﻿@page "/paau/asrsstatus"
+﻿@page "/4/4_1"
 @using System.Runtime.Serialization;
 @using Newtonsoft.Json;
 @using GoWMS.Server.Controllers;
 @using GoWMS.Server.Models.Wcs;
+@using GoWMS.Server.Models;
 @using System.Net.NetworkInformation;
+
+@inject IStringLocalizer<PuAuConveyorStatus> L
 
 @inject WcsService ObjWcsService;
 @implements IDisposable;
@@ -11,7 +14,8 @@
 @inject IJSRuntime jsRuntime
 @inject UtilityServices ObjUtitityservice
 @inject IDialogService DialogService
-
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -20,7 +24,7 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary"> @mPagecaption </MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
@@ -30,23 +34,30 @@ else
               Bordered="@bordered"
               Striped="@striped"
               Filter="new Func<Vmachine,bool>(FilterFunc)"
-              SortLabel="Sort By">
+              SortLabel=@L["SortBy"]>
         <ToolBarContent>
-            <MudIconButton OnClick="NavigateToNewTab" Icon="@Icons.Material.Filled.TouchApp" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI" />
+            <MudIconButton OnClick="NavigateToNewTab" 
+                           Icon="@Icons.Material.Filled.TouchApp" 
+                           Variant="Variant.Filled" 
+                           Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI" />
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" 
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.Mccode)">MCCODE</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.Information)">INFO</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.St_no)">STATUS</MudTableSortLabel></MudTh>
-            <MudTh>ACTION</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.Mccode)">@L["MCCODE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.Information)">@L["INFO"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vmachine, object>(x=>x.St_no)">@L["STATUS"]</MudTableSortLabel></MudTh>
+            <MudTh>@L["ACTION"]</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="MC CODE">@context.Mccode</MudTd>
-            <MudTd DataLabel="INFO">@context.Information</MudTd>
-            <MudTd DataLabel="STATUS">
+            <MudTd DataLabel=@L["MCCODE"]>@context.Mccode</MudTd>
+            <MudTd DataLabel=@L["INFO"]>@context.Information</MudTd>
+            <MudTd DataLabel=@L["STATUS"]>
                 @{if (@context.Is_alert == true)
                         {
                         <MudAlert Severity="Severity.Error"
@@ -68,7 +79,7 @@ else
                 }
             </MudTd>
 
-            <MudTd DataLabel="ACTION">
+            <MudTd DataLabel=@L["ACTION"]>
 
                 @if (@context.Is_cmd == true)
                     {
@@ -84,7 +95,7 @@ else
 
 
 @code {
-    private string mPagecaption = "ASRS-STATUS";
+    private string pageheader = "4.1.ASRS-Status";
     private bool dense = true;
     private bool hover = true;
     private bool striped = true;
@@ -95,12 +106,14 @@ else
     private string McCommand { get; set; }
     private string setMcCommand { get; set; } = "wcs/mccmd/";
 
+    public string mPagedesc { get; set; } = "4.1.ASRS-Status";
+    private string mPagename { get; set; } = "/4/4_1";
 
 
 
     List<Vmachine> Elements = new List<Vmachine>();
 
-
+    private ResultReturn resultReturn = null;
 
 
 
@@ -121,6 +134,11 @@ else
         ExecuteStatus();
 
         await Task.Run(() => InitialTimer());
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
 
     }
 

@@ -1,0 +1,126 @@
+﻿
+@using GoWMS.Server.Data;
+@using GoWMS.Server.Controllers
+@using NETCore.Encrypt;
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Mas
+@using Microsoft.Extensions.Configuration
+
+@inject IConfiguration Configuration
+@inject UserServices ObjUserService
+@inject NavigationManager navigationManager
+
+<MudDialog>
+    <DialogContent>
+
+        <MudText Typo="Typo.h4" GutterBottom="true">Edit User Infomation</MudText>
+
+        <MudTextField @bind-Value="@MUsername" T="string" Label="Username" Variant="Variant.Outlined" Class="my-4"></MudTextField>
+
+        <MudTextField @bind-Value="@MPassword" Label="New Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" Class="my-4" />
+
+        <MudSelect Label="GROUP" HelperText="Pick the GROUP" @bind-SelectedValues="selectedItems">
+            @foreach (var cmd in Elements)
+            {
+                <MudSelectItem Value="@cmd">@cmd.Ugdesc</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Link="/pages/authentication/login" Size="Size.Large" FullWidth="true" Class="mt-2">Edit</MudButton>
+
+@code {
+            [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+            [Parameter] public string MPassword { get; set; }
+            [Parameter] public string MUsername { get; set; }
+            [Parameter] public string MEmail { get; set; }
+            /*
+                    string MPassword { get; set; }
+                    string MUsername { get; set; }
+                    string MEmail { get; set; }
+            */
+            private HashSet<Usergroups> selectedItems = new HashSet<Usergroups>();
+            private IEnumerable<Usergroups> Elements = new List<Usergroups>();
+
+            private ResultReturn resultReturn = null;
+
+            bool PasswordVisibility;
+            InputType PasswordInput = InputType.Password;
+            string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+            void TogglePasswordVisibility()
+            {
+        @if (PasswordVisibility)
+        {
+            PasswordVisibility = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            PasswordVisibility = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await Task.Run(() => ObjUserService.GetUsergroups());
+    }
+
+    private async Task Submit()
+    {
+
+        if (selectedItems != null)
+        {
+
+            long iCmd = 0;
+            foreach (var item in selectedItems)
+            {
+                iCmd = item.Idx.Value;
+            }
+
+            var key = Configuration.GetSection("Appkey")["Pass"].ToString();
+            //var encrypted = Security.EncryptString(Password, key);
+            var encrypted = EncryptProvider.DESEncrypt(MPassword, key);
+
+
+            resultReturn = await Task.Run(() => ObjUserService.UpsertRegister(iCmd, MEmail, encrypted, MUsername));
+
+            if (resultReturn.Bret == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+
+
+
+            //pages / authentication / login
+
+            /*
+            bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
+            if (bRet)
+            {
+                Snackbar.Add("Set Command OK", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Set Command Failed", Severity.Error);
+            }
+            */
+
+        }
+
+
+
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}

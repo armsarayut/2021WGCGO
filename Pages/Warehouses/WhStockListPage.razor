@@ -1,38 +1,64 @@
-﻿@page "/wh-stock"
+﻿@page "/2/2_1"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
+
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inv
+@using GoWMS.Server.Reports
 
 @inject InvService ObjService
+@inject UserServices OpjUserService
+@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<WhStockListPage> L
+@attribute [Authorize]
 
 @if (Elements == null)
 {
-    // <p><em>Loading...</em></p>
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else
 {
+
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["Excel"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+        <MudSwitch T="bool" CheckedChanged="@OnSelectChange" Color="Color.Primary" Label="@selectby" />
+    </MudAppBar>
+
     <MudGrid>
         <MudItem xs="12" md="3">
-            <MudSwitch T="bool" CheckedChanged="@OnSelectChange" Color="Color.Primary" Label="Select View Stock" />
+            
         </MudItem>
     </MudGrid>
 
     @if (StkGroup)
     {
-<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeader"] </MudText>
-        <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <MudTable Items="@Elements" FixedHeader="@fixed_header" 
+                  FixedFooter="@fixed_footer" 
+                  Height="@(fixed_header || fixed_footer ?"600px":"")" 
+                  Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+                  Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
             <ToolBarContent>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 120px; height: 30px;">
-                    @L["Excel"]
-                </MudButton>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 120px; height: 30px;">
-                    @L["PDF"]
-                </MudButton>
                 <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="searchString"
+                              Placeholder=@L["Search"]
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>@L["ItemCode"]</MudTh>
@@ -45,14 +71,14 @@ else
                 <MudTh>@L["Location"]</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="ItemCode">@context.Itemcode</MudTd>
-                <MudTd DataLabel="ItemName">@context.Itemname</MudTd>
-                <MudTd DataLabel="Stock">@string.Format(VarGlobals.FormatN0, @context.Quantity)</MudTd>
-                <MudTd DataLabel="Lot">@context.Docno</MudTd>
-                <MudTd DataLabel="SEQ">@context.Pallettag</MudTd>
-                <MudTd DataLabel="PalletGo">@context.Pallteno</MudTd>
-                <MudTd DataLabel="Area">@context.Storagearea</MudTd>
-                <MudTd DataLabel="Location">@context.Storagebin</MudTd>
+                <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
+                <MudTd DataLabel=@L["ItemName"]>@context.Itemname</MudTd>
+                <MudTd DataLabel=@L["Stock"]>@string.Format(VarGlobals.FormatN0, @context.Quantity)</MudTd>
+                <MudTd DataLabel=@L["Lot"]>@context.Docno</MudTd>
+                <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
+                <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
+                <MudTd DataLabel=@L["Area"]>@context.Storagearea</MudTd>
+                <MudTd DataLabel=@L["Location"]>@context.Storagebin</MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -61,17 +87,19 @@ else
     }
     else
     {
-<MudText Typo="Typo.h6" Color="Color.Primary"> @L["pageHeaderlist"]</MudText>
-        <MudTable Items="@Elements_" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<InvStockSum,bool>(FilterFunc_)" @bind-SelectedItem="selectedItem_">
+        <MudTable Items="@Elements_"
+                  FixedHeader="@fixed_header"
+                  FixedFooter="@fixed_footer"
+                  Height="@(fixed_header || fixed_footer ?"600px":"")"
+                  Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
+                  Filter="new Func<InvStockSum,bool>(FilterFunc_)" @bind-SelectedItem="selectedItem_">
             <ToolBarContent>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: mediumseagreen; color: white; width: 80px; height: 30px;">
-                    @L["Excel"]
-                </MudButton>
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FileDownload" Style="background-color: orangered; color: white; width: 80px; height: 30px;">
-                    @L["PDF"]
-                </MudButton>
                 <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="searchString"
+                              Placeholder=@L["Search"]
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
                 <MudTh>@L["ItemCode"]</MudTh>
@@ -93,7 +121,11 @@ else
 
 @code {
 
-    private string mPageHeader = "Stock List";
+    public string mPagedesc { get; set; } = "2.1.Stocklist";
+    private string mPagename { get; set; } = "/2/2_1";
+
+    private string pageheader { get; set; } = "2.1.Stocklist";
+    private string selectby { get; set; }
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -114,6 +146,7 @@ else
     private IEnumerable<InvStockSum> Elements_ = new List<InvStockSum>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     public bool StkGroup { get; set; }
 
@@ -126,6 +159,10 @@ else
         Elements_ = await Task.Run(() => objCS.GetStockSum());
 
         OnSelectChange();
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
 
@@ -134,11 +171,11 @@ else
         StkGroup = !StkGroup;
         if (StkGroup)
         {
-            mPageHeader = "Stock List";
+            selectby = "View Stock List";
         }
         else
         {
-            mPageHeader = "Stock Summary";
+            selectby = "View Stock Summary";
         }
     }
 
@@ -170,6 +207,66 @@ else
         if ($"{element.Item_name} ".Contains(searchString))
             return true;
         return false;
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            if (StkGroup)
+            {
+                WhStockListRptExcel excelReport = new WhStockListRptExcel();
+                List<Inv_Stock_GoInfo> listExcelReport = new List<Inv_Stock_GoInfo>();
+                listExcelReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            }
+            else
+            {
+                WhStockSumRptExcel excelReport = new WhStockSumRptExcel();
+                List<InvStockSum> listExcelReport = new List<InvStockSum>();
+                listExcelReport = Elements_.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            }
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            if (StkGroup)
+            {
+                WhStockListRptPdf pdfReport = new WhStockListRptPdf();
+
+                List<Inv_Stock_GoInfo> listPdfReport = new List<Inv_Stock_GoInfo>();
+                listPdfReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+            }
+            else
+            {
+                WhStockSumRptPdf pdfReport = new WhStockSumRptPdf();
+
+                List<InvStockSum> listPdfReport = new List<InvStockSum>();
+                listPdfReport = Elements_.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+            }
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
     }
 
 }

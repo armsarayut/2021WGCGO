@@ -96,9 +96,6 @@ namespace GoWMS.Server.Data
             NpgDAL npgDAL = new NpgDAL();
             bRet = npgDAL.SyncInsertsqlData(NpgCmd);
 
-
-
-
             return bRet;
         }
     }

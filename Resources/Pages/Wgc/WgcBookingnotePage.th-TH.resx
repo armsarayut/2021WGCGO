@@ -141,11 +141,20 @@
   <data name="Qty" xml:space="preserve">
     <value>จำนวน</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
   <data name="Seq" xml:space="preserve">
     <value>ลำดับที่</value>
   </data>
   <data name="SoNo" xml:space="preserve">
     <value>ใบจอง</value>
+  </data>
+  <data name="StartPick" xml:space="preserve">
+    <value>เริ่มหยิบ</value>
+  </data>
+  <data name="TotalQuantity" xml:space="preserve">
+    <value>รวม</value>
   </data>
   <data name="Unit" xml:space="preserve">
     <value>หน่วย</value>

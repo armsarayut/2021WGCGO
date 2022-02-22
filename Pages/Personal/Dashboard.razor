@@ -1,4 +1,4 @@
-﻿@page "/dashboard"
+﻿@page "/gowms"
 @using GoWMS.Server.Models.Das
 @using GoWMS.Server.Models.Public
 
@@ -6,12 +6,12 @@
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 
-
+@inject IStringLocalizer<Dashboard> L
 
 @inject WgcService ObjErpService
 @inject InboundService ObjInbService
 @inject DashService ObjDashService
-
+@attribute [Authorize]
 
 <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Dashboard</MudText>
 <MudGrid>
@@ -19,7 +19,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.Receipt" Color="Color.Primary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Pending Receving</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["PendingReceving"]</MudText>
                 <MudText Typo="Typo.h5">@palletGR/@orderGR</MudText>
             </div>
         </MudPaper>
@@ -28,7 +28,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.Queue" Color="Color.Secondary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Pending Put away</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["PendingPutaway"]</MudText>
                 <MudText Typo="Typo.h5">@palletPut/@orderPut</MudText>
             </div>
         </MudPaper>
@@ -37,7 +37,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Success" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Pending picking</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["Pendingpicking"]</MudText>
                 <MudText Typo="Typo.h5">@palletPicking/@orderPicking</MudText>
             </div>
         </MudPaper>
@@ -46,7 +46,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Color="Color.Warning" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Complete Order</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["CompleteOrder"]</MudText>
                 <MudText Typo="Typo.h5">@orderCompletePut/@orderCompletePick</MudText>
             </div>
         </MudPaper>
@@ -55,7 +55,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.Login" Color="Color.Primary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Storage</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["Storage"]</MudText>
                 <MudText Typo="Typo.h5">@mstorage</MudText>
             </div>
         </MudPaper>
@@ -64,7 +64,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Secondary" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Retrieval</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["Retrieval"]</MudText>
                 <MudText Typo="Typo.h5">@mretrieval</MudText>
             </div>
         </MudPaper>
@@ -73,7 +73,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.SyncAlt" Color="Color.Success" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Total</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["Total"]</MudText>
                 <MudText Typo="Typo.h5">@mtotal</MudText>
             </div>
         </MudPaper>
@@ -82,7 +82,7 @@
         <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:90px;">
             <MudIcon Icon="@Icons.Material.Filled.Speed" Color="Color.Warning" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
-                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">Average Time</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["AverageTime"]</MudText>
                 <MudText Typo="Typo.h5">00:00:00</MudText>
             </div>
         </MudPaper>
@@ -91,13 +91,13 @@
         <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Lane 01</MudText>
+                    <MudText Typo="Typo.h6">@L["Lane"] 01</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudPaper Class="d-flex py-2 px-1">
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L1Use</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L1Emp</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L1Total</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">@L["Use"]: @L1Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">@L["Empty"]: @L1Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">@L["Total"]: @L1Total</MudText></MudPaper>
             </MudPaper>
             <br />
             <MudChart ChartType="ChartType.Pie" InputData="@data1" @bind-SelectedIndex="Index1" InputLabels="@labels1" Width="150px" Height="150px" />
@@ -107,13 +107,13 @@
         <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Lane 02</MudText>
+                    <MudText Typo="Typo.h6">@L["Lane"] 02</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudPaper Class="d-flex py-2 px-1">
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L2Use</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L2Emp</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L2Total</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">@L["Use"]: @L2Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">@L["Empty"]: @L2Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">@L["Total"]: @L2Total</MudText></MudPaper>
             </MudPaper>
             <br />
             <MudChart ChartType="ChartType.Pie" InputData="@data2" @bind-SelectedIndex="Index2" InputLabels="@labels2" Width="150px" Height="150px" />
@@ -123,13 +123,13 @@
         <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Lane 03</MudText>
+                    <MudText Typo="Typo.h6">@L["Lane"] 03</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudPaper Class="d-flex py-2 px-1">
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L3Use</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L3Emp</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L3Total</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">@L["Use"]: @L3Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">@L["Empty"]: @L3Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">@L["Total"]: @L3Total</MudText></MudPaper>
             </MudPaper>
             <br />
             <MudChart ChartType="ChartType.Pie" InputData="@data3" @bind-SelectedIndex="Index3" InputLabels="@labels3" Width="150px" Height="150px" />
@@ -140,13 +140,13 @@
         <MudCard Elevation="25" Style="height:350px;">
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Lane 04</MudText>
+                    <MudText Typo="Typo.h6">@L["Lane"] 04</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudPaper Class="d-flex py-2 px-1">
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">Use:@L4Use</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">Empty:@L4Emp</MudText></MudPaper>
-                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">Total:@L4Total</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-2" Style="@($"color:{Colors.Shades.White}; background:rgb(41, 121, 255);")"><MudText Typo="Typo.h6">@L["Use"]: @L4Use</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-0 pa-2 mx-2 order-3" Style="@($"color:{Colors.Shades.White}; background:rgb(83, 199, 144);")"><MudText Typo="Typo.h6">@L["Empty"]: @L4Emp</MudText></MudPaper>
+                <MudPaper Class="flex-grow-1 flex-shrink-1 pa-2 mx-2 order-1" Style="@($"color:{Colors.Shades.White}; background:rgb(255, 64, 129);")"><MudText Typo="Typo.h6">@L["Total"]: @L4Total</MudText></MudPaper>
             </MudPaper>
             <br />
             <MudChart ChartType="ChartType.Pie" InputData="@data4" @bind-SelectedIndex="Index4" InputLabels="@labels4" Width="150px" Height="150px" />
@@ -154,143 +154,6 @@
     </MudItem>
 
 
-
-
-    @*
-        <MudItem xs="12" sm="6" md="3">
-            <MudCard Elevation="25" Style="height:500px;">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">Notification</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent Class="px-0">
-                    <MudSimpleTable Elevation="0" Hover="true">
-                        <thead>
-                            <tr>
-                                <th>Station</th>
-                                <th>Priority</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var report in earningReports.OrderBy(x => x.SeverityTitle))
-                            {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex flex-row">
-                                            <div class="ml-6">
-                                                <MudText Typo="Typo.subtitle2">@report.Name</MudText>
-                                                <MudText Typo="Typo.body2">@report.Title</MudText>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><MudChip Label="true" Color="@report.Severity" Size="Size.Small" Class="ml-auto mud-elevation-25">@report.SeverityTitle</MudChip></td>
-                                    <td><MudText>@report.Salary</MudText></td>
-                                </tr>
-                             }
-                        </tbody>
-                    </MudSimpleTable>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    *@
-
-    @*
-        <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">@stxtInput</MudText>
-
-        <input @bind-value="MyValue" @bind-value:event="oninput" @onkeyup="DoTheThing" />
-    *@
-
-    @*
-        <MudItem xs="12" sm="12" md="6">
-            <MudCard Elevation="25" Style="height:100%;">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">Earning Report</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent Class="px-0">
-                    <MudSimpleTable Elevation="0" Hover="true">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Priority</th>
-                                <th>Earnings</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var report in earningReports.OrderBy(x => x.Name))
-                            {
-                            <tr>
-                                <td>
-                                    <div class="d-flex flex-row">
-                                        <MudAvatar Image="@report.Avatar" Class="mud-elevation-25" />
-                                        <div class="ml-6">
-                                            <MudText Typo="Typo.subtitle2">@report.Name</MudText>
-                                            <MudText Typo="Typo.body2">@report.Title</MudText>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><MudChip Label="true" Color="@report.Severity" Size="Size.Small" Class="ml-auto mud-elevation-25">@report.SeverityTitle</MudChip></td>
-                                <td><MudText>@report.Salary</MudText></td>
-                            </tr>
-                            }
-                        </tbody>
-                    </MudSimpleTable>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-        <MudItem xs="12" sm="12" md="6">
-            <MudCard Elevation="25" Style="height:100%;">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">Recent incidents</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent Class="px-0">
-                    <MudList Clickable="true">
-                        <MudListItem>
-                            <div class="d-flex flex-row">
-                                <MudAvatar Class="mud-elevation-25">
-                                    <MudIcon Icon="@Icons.Custom.Brands.GitHub" Class="mx-4" />
-                                </MudAvatar>
-                                <div class="ml-6">
-                                    <MudText Typo="Typo.subtitle2">Issues rising</MudText>
-                                    <MudText Typo="Typo.body2">Issues is almost reaching 100</MudText>
-                                </div>
-                                <MudChip Label="true" Color="Color.Error" Size="Size.Small" Class="ml-auto mud-elevation-25">Danger</MudChip>
-                            </div>
-                        </MudListItem>
-                        <MudListItem>
-                            <div class="d-flex flex-row">
-                                <MudAvatar Class="mud-elevation-25">
-                                    <MudIcon Icon="@Icons.Custom.Uncategorized.Radioactive" Class="mx-4" />
-                                </MudAvatar>
-                                <div class="ml-6">
-                                    <MudText Typo="Typo.subtitle2">Incident in plant number 4</MudText>
-                                    <MudText Typo="Typo.body2">Fire in reactor core</MudText>
-                                </div>
-                                <MudChip Label="true" Color="Color.Info" Size="Size.Small" Class="ml-auto mud-elevation-25">Minor</MudChip>
-                            </div>
-                        </MudListItem>
-                        <MudListItem>
-                            <div class="d-flex flex-row">
-                                <MudAvatar Class="mud-elevation-25">
-                                    <MudIcon Icon="@Icons.Material.Filled.Person" Class="mx-4" />
-                                </MudAvatar>
-                                <div class="ml-6">
-                                    <MudText Typo="Typo.subtitle2">Occupational injury</MudText>
-                                    <MudText Typo="Typo.body2">Employee broke a finger while writing some code</MudText>
-                                </div>
-                                <MudChip Label="true" Color="Color.Success" Size="Size.Small" Class="ml-auto mud-elevation-25">Dismissed</MudChip>
-                            </div>
-                        </MudListItem>
-                    </MudList>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    *@
 </MudGrid>
 
 @code { private System.Threading.Timer timer;
@@ -316,8 +179,6 @@
     private Int64 mstorage = 0;
     private Int64 mretrieval = 0;
     private Int64 mtotal = 0;
-
-
 
     private Int64 L1Total = 0;
     private Int64 L1Use = 0;
@@ -355,7 +216,7 @@
         new EarningReport { Name = "CVY02", Title = "Sensor not found", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "10:10", Severity = Color.Warning, SeverityTitle = "Medium"},
         new EarningReport { Name = "SRM02", Title = "Distance error", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "10:10", Severity = Color.Error, SeverityTitle = "High"},
         new EarningReport { Name = "SRM03", Title = "Limit X error", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "10:10", Severity = Color.Error, SeverityTitle = "High"},
-        };
+                };
 
     class EarningReport
     {
@@ -400,8 +261,8 @@
     {
         //Ticker();
         await base.OnInitializedAsync();
-        
-        
+
+
         palletGR = await ObjErpService.GetSumPalletAllApiNewDelivery_note();
         orderGR = await ObjErpService.GetSumOrderAllApiNewDelivery_note();
         palletPut = await ObjInbService.GetSumPalletAllInbGoodreceiptGo();
@@ -534,7 +395,7 @@
 
         var allCorrectTas01 = ElementWorks.Where(a => a.Work_Code == "01").ToList();
 
-        if(allCorrectTas01.ToList().Count > 0)
+        if (allCorrectTas01.ToList().Count > 0)
         {
             foreach (var val in allCorrectTas01)
             {
@@ -566,15 +427,6 @@
 
         mtotal = mstorage + mretrieval;
 
-
-
-        //custs = await Http.GetFromJsonAsync<List<Customer>>("/api/customers");
-
-        //timer = new System.Threading.Timer(async (object stateInfo) =>
-        //{
-        //    daslos = await Http.GetFromJsonAsync<List<Customer>>("/api/customers");
-        //    StateHasChanged(); // MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
-        //}, new System.Threading.AutoResetEvent(false), 1000, 1000);
         Count = 10;
 
         if (bRefresh == false)
@@ -582,8 +434,8 @@
             this.StartCountdown();
             bRefresh = true;
         }
-        
-    
+
+
     }
 
 
@@ -647,31 +499,11 @@
 
             //-----
             await Task.Delay(10_000);
-            StateHasChanged();   // refresh everything
+            this.StateHasChanged();   // refresh everything
         }
     }
 
     void StartCountdown()
     {
-        /*
-        var timer = new Timer(new TimerCallback(_ =>
-        {
-            if (Count > 0)
-            {
-                Count--;
 
-                // Note that the following line is necessary because otherwise
-                // Blazor would not recognize the state change and not refresh the UI
-                InvokeAsync(() =>
-                {
-                    this.StateHasChanged();
-                });
-            }
-            else
-            {
-                Count = 10;
-            }
-        }), null, 1000, 1000);
-        */
-    } 
-}
+    } }

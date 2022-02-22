@@ -147,6 +147,9 @@
   <data name="REQUESTDATE" xml:space="preserve">
     <value>REQUESTDATE</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
   <data name="SONO" xml:space="preserve">
     <value>SONO</value>
   </data>

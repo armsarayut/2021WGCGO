@@ -1,4 +1,4 @@
-﻿@page "/paau/asrsqueue"
+﻿@page "/4/4_2"
 @using System
 @using System.IO
 @using System.Linq
@@ -7,6 +7,8 @@
 @using System.Threading.Tasks
 @using System.Collections.Generic
 
+@inject IStringLocalizer<PaAuASRSQueue> L
+
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -14,44 +16,54 @@
 @using GoWMS.Server.Models.Wcs
 
 @inject WcsService ObjWcsService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 
 @if (Elements == null)
 {
-    // <p><em>Loading...</em></p>
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Tas_Mcworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+    <MudTable Items="@Elements" 
+              FixedHeader="@fixed_header" 
+              FixedFooter="@fixed_footer" 
+              Height="@(fixed_header || fixed_footer ?"600px":"")" 
+              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+              Filter="new Func<Tas_Mcworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
+            <MudTooltip Text=@L["Export"] Color="Color.Secondary" Placement="Placement.Top">
                 <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                    <MudMenuItem>Excel</MudMenuItem>
-                    <MudMenuItem>Pdf</MudMenuItem>
+                    <MudMenuItem>@L["EXCEL"]</MudMenuItem>
+                    <MudMenuItem>@L["PDF"]</MudMenuItem>
                 </MudMenu>
             </MudTooltip>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" 
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Ctime)">QUEUING</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Lpncode)">PALLET</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Work_Code)">TASKTYPE</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_No)">SRM</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_From)">SOURCE</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_To)">DESTINATION</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Stime)">STARTED</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Ctime)">@L["QUEUING"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Lpncode)">@L["PALLET"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Work_Code)">@L["TASKTYPE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_No)">@L["SRM"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_From)">@L["SOURCE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_To)">@L["DESTINATION"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Stime)">@L["STARTED"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="QUEUING">@Convert.ToDateTime(context.Ctime).ToString(VarGlobals.FormatDT)</MudTd>
-            <MudTd DataLabel="PALLET">@context.Lpncode</MudTd>
-            <MudTd DataLabel="TASKTYPE">@context.Work_Code</MudTd>
-            <MudTd DataLabel="SRM">@context.Srm_No</MudTd>
-            <MudTd DataLabel="SOURCE">@context.Srm_From</MudTd>
-            <MudTd DataLabel="DESTINATION">@context.Srm_To</MudTd>
-            <MudTd DataLabel="STARTED">
+            <MudTd DataLabel=@L["QUEUING"]>@Convert.ToDateTime(context.Ctime).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
+            <MudTd DataLabel=@L["TASKTYPE"]>@context.Work_Code</MudTd>
+            <MudTd DataLabel=@L["SRM"]>@context.Srm_No</MudTd>
+            <MudTd DataLabel=@L["SOURCE"]>@context.Srm_From</MudTd>
+            <MudTd DataLabel=@L["DESTINATION"]>@context.Srm_To</MudTd>
+            <MudTd DataLabel=@L["STARTED"]>
                 @if (context.Stime != null)
                     {
                     @Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)
@@ -65,7 +77,11 @@ else
 }
 
 @code {
-    private string mPageHeader = "ASRS-QUEUE";
+    private string pageheader { get; set; } = "4.2.ASRS-Queue";
+
+    public string mPagedesc { get; set; } = "4.2.ASRS-Queue";
+    private string mPagename { get; set; } = "/4/4_2";
+
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -81,13 +97,20 @@ else
     private HashSet<Tas_Mcworks> selectedItems = new HashSet<Tas_Mcworks>();
     private IEnumerable<Tas_Mcworks> Elements = new List<Tas_Mcworks>();
 
+    private ResultReturn resultReturn = null;
+
     public int elevation = 0;
 
     protected override async Task OnInitializedAsync()
     {
         WcsService objCS = new WcsService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+
         Elements = await Task.Run(() => objCS.GetASRSWorks());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+
     }
 
     private void setstr(string str)

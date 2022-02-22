@@ -1,12 +1,14 @@
-﻿@page "/pa/m6_7f"
+﻿@page "/5/5_5_5"
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Public
 
-
+@inject IStringLocalizer<PaM67E> L
 @inject PublicService ObjPublicService
 @inject ReportService UserlogService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -16,6 +18,15 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
+                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
+                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
+            </MudMenu>
+        </MudTooltip>
+        <MudSpacer />
+    </MudAppBar>
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
@@ -27,57 +38,49 @@ else
               Filter="new Func<Class6_7_F,bool>(FilterFunc)"
               @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
-                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                    <MudMenuItem>Excel</MudMenuItem>
-                    <MudMenuItem>Pdf</MudMenuItem>
-                </MudMenu>
-            </MudTooltip>
             <MudSpacer />
             <MudGrid>
-                <MudSpacer />   
-                <MudItem xs=6 >
-                    <MudDateRangePicker 
-                                        @ref="_picker" 
-                                        Label="Search Date" 
-                                        @bind-DateRange="_dateRange" 
+                <MudSpacer />
+                <MudItem xs=6>
+                    <MudDateRangePicker @ref="_picker"
+                                        Label=@L["SearchDate"]
+                                        @bind-DateRange="_dateRange"
                                         DateFormat="@VarGlobals.FormatD">
                         <PickerActions>
-                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">Clear</MudButton>
-                            <MudButton OnClick="@(() => setFindDate(false))">Cancel</MudButton>
-                            <MudButton Color="Color.Primary" OnClick="@(() => setFindDate(true))">Ok</MudButton>
+                            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">@L["Clear"]</MudButton>
+                            <MudButton OnClick="@(() => setFindDate(false))">@L["Cancel"]</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="@(() => setFindDate(true))">@L["Ok"]</MudButton>
                         </PickerActions>
                     </MudDateRangePicker>
-                </MudItem>  
-                <MudItem xs=6 >
-                    <MudTextField 
-                                  @bind-Value="searchString" 
-                                  Placeholder="Search" 
-                                  Adornment="Adornment.Start" 
-                                  AdornmentIcon="@Icons.Material.Filled.Search" 
-                                  IconSize="Size.Medium" 
+                </MudItem>
+                <MudItem xs=6>
+                    <MudTextField @bind-Value="searchString"
+                                  Placeholder=@L["Search"]
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search"
+                                  IconSize="Size.Medium"
                                   Class="mt-0">
                     </MudTextField>
                 </MudItem>
             </MudGrid>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W_date)">DATE</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.Wtotal)">TOTAL</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W01)">STORE-IN</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W05)">STORE-OUT</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W101)">EMPTY-IN</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W102)">EMPTY-OUT</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W09)">MOVE</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W_date)">@L["DATE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.Wtotal)">@L["TOTAL"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W01)">@L["STORE-IN"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W05)">@L["STORE-OUT"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W101)">@L["EMPTY-IN"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W102)">@L["EMPTY-OUT"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_7_F, object>(x=>x.W09)">@L["MOVE"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="DATE">@Convert.ToDateTime(context.W_date).ToString(VarGlobals.FormatD)</MudTd>
-            <MudTd DataLabel="TOTAL">@context.Wtotal</MudTd>
-            <MudTd DataLabel="STORE-IN">@context.W01</MudTd>
-            <MudTd DataLabel="STORE-OUT">@context.W05</MudTd>
-            <MudTd DataLabel="EMPTY-IN">@context.W101</MudTd>
-            <MudTd DataLabel="EMPTY-OUT">@context.W102</MudTd>
-            <MudTd DataLabel="MOVE">@context.W09</MudTd>
+            <MudTd DataLabel=@L["DATE"]>@Convert.ToDateTime(context.W_date).ToString(VarGlobals.FormatD)</MudTd>
+            <MudTd DataLabel=@L["TOTAL"]>@context.Wtotal</MudTd>
+            <MudTd DataLabel=@L["STORE-IN"]>@context.W01</MudTd>
+            <MudTd DataLabel=@L["STORE-OUT"]>@context.W05</MudTd>
+            <MudTd DataLabel=@L["EMPTY-IN"]>@context.W101</MudTd>
+            <MudTd DataLabel=@L["EMPTY-OUT"]>@context.W102</MudTd>
+            <MudTd DataLabel=@L["MOVE"]>@context.W09</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -86,8 +89,11 @@ else
 }
 
 @code {
+    public string mPagedesc { get; set; } = "5.5.5.ASRS-End of day";
+    private string mPagename { get; set; } = "/5/5_5_5";
+
     private string msgAction = "Enter Palletcode";
-    private string mMenudesc = "TASK SUMMARY";
+    private string mMenudesc = "5.5.5.ASRS-End of day";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
     private string palletcode { get; set; }
@@ -104,6 +110,7 @@ else
     private IEnumerable<Class6_7_F> Elementsource = new List<Class6_7_F>();
 
     public int elevation = 0;
+    private ResultReturn resultReturn = null;
 
     MudDateRangePicker _picker;
     DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
@@ -117,6 +124,10 @@ else
         Elements = Elementsource;
 
         this.InsertAuditrial("View", mMenudesc);
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     private void setstr(string str)
@@ -183,7 +194,7 @@ else
         bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
     }
 
-     void setFindDate(bool bOk)
+    void setFindDate(bool bOk)
     {
         _picker.Close();
 
@@ -193,6 +204,40 @@ else
             DateTime dtEnd = _dateRange.End.Value;
             Elements = Elementsource.Where(x => x.W_date >= dtStart.Date && x.W_date <= dtEnd.Date).ToList();
             StateHasChanged();
+        }
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+            //listExcelReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
         }
     }
 }

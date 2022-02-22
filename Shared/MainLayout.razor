@@ -1,6 +1,12 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+
+
 @inject NavigationManager NavigationManager
 @inject IConfiguration Configuration
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRunTime
+
 
 <MudThemeProvider Theme="_themeManager.Theme" />
 <MudDialogProvider />
@@ -9,10 +15,10 @@
 <MudLayout>
     <MudAppBar Elevation="4">
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
-          
-        <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Large" />
-        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" />
-          
+
+            <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Large" />
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" />
+
             @*<img src="Images/AEI_Logo_2.png" width="100px" />*@
 
 
@@ -24,11 +30,11 @@
             <MudText Typo="Typo.h6" Class="ml-1">Warehouse Management System</MudText>
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-       
-        <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Medium" />
-        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Medium" />
-        <MudText Typo="Typo.button" Class="ml-1">WMS</MudText>
-        
+
+            <MudIcon Icon="@Icons.Custom.Brands.Google" Size="Size.Medium" />
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Medium" />
+            <MudText Typo="Typo.button" Class="ml-1">WMS</MudText>
+
             @*<img src="Images/AEI_Logo_2.png" width="50px" />*@
 
 
@@ -37,35 +43,13 @@
         <ChooseLanguage />
 
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" OnClick="@((e) => DarkMode())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="@((e) => btnLogout_Click())" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="_themeManager.DrawerClipMode">
         <MudDrawerHeader>
-            <div class="d-flex justify-center mb-1">
-                <img src="Images/AEI_Logo_2.png" width="100px" />
+            <div class="block center">
+                <img src="Images/AEI_Logo_2.png" width="150px" height="40px" style="align-items:center" />
             </div>
-            @*
-        <MudDrawerContainer>
-            <div class="d-flex justify-center mb-1">
-                <img src="Images/AEI_Logo_2.png" width="100px" />
-            </div>
-            <MudText Color="Color.Primary" Align="Align.Center">WE AUTOMATE YOUR INTRALOGISTICS</MudText>
-        </MudDrawerContainer>
-            *@
-
-
-            @*
-        <MudDrawerContainer>
-        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Align="Align.Center">WE AUTOMATE YOUR INTRALOGISTICS</MudText>
-        </MudDrawerContainer>
-            *@
-            @*
-        <MudCardContent>
-        <div class="d-flex justify-center mb-1">
-            <img src="Images/AEI_Logo_2.png" width="100px" />
-        </div>
-        <MudText Typo="Typo.subtitle2" Color="Color.Primary" Align="Align.Center">WE AUTOMATE YOUR INTRALOGISTICS</MudText>
-        </MudCardContent>
-            *@
         </MudDrawerHeader>
         <NavMenu />
     </MudDrawer>
@@ -75,17 +59,18 @@
                 <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
 
                 <MudSpacer />
-                <MudButton Variant="Variant.Text" Link="https://aei-solution.com/" Color="Color.Primary" >AEI Solution</MudButton>
+                <MudButton Variant="Variant.Text" Link="https://aei-solution.com/" Color="Color.Primary">AEI Solution</MudButton>
             </MudToolBar>
         </MudHidden>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             @Body
-        </MudContainer>    
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 
 @code
 {
+
 
     private ThemeManagerTheme _themeManager = new ThemeManagerTheme();
     public bool _drawerOpen = true;
@@ -120,8 +105,11 @@
         cultures = Configuration.GetSection("Cultures")
        .GetChildren().ToDictionary(x => x.Key, x => x.Value);
 
-        StateHasChanged();
+      
     }
+
+
+
 
     #region Theme
 
@@ -296,11 +284,12 @@
     private Dictionary<string, string> cultures;
 
 
+    private async void btnLogout_Click()
+    {
+        var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
+        await authModule.InvokeVoidAsync("SignOut", "/");
+    }
+
    
-
-
-
-   
-
 
 }

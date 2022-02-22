@@ -1,4 +1,4 @@
-﻿@page "/paau/rgvqueue"
+﻿@page "/4/4_3"
 @using System
 @using System.IO
 @using System.Linq
@@ -13,8 +13,11 @@
 @using GoWMS.Server.Models.Inb
 @using GoWMS.Server.Models.Wcs
 
-@inject WcsService ObjWcsService
+@inject IStringLocalizer<PaAuRGVQueue> L
 
+@inject WcsService ObjWcsService
+@inject UserServices OpjUserService
+@attribute [Authorize]
 
 @if (Elements == null)
 {
@@ -23,35 +26,44 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary">@mPageHeader</MudText>
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Tas_Rgvworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+    <MudTable Items="@Elements" 
+              FixedHeader="@fixed_header" 
+              FixedFooter="@fixed_footer" 
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+              Filter="new Func<Tas_Rgvworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudTooltip Text="Export" Color="Color.Secondary" Placement="Placement.Top">
+            <MudTooltip Text=@L["Export"] Color="Color.Secondary" Placement="Placement.Top">
                 <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                    <MudMenuItem>Excel</MudMenuItem>
-                    <MudMenuItem>Pdf</MudMenuItem>
+                    <MudMenuItem>@L["EXCEL"]</MudMenuItem>
+                    <MudMenuItem>@L["PDF"]</MudMenuItem>
                 </MudMenu>
             </MudTooltip>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" 
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Ctime)">QUEUING</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Lpncode)">PALLET</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Work_Code)">TASKTYPE</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_No)">RGV</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_From)">SOURCE</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_To)">DESTINATION</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Stime)">STARTED</MudTableSortLabel></MudTh>
-        </HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Ctime)">@L["QUEUING"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Lpncode)">>@L["PALLET"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Work_Code)">>@L["TASKTYPE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_No)">@L["RGV"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_From)">@L["SOURCE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_To)">@L["DESTINATION"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Stime)">@L["STARTED"]</MudTableSortLabel></MudTh>
+</HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="QUEUING">@Convert.ToDateTime(context.Ctime).ToString(VarGlobals.FormatDT)</MudTd>
-            <MudTd DataLabel="PALLET">@context.Lpncode</MudTd>
-            <MudTd DataLabel="TASKTYPE">@context.Work_Code</MudTd>
-            <MudTd DataLabel="RGV">@context.Rgv_No</MudTd>
-            <MudTd DataLabel="SOURCE">@context.Rgv_From</MudTd>
-            <MudTd DataLabel="DESTINATION">@context.Rgv_To</MudTd>
-            <MudTd DataLabel="STARTED">
+            <MudTd DataLabel=@L["QUEUING"]>@Convert.ToDateTime(context.Ctime).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
+            <MudTd DataLabel=@L["TASKTYPE"]>@context.Work_Code</MudTd>
+            <MudTd DataLabel=@L["RGV"]>@context.Rgv_No</MudTd>
+            <MudTd DataLabel=@L["SOURCE"]>@context.Rgv_From</MudTd>
+            <MudTd DataLabel=@L["DESTINATION"]>@context.Rgv_To</MudTd>
+            <MudTd DataLabel=@L["STARTED"]>
                 @if (context.Stime != null)
                     {
                     @Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)
@@ -65,7 +77,10 @@ else
 }
 
 @code {
-    private string mPageHeader = "ASRS-QUEUE";
+    private string pageheader = "4.3.RGV-Queue";
+    public string mPagedesc { get; set; } = "4.3.RGV-Queue";
+    private string mPagename { get; set; } = "/4/4_3";
+
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -83,11 +98,18 @@ else
 
     public int elevation = 0;
 
+    private ResultReturn resultReturn = null;
+
     protected override async Task OnInitializedAsync()
     {
         WcsService objCS = new WcsService();
         //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
         Elements = await Task.Run(() => objCS.GetRGVWorks());
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+
     }
 
     private void setstr(string str)

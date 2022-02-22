@@ -1,33 +1,48 @@
 ﻿@page "/pages/authentication/register"
 @layout LoginLayout
 
+@using GoWMS.Server.Data;
+@using GoWMS.Server.Controllers
+@using NETCore.Encrypt;
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Mas
+@using Microsoft.Extensions.Configuration
 
-
+@inject IConfiguration Configuration
+@inject UserServices ObjUserService
+@inject NavigationManager navigationManager
+@inject ISnackbar Snackbar
 
 <MudText Typo="Typo.h4" GutterBottom="true">Sign Up</MudText>
 <MudText>Already have an account? <MudLink Href="/pages/authentication/login">Sign In</MudLink></MudText>
+@*
+    <MudSelect T="string" Label="Department">
+        <MudSelectItem Value="@("A")" />
+        <MudSelectItem Value="@("B")" />
+        <MudSelectItem Value="@("C")" />
+        <MudSelectItem Value="@("D")" />
+    </MudSelect>
+*@
 
-<MudSelect T="string" Label="Department">
-    <MudSelectItem Value="@("A")" />
-    <MudSelectItem Value="@("B")" />
-    <MudSelectItem Value="@("C")" />
-    <MudSelectItem Value="@("D")" />
-</MudSelect>
+<MudTextField @bind-Value="@MUsername" T="string" Label="Username" Variant="Variant.Outlined" Class="my-4"></MudTextField>
 
-<MudTextField T="string" Label="Username" Variant="Variant.Outlined" Class="my-4"></MudTextField>
+<MudTextField @bind-Value="@MEmail" T="string" Label="E-mail" Variant="Variant.Outlined"></MudTextField>
 
-<MudTextField T="string" Label="E-mail" Variant="Variant.Outlined"></MudTextField>
-
-<MudTextField @bind-Value="@Password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" Class="mt-4"/>
+<MudTextField @bind-Value="@MPassword" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" Class="mt-4" />
 
 <MudCheckBox @bind-Checked="@AgreeToTerms" Label="I agree to the terms and privacy" Color="Color.Primary" Class="ml-n1 my-3"></MudCheckBox>
 
-<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!AgreeToTerms)" Link="/pages/authentication/login" Size="Size.Large" FullWidth="true">Register</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!AgreeToTerms)" Size="Size.Large" FullWidth="true" OnClick="@RegisterUser">Register</MudButton>
 
 @code {
-    string Password { get; set; }
+    string MPassword { get; set; }
     public bool AgreeToTerms { get; set; }
     string lblAgree { get; set; }
+
+    string MEmail { get; set; }
+    string MUsername { get; set; }
+
+    private ResultReturn resultReturn = null;
 
     bool PasswordVisibility;
     InputType PasswordInput = InputType.Password;
@@ -47,5 +62,35 @@
             PasswordInputIcon = Icons.Material.Filled.Visibility;
             PasswordInput = InputType.Text;
         }
+    }
+
+    private async Task RegisterUser()
+    {
+        if (MUsername.Length > 0 && MPassword.Length > 0 && MEmail.Length > 0)
+        {
+            var key = Configuration.GetSection("Appkey")["Pass"].ToString();
+            //var encrypted = Security.EncryptString(Password, key);
+            var encrypted = EncryptProvider.DESEncrypt(MPassword, key);
+
+
+            resultReturn = await Task.Run(() => ObjUserService.UpsertRegister(5, MEmail, encrypted, MUsername));
+
+            if (resultReturn.Bret == true)
+            {
+                navigationManager.NavigateTo("pages/authentication/login");
+            }
+            else
+            {
+                Snackbar.Add(resultReturn.Sret, Severity.Error);
+            }
+
+
+            //pages / authentication / login
+        }
+        else
+        {
+            Snackbar.Add("Please Enter User and Password", Severity.Error);
+        }
+
     }
 }

@@ -20,13 +20,14 @@ namespace GoWMS.Server.Controllers
         {
             // Validate the Principal
             var userPrincipal = context.Principal;
-
+            /*
             // If not valid, Sign out
             if (userPrincipal.Identity.Name != "denis@voituron.net")
             {
                 context.RejectPrincipal();
                 await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             }
+            */
         }
     }
 }

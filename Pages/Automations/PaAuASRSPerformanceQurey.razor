@@ -1,36 +1,43 @@
-﻿@page "/wcs/asrsthroughput"
+﻿@page "/5/5_6"
 
 @using GoWMS.Server.Controllers;
 @using GoWMS.Server.Models.Wcs;
 @using GoWMS.Server.Data;
+@using GoWMS.Server.Models;
 
-@inject WcsService ObjWcsService;
+@inject IStringLocalizer<PaAuASRSPerformanceQurey> L
+
+@inject WcsService ObjWcsService
+@inject UserServices OpjUserService
 @inject NavigationManager navigationManager
+@attribute [Authorize]
 
 
 @if (Elements != null)
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary">@mPagecaption</MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
     <MudGrid>
 
         <MudItem Class="d-flex flex-row">
             <MudItem>
-                <MudDatePicker Class="" Label="From Date" @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
+                <MudDatePicker Class="" Label=@L["FromDate"] @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
             </MudItem>
             <MudItem>
-                <MudTimePicker Class="px-2" Label="From Time" @bind-Time="fromTime" />
+                <MudTimePicker Class="px-2" Label=@L["FromTime"] @bind-Time="fromTime" />
             </MudItem>
         </MudItem>
         <MudItem Class="d-flex flex-row">
             <MudItem>
-                <MudDatePicker Class="" Label="To Date" @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
+                <MudDatePicker Class="" Label=@L["ToDate"] @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
             </MudItem>
             <MudItem>
-                <MudTimePicker Class="px-2" Label="To Time" @bind-Time="toTime" />
+                <MudTimePicker Class="px-2" Label=@L["ToTime"] @bind-Time="toTime" />
             </MudItem>
         </MudItem>
         <MudItem Class="d-flex flex-row align-self-end">
-            <MudButton OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium">Search</MudButton>
+            <MudButton OnClick="OnclickSearch" Variant="Variant.Filled" 
+                       Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" 
+                       Size="Size.Medium">@L["Search"]</MudButton>
         </MudItem>
     </MudGrid>
     <MudGrid Class="py-2">
@@ -43,21 +50,24 @@
                   Bordered="@bordered" Striped="@striped" Filter="new Func<AsrsPerformance, bool>(FilterFunc)" Style="width:100%;">
             <ToolBarContent>
                 <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                <MudTextField @bind-Value="searchString" 
+                              Placeholder=@L["Search"] Adornment="Adornment.Start" 
+                              AdornmentIcon="@Icons.Material.Filled.Search" 
+                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>MACHINE</MudTh>
-                <MudTh>IN</MudTh>
-                <MudTh>OUT</MudTh>
-                <MudTh>TOTAL</MudTh>
+                <MudTh>@L["MACHINE"]</MudTh>
+                <MudTh>@L["IN"]</MudTh>
+                <MudTh>@L["OUT"]</MudTh>
+                <MudTh>@L["TOTAL"]</MudTh>
 
             </HeaderContent>
             <RowTemplate>
 
-                <MudTd DataLabel="MACHINE">@context.Mccode</MudTd>
-                <MudTd DataLabel="IN">@context.Inbound</MudTd>
-                <MudTd DataLabel="OUT">@context.Outbound</MudTd>
-                <MudTd DataLabel="TOTAL">@context.Total</MudTd>
+                <MudTd DataLabel=@L["MACHINE"]>@context.Mccode</MudTd>
+                <MudTd DataLabel=@L["IN"]>@context.Inbound</MudTd>
+                <MudTd DataLabel=@L["OUT"]>@context.Outbound</MudTd>
+                <MudTd DataLabel=@L["TOTAL"]>@context.Total</MudTd>
             </RowTemplate>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[] { 10, 20, 50, 100 }" />
@@ -69,7 +79,10 @@
 
 
 @code {
-    private string mPagecaption { get; set; } = "ASRS Throughput";
+    private string pageheader { get; set; } = "5.6.ASRS Throughput";
+
+    public string mPagedesc { get; set; } = "5.6.ASRS Throughput";
+    private string mPagename { get; set; } = "/5/5_6";
 
     private IEnumerable<AsrsPerformance> Elements = new List<AsrsPerformance>();
 
@@ -91,7 +104,7 @@
     private bool fixed_footer = true;
     private string searchString = "";
 
-
+    private ResultReturn resultReturn = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,6 +116,10 @@
 
 
         Elements = await Task.Run(() => objCS.GetAsrsPerformance(fromDateTime.Value, toDateTime.Value));
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
     }
 
     bool FilterFunc(AsrsPerformance element)

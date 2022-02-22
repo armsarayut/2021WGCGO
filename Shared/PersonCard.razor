@@ -1,16 +1,62 @@
-﻿<MudCard Elevation="0" Square="true" Class="@Class" Style="@Style">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using System.Security.Claims
+
+@using GoWMS.Server.Data;
+
+<MudCard Elevation="0" Square="true" Class="@Class" Style="@Style">
     <MudCardHeader>
         <CardHeaderAvatar>
-            <MudAvatar Image="images/freedev.png" />
+            @if (VarGlobals.User.GroupID == 1)
+            {
+                <MudAvatar Image="images/programmer.png" /> }
+            else if (VarGlobals.User.GroupID == 2)
+            {
+                <MudAvatar Image="images/man.png" /> }
+            else if (VarGlobals.User.GroupID == 3)
+            {
+                <MudAvatar Image="images/businessman.png" /> }
+            else if (VarGlobals.User.GroupID == 4)
+            {
+                <MudAvatar Image="images/man.png" /> }
+            else if (VarGlobals.User.GroupID == 5)
+            {
+                <MudAvatar Image="images/guest-icon.jpg" /> }
+            else
+            {
+                <MudAvatar Image="images/maori.png" />}
         </CardHeaderAvatar>
+
         <CardHeaderContent>
-            <MudText Typo="Typo.body2">Admin</MudText>
-            <MudText Typo="Typo.caption">Administrator</MudText>
+            <MudText Typo="Typo.body2">Welcome</MudText>
+            <MudText Typo="Typo.caption">@(sRole)</MudText>
         </CardHeaderContent>
     </MudCardHeader>
 </MudCard>
 
-@code {
-    [Parameter] public string Class { get; set; }
+@code { [Parameter] public string Class { get; set; }
     [Parameter] public string Style { get; set; }
-}
+
+
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        sUsername = user.Identity.Name;
+        sRole = user.Claims.FirstOrDefault(
+             c => c.Type == ClaimTypes.Email)?.Value;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.GroupSid)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+     c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+    }
+
+
+    }

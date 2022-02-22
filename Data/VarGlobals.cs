@@ -20,6 +20,17 @@ namespace GoWMS.Server.Data
             return $"{Directory.GetCurrentDirectory()}{@"\wwwroot\fonts\ARIALUNI.TTF"}";
         }
 
+        public static string CurrentUserName { get; set; }
+
+        public static class User
+        {
+            public static long UserID { get; set; }
+            public static string UserCode { get; set; }
+            public static string UserName { get; set; }
+            public static long DeepID { get; set; }
+            public static long GroupID { get; set; }
+        }
+
         public static string FormatN0 { get; set; } = "{0:N0}";
         public static string FormatN2 { get; set; } = "{0:N2}";
         public static string FormatD2 { get; set; } = "{0:D2}";

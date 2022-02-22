@@ -126,14 +126,89 @@
   <data name="3.Outbound" xml:space="preserve">
     <value>3.ขาออก</value>
   </data>
+  <data name="4.1.ASRS-STATUS" xml:space="preserve">
+    <value>4.1.ASRS-สถานะ</value>
+  </data>
+  <data name="4.2.ASRS-QUEUE" xml:space="preserve">
+    <value>4.2.ASRS-คิว</value>
+  </data>
+  <data name="4.3.RGV-QUEUE" xml:space="preserve">
+    <value>4.3.RGV-คิว</value>
+  </data>
+  <data name="4.4-RGV-SURVEY" xml:space="preserve">
+    <value>4.4-RGV-แบบสำรวจ</value>
+  </data>
+  <data name="4.4.1.RGV01-SURVEY" xml:space="preserve">
+    <value>4.4.1.RGV01-แบบสำรวจ</value>
+  </data>
+  <data name="4.4.2.RGV02-SURVEY" xml:space="preserve">
+    <value>4.4.2.RGV02-แบบสำรวจ</value>
+  </data>
   <data name="4.Automation" xml:space="preserve">
     <value>4.ระบบอัตโนมัติ</value>
+  </data>
+  <data name="5.1.Audit trail" xml:space="preserve">
+    <value>5.1.เส้นทางการตรวจสอบ</value>
+  </data>
+  <data name="5.2-Inbound" xml:space="preserve">
+    <value>5.2.ขาเข้า</value>
+  </data>
+  <data name="5.2.1.Order Receive" xml:space="preserve">
+    <value>5.2.1.รับคำสั่งซื้อ</value>
+  </data>
+  <data name="5.2.2.Order Receive Summary" xml:space="preserve">
+    <value>5.2.2.สรุปการรับคำสั่ง</value>
+  </data>
+  <data name="5.3-Inventory" xml:space="preserve">
+    <value>5.3.สินค้าคงคลัง</value>
+  </data>
+  <data name="5.3.1.Inventory location" xml:space="preserve">
+    <value>5.3.1.ที่ตั้งสินค้าคงคลัง</value>
+  </data>
+  <data name="5.3.2.Inventory summary" xml:space="preserve">
+    <value>5.3.2.สรุปสินค้าคงคลัง</value>
+  </data>
+  <data name="5.3.3.Inventory aging" xml:space="preserve">
+    <value>5.3.3.อายุสินค้าคงคลัง</value>
+  </data>
+  <data name="5.4-Outbound" xml:space="preserve">
+    <value>5.4.ขาออก</value>
+  </data>
+  <data name="5.4.1.Order picking" xml:space="preserve">
+    <value>5.4.1.การหยิบสินค้า</value>
+  </data>
+  <data name="5.4.2.Order picking summary" xml:space="preserve">
+    <value>5.4.2.สรุปการหยิบสินค้า</value>
+  </data>
+  <data name="5.5-Machine" xml:space="preserve">
+    <value>5.5.เครื่องจักร</value>
+  </data>
+  <data name="5.5.1.ASRS-History" xml:space="preserve">
+    <value>5.5.1.ASRS-ประวัติ</value>
+  </data>
+  <data name="5.5.2.ASRS-Error summary" xml:space="preserve">
+    <value>5.5.2.ASRS-สรุปข้อผิดพลาด</value>
+  </data>
+  <data name="5.5.3.ASRS-Inbound/hour" xml:space="preserve">
+    <value>5.5.3.ASRS-ขาเข้า/ชั่วโมง</value>
+  </data>
+  <data name="5.5.4.ASRS-Outbound/hour" xml:space="preserve">
+    <value>5.5.4.ASRS-ขาออก/ชั่วโมง</value>
+  </data>
+  <data name="5.5.5.ASRS-End of day" xml:space="preserve">
+    <value>5.5.5.ASRS-สิ้นวัน</value>
+  </data>
+  <data name="5.5.6.ASRS-LOADTIME" xml:space="preserve">
+    <value>5.5.6.ASRS-โหลดไทม์</value>
+  </data>
+  <data name="5.6.ASRS Throughput" xml:space="preserve">
+    <value>5.6.ASRS ปริมาณงาน</value>
   </data>
   <data name="5.Report" xml:space="preserve">
     <value>5.รายงาน</value>
   </data>
   <data name="6.Setup" xml:space="preserve">
-    <value>6.ตั้งค่า</value>
+    <value>6.ข้อมูลหลัก</value>
   </data>
   <data name="7.Admin" xml:space="preserve">
     <value>7.ผู้ดูแลระบบ</value>
@@ -145,19 +220,19 @@
     <value>9.ระบบERP</value>
   </data>
   <data name="AdmGroup" xml:space="preserve">
-    <value>กลุ่มผู้ใช้</value>
+    <value>7.3.กลุ่มผู้ใช้</value>
   </data>
   <data name="AdmPrivileges" xml:space="preserve">
-    <value>สิทธิพิเศษ</value>
+    <value>7.1.สิทธิพิเศษ</value>
   </data>
   <data name="AdmUser" xml:space="preserve">
-    <value>ผู้ใช้</value>
+    <value>7.2.ผู้ใช้</value>
   </data>
   <data name="AuditTrail" xml:space="preserve">
     <value>แนวทางการตรวจสอบ</value>
   </data>
   <data name="Capacity" xml:space="preserve">
-    <value>ความจุคลัง</value>
+    <value>2.2.ความจุคลัง</value>
   </data>
   <data name="Conveyor" xml:space="preserve">
     <value>สายพาน</value>
@@ -165,44 +240,47 @@
   <data name="CountCheck" xml:space="preserve">
     <value>ตรวจนับ</value>
   </data>
+  <data name="Counting" xml:space="preserve">
+    <value>2.5.ตรวจนับ</value>
+  </data>
   <data name="CountSuggesstion" xml:space="preserve">
     <value>แนะนำการนับ</value>
   </data>
   <data name="CycleCount" xml:space="preserve">
-    <value>รอบการนับ</value>
+    <value>2.4รอบการนับ</value>
   </data>
   <data name="Dashboard" xml:space="preserve">
     <value>แผงควบคุม</value>
   </data>
   <data name="ErpBookingNote" xml:space="preserve">
-    <value>บันทึกการจอง</value>
+    <value>9.1.บันทึกการจอง</value>
   </data>
   <data name="ErpBookingOrder" xml:space="preserve">
     <value>การจองคำสั่งซื้อ</value>
   </data>
   <data name="ErpCustomers" xml:space="preserve">
-    <value>ลูกค้า</value>
+    <value>9.4.ลูกค้า</value>
   </data>
   <data name="ErpDeliveryNote" xml:space="preserve">
-    <value>บันทึกการส่งมอบ</value>
+    <value>9.2.บันทึกการส่งมอบ</value>
   </data>
   <data name="ErpItems" xml:space="preserve">
-    <value>สินค้า</value>
+    <value>9.3.สินค้า</value>
   </data>
   <data name="ErpPackeing" xml:space="preserve">
-    <value>การบรรจุ</value>
+    <value>9.5.การบรรจุ</value>
   </data>
   <data name="GoodReceive" xml:space="preserve">
-    <value>การรับ</value>
+    <value>1.2.การรับ</value>
   </data>
   <data name="History" xml:space="preserve">
     <value>ประวัติ</value>
   </data>
   <data name="HlpHelpdesk" xml:space="preserve">
-    <value>ฝ่ายช่วยเหลือ</value>
+    <value>8.2.ฝ่ายช่วยเหลือ</value>
   </data>
   <data name="HlpUserguide" xml:space="preserve">
-    <value>คู่มือ</value>
+    <value>8.1.คู่มือ</value>
   </data>
   <data name="HoldStock" xml:space="preserve">
     <value>กักสินค้า</value>
@@ -214,7 +292,7 @@
     <value>คงคลัง</value>
   </data>
   <data name="Location" xml:space="preserve">
-    <value>พื้นที่จัดเก็บ</value>
+    <value>2.3.พื้นที่จัดเก็บ</value>
   </data>
   <data name="Machine" xml:space="preserve">
     <value>เครื่องจักร</value>
@@ -223,13 +301,13 @@
     <value>การทำแพลน</value>
   </data>
   <data name="MasterQueuing" xml:space="preserve">
-    <value>มาสเตอร์คิว</value>
+    <value>1.3.มาสเตอร์คิว</value>
   </data>
   <data name="OrderBooking" xml:space="preserve">
-    <value>รายการจองสินค้า</value>
+    <value>3.1.รายการจองสินค้า</value>
   </data>
   <data name="OrderPicking" xml:space="preserve">
-    <value>การเลือกคำสั่งหยิบ</value>
+    <value>3.2.การเลือกคำสั่งหยิบ</value>
   </data>
   <data name="Outbound" xml:space="preserve">
     <value>ขาออก</value>
@@ -238,16 +316,16 @@
     <value>หยิบ</value>
   </data>
   <data name="QueuePicking" xml:space="preserve">
-    <value>การเลือกคิว</value>
+    <value>3.3.การเลือกคิว</value>
   </data>
   <data name="ReceivingOrder" xml:space="preserve">
-    <value>รับออเดอร์</value>
+    <value>1.1.รับออเดอร์</value>
   </data>
   <data name="ReleaseStock" xml:space="preserve">
     <value>ปล่อยสินค้า</value>
   </data>
   <data name="Return" xml:space="preserve">
-    <value>คืน</value>
+    <value>1.4.คืน</value>
   </data>
   <data name="RGV" xml:space="preserve">
     <value>รถขนส่ง</value>
@@ -286,28 +364,28 @@
     <value>จำนวนขาออก</value>
   </data>
   <data name="SetMaterial" xml:space="preserve">
-    <value>วัสดุ</value>
+    <value>6.1.สินค้า</value>
   </data>
   <data name="SetPallet" xml:space="preserve">
-    <value>พาเลท</value>
+    <value>6.4.พาเลท</value>
   </data>
   <data name="SetReason" xml:space="preserve">
-    <value>เหตุผล</value>
+    <value>6.3.เหตุผล</value>
   </data>
   <data name="SetStatus" xml:space="preserve">
-    <value>สถานะ</value>
+    <value>6.3.สถานะ</value>
   </data>
   <data name="SetStore" xml:space="preserve">
-    <value>คลัง</value>
+    <value>6.5.คลัง</value>
   </data>
   <data name="SetWorktype" xml:space="preserve">
-    <value>ประเภทงาน</value>
+    <value>6.2.ประเภทงาน</value>
   </data>
   <data name="SRM" xml:space="preserve">
     <value>เครน</value>
   </data>
   <data name="StockList" xml:space="preserve">
-    <value>รายการคงคลัง</value>
+    <value>2.1.รายการคงคลัง</value>
   </data>
   <data name="Storage" xml:space="preserve">
     <value>จัดเก็บ</value>
@@ -316,6 +394,6 @@
     <value>โอนย้าย</value>
   </data>
   <data name="Unplanned" xml:space="preserve">
-    <value>เบิกแมนนวล</value>
+    <value>3.4.เบิกแมนนวล</value>
   </data>
 </root>
