@@ -138,6 +138,9 @@
   <data name="Queuetime" xml:space="preserve">
     <value>Queuetime</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
   <data name="SRM" xml:space="preserve">
     <value>SRM</value>
   </data>

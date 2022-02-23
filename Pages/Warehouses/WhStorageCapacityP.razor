@@ -37,14 +37,22 @@ else
         <MudSpacer />
     </MudAppBar>
 
-    <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<WhStorageCapacity,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+    <MudTable Items="@Elements" 
+              FixedHeader="@fixed_header" 
+              FixedFooter="@fixed_footer" 
+              Height="@(fixed_header || fixed_footer ?"600px":"")" 
+              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+              Filter="new Func<WhStorageCapacity,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
         <ToolBarContent>
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" 
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Rn)">@L["No"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<WhStorageCapacity, object>(x=>x.Srmname)">@L["Lane"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locavlt1)">@L["Occupied"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.Locemp)">@L["Mass"]</MudTableSortLabel></MudTh>
@@ -54,14 +62,13 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<WhStorageCapacity, object>(x=>x.OccRate)">@L["OccupancyRate"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="No">@context.Rn</MudTd>
-            <MudTd DataLabel="Lane">@context.Srmname</MudTd>
-            <MudTd DataLabel="Occupied [Type A]">@context.Locavlt1</MudTd>
-            <MudTd DataLabel="Empty">@context.Locemp</MudTd>
-            <MudTd DataLabel="Block/Error">@context.Perr</MudTd>
-            <MudTd DataLabel="Prohibited Location">@context.Prohloc</MudTd>
-            <MudTd DataLabel="Total">@context.Total</MudTd>
-            <MudTd DataLabel="Occupancy Rate">@context.OccRate</MudTd>
+            <MudTd DataLabel=@L["Lane"]>@context.Srmname</MudTd>
+            <MudTd DataLabel=@L["Occupied"]>@context.Locavlt1</MudTd>
+            <MudTd DataLabel=@L["Mass"]>@context.Locemp</MudTd>
+            <MudTd DataLabel=@L["Block/Error"]>@context.Perr</MudTd>
+            <MudTd DataLabel=@L["ProhibitedLocation"]>@context.Prohloc</MudTd>
+            <MudTd DataLabel=@L["Total"]>@context.Total</MudTd>
+            <MudTd DataLabel=@L["OccupancyRate"]>@context.OccRate</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />

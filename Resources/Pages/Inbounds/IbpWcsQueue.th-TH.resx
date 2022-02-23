@@ -138,6 +138,9 @@
   <data name="Queuetime" xml:space="preserve">
     <value>เวลาคิว</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
   <data name="SRM" xml:space="preserve">
     <value>เครน</value>
   </data>

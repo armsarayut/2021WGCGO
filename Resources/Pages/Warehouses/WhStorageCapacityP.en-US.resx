@@ -147,6 +147,9 @@
   <data name="ProhibitedLocation" xml:space="preserve">
     <value>Prohibited Location</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
   <data name="Total" xml:space="preserve">
     <value>Total</value>
   </data>

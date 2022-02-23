@@ -147,6 +147,9 @@
   <data name="PDF" xml:space="preserve">
     <value>พีดีเอฟ</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
   <data name="Status" xml:space="preserve">
     <value>สถานะ</value>
   </data>

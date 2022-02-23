@@ -54,23 +54,29 @@ else
               @bind-SelectedItem="selectedItem">
         <ToolBarContent>
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
         <HeaderContent>
             <MudTh>@L["DNDate"]</MudTh>
             <MudTh>@L["DNNo"]</MudTh>
+            <MudTh>@L["DNSeq"]</MudTh>
             <MudTh>@L["ItemCode"]</MudTh>
             <MudTh>@L["ItemName"]</MudTh>
             <MudTh>@L["Qty"]</MudTh>
             <MudTh>@L["Unit"]</MudTh>
             <MudTh>@L["Weight"]</MudTh>
+
             <MudTh>@L["LotNo"]</MudTh>
             <MudTh>@L["BatchNo"]</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="@L["DNDate"]">@Convert.ToDateTime(context.Docdate).ToString(VarGlobals.FormatD)</MudTd>
             <MudTd DataLabel="@L["DNNo"]">@context.Pono</MudTd>
+            <MudTd DataLabel=@L["DNSeq"]>@context.Pallettag</MudTd>
             <MudTd DataLabel="@L["ItemCode"]">@context.Itemcode</MudTd>
             <MudTd DataLabel="@L["ItemName"]">@context.Itemname</MudTd>
             <MudTd DataLabel="@L["Qty"]" Style="text-align: right">@string.Format(VarGlobals.FormatN0, context.Quantity)</MudTd>

@@ -51,35 +51,20 @@ else
               @bind-SelectedItem="selectedItem">
         <ToolBarContent>
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <MudTextField @bind-Value="searchString" 
+                          Placeholder=@L["Search"] 
+                          Adornment="Adornment.Start" 
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh>@L["Queuetime"]</MudTh>
             <MudTh>@L["PalletGo"]</MudTh>
             <MudTh>@L["Worktype"]</MudTh>
-            <MudTh>@L["SRM"]</MudTh>
-            <MudTh>@L["Location"]</MudTh>
-            <MudTh>@L["Starttime"]</MudTh>
-            <MudTh>@L["Endtime"]</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="@L["Queuetime"]">@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
             <MudTd DataLabel="@L["PalletGo"]">@context.Palletno</MudTd>
             <MudTd DataLabel="@L["Worktype"]">@context.Puttype</MudTd>
-            <MudTd DataLabel="@L["SRM"]">@context.Storagearea</MudTd>
-            <MudTd DataLabel="@L["Location"]">@context.Storagebin</MudTd>
-            <MudTd DataLabel="@L["Starttime"]">
-                @if (context.Storagetime != null)
-                    {
-                    @Convert.ToDateTime(context.Storagetime).ToString(VarGlobals.FormatDT)
-                    }
-            </MudTd>
-            <MudTd DataLabel="@L["Endtime"]">
-                @if (context.Completed != null)
-                    {
-                    @Convert.ToDateTime(context.Completed).ToString(VarGlobals.FormatDT)
-                    }
-            </MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />

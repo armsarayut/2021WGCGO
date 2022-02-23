@@ -34,12 +34,6 @@ else
               Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
               Filter="new Func<Tas_Mcworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudTooltip Text=@L["Export"] Color="Color.Secondary" Placement="Placement.Top">
-                <MudMenu Icon="@Icons.Filled.Download" Color="Color.Primary">
-                    <MudMenuItem>@L["EXCEL"]</MudMenuItem>
-                    <MudMenuItem>@L["PDF"]</MudMenuItem>
-                </MudMenu>
-            </MudTooltip>
             <MudSpacer />
             <MudTextField @bind-Value="searchString" 
                           Placeholder=@L["Search"] 

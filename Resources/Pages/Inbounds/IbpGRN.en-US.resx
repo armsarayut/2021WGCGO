@@ -126,6 +126,9 @@
   <data name="DNNo" xml:space="preserve">
     <value>DNNo</value>
   </data>
+  <data name="DNSeq" xml:space="preserve">
+    <value>DNSeq</value>
+  </data>
   <data name="Excel" xml:space="preserve">
     <value>Excel</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="ReceivingOrder" xml:space="preserve">
     <value>ReceivingOrder</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
   </data>
   <data name="Unit" xml:space="preserve">
     <value>Unit</value>

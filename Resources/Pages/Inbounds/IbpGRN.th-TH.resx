@@ -126,6 +126,9 @@
   <data name="DNNo" xml:space="preserve">
     <value>เลขที่เอกสาร</value>
   </data>
+  <data name="DNSeq" xml:space="preserve">
+    <value>ลำดับ</value>
+  </data>
   <data name="Excel" xml:space="preserve">
     <value>เอกเซล</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="ReceivingOrder" xml:space="preserve">
     <value>การรับ</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>ค้นหา</value>
   </data>
   <data name="Unit" xml:space="preserve">
     <value>หน่วย</value>

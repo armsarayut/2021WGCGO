@@ -150,6 +150,9 @@
   <data name="Qty" xml:space="preserve">
     <value>Qty</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
   <data name="Unit" xml:space="preserve">
     <value>Unit</value>
   </data>

@@ -150,6 +150,9 @@
   <data name="Qty" xml:space="preserve">
     <value>จำนวน</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>ค้นหา</value>
+  </data>
   <data name="Unit" xml:space="preserve">
     <value>หน่วย</value>
   </data>
