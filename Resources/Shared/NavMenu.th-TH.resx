@@ -144,6 +144,15 @@
   <data name="4.4.2.RGV02-SURVEY" xml:space="preserve">
     <value>4.4.2.RGV02-แบบสำรวจ</value>
   </data>
+  <data name="4.5-SRM-OPERATE" xml:space="preserve">
+    <value>4.5-SRM-ใช้งาน</value>
+  </data>
+  <data name="4.5.1.SRM-ENABLE" xml:space="preserve">
+    <value>4.5.1.SRM-เปิดใช้งาน</value>
+  </data>
+  <data name="4.5.2.SRM-INOUT" xml:space="preserve">
+    <value>4.5.2.SRM-เข้าออก</value>
+  </data>
   <data name="4.Automation" xml:space="preserve">
     <value>4.ระบบอัตโนมัติ</value>
   </data>

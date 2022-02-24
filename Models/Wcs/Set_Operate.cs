@@ -16,5 +16,7 @@ namespace GoWMS.Server.Models.Wcs
 		public string Mc_Type { get; set; }
 		public string Mc_Name { get; set; }
 		public Int32? Mc_No { get; set; }
+		public bool? Enable { get; set; }
+
 	}
 }

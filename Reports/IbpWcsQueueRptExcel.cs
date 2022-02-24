@@ -36,21 +36,15 @@ namespace GoWMS.Server.Reports
                 worksheet.Cell(rptRows, 1).Value = "Queuetime";
                 worksheet.Cell(rptRows, 2).Value = "Pallet";
                 worksheet.Cell(rptRows, 3).Value = "Tasktype";
-                worksheet.Cell(rptRows, 4).Value = "SRM";
-                worksheet.Cell(rptRows, 5).Value = "Location";
-                worksheet.Cell(rptRows, 6).Value = "Starttime";
-                worksheet.Cell(rptRows, 7).Value = "Endtime";
+
 
                 foreach (var rpt in rptElements)
                 {
                     rptRows++;
                     worksheet.Cell(rptRows, 1).Value = rpt.Created;
                     worksheet.Cell(rptRows, 2).Value = rpt.Palletno;
-                    worksheet.Cell(rptRows, 3).Value = rpt.Puttype;
-                    worksheet.Cell(rptRows, 4).Value = rpt.Storagearea;
-                    worksheet.Cell(rptRows, 5).Value = rpt.Storagebin;
-                    worksheet.Cell(rptRows, 6).Value = rpt.Storagetime;
-                    worksheet.Cell(rptRows, 7).Value = rpt.Completed;
+                    worksheet.Cell(rptRows, 3).Value = "'" + rpt.Puttype;
+
                 }
                 #endregion
                 workbook.SaveAs(_memoryStream);

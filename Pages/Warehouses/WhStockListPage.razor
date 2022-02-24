@@ -29,14 +29,12 @@ else
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
-                <MudMenuItem OnClick="DownloadExcelDocument">@L["Excel"]</MudMenuItem>
-                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
-            </MudMenu>
-        </MudTooltip>
-        <MudSpacer />
         <MudSwitch T="bool" CheckedChanged="@OnSelectChange" Color="Color.Primary" Label="@selectby" />
+        <MudSpacer />
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
     </MudAppBar>
 
     <MudGrid>

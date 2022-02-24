@@ -182,7 +182,7 @@ namespace GoWMS.Server.Data
 
                     sql.AppendLine("SELECT  role_acc, role_add, role_edit, role_del, role_rpt, role_apv");
                     sql.AppendLine("FROM public.vrole");
-                    sql.AppendLine("WHERE menu_desc = @menu_desc");
+                    sql.AppendLine("WHERE menu_id = @menu_desc");
                     sql.AppendLine("AND group_id = @group_id");
                     sql.AppendLine(";");
 

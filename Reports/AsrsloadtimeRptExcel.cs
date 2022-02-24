@@ -18,16 +18,16 @@ namespace GoWMS.Server.Reports
         {
             using (var workbook = new XLWorkbook())
             {
-                var worksheet = workbook.AddWorksheet("ASRS LOADTIME");
+                var worksheet = workbook.AddWorksheet("5.5.6");
                 int startRows = 4;
                 #region Excel Report Header
                 var imagePath = VarGlobals.Imagelogoreport();
                 worksheet.Column(1).Width = 18;
                 worksheet.Row(1).Height = 60;
                 var image = worksheet.AddPicture(imagePath).MoveTo(worksheet.Cell("A1")); //this will throw an error
-                image.ScaleWidth(.3);
-                image.ScaleHeight(.2);
-                worksheet.Cell("B1").Value = "ASRS LOADTIME" + " Report";
+                image.ScaleWidth(.7);
+                image.ScaleHeight(.7);
+                worksheet.Cell("B1").Value = "5.5.6.ASRS-Loadtime" + " Report";
                 worksheet.Cell("B1").Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
                 worksheet.Cell("B2").Value = $"PrintDate : {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}";
                 #endregion Excel

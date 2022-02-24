@@ -33,13 +33,11 @@ else
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
-                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
-                <MudMenuItem OnClick="DownloadPdfDocument" >@L["PDF"]</MudMenuItem>
-            </MudMenu>
-        </MudTooltip>
         <MudSpacer />
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
     </MudAppBar>
 
     <MudTable Items="@Elements"
@@ -69,7 +67,6 @@ else
             <MudTh>@L["Qty"]</MudTh>
             <MudTh>@L["Unit"]</MudTh>
             <MudTh>@L["Weight"]</MudTh>
-
             <MudTh>@L["LotNo"]</MudTh>
             <MudTh>@L["BatchNo"]</MudTh>
         </HeaderContent>
@@ -114,6 +111,10 @@ else
     private Inb_Goodreceipt_Go selectedItem = null;
     private HashSet<Inb_Goodreceipt_Go> selectedItems = new HashSet<Inb_Goodreceipt_Go>();
     private IEnumerable<Inb_Goodreceipt_Go> Elements = new List<Inb_Goodreceipt_Go>();
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+
+    [Inject] private IDialogService DialogService { get; set; }
+
 
     public int elevation = 0;
 
@@ -129,6 +130,8 @@ else
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, VarGlobals.User.GroupID));
+
         ////////////////////////////////////////
     }
 
@@ -190,11 +193,16 @@ else
     {
         try
         {
-            IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
-            List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
-            listExcelReport = Elements.ToList();
-            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
-            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            bool? result = await CheckRoleReport();
+            if (result == true)
+            {
+                IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
+                List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
+                listExcelReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            }
+
         }
         catch (Exception e)
         {
@@ -206,18 +214,185 @@ else
     {
         try
         {
-            IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
-            List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
-            listPdfReport = Elements.ToList();
-            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
-            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
-
+            bool? result = await CheckRoleReport();
+            if (result == true)
+            {
+                IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
+                List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+                listPdfReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+            }
         }
         catch (Exception e)
         {
             var exmsg = e.Message.ToString();
         }
     }
+
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_acc == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
+
 
 }

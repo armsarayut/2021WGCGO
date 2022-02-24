@@ -144,6 +144,15 @@
   <data name="4.4.2.RGV02-SURVEY" xml:space="preserve">
     <value>4.4.2.RGV02-Queue</value>
   </data>
+  <data name="4.5-SRM-OPERATE" xml:space="preserve">
+    <value>4.5-SRM-Operate</value>
+  </data>
+  <data name="4.5.1.SRM-ENABLE" xml:space="preserve">
+    <value>4.5.1.SRM-Enable</value>
+  </data>
+  <data name="4.5.2.SRM-INOUT" xml:space="preserve">
+    <value>4.5.2.SRM-InOut</value>
+  </data>
   <data name="4.Automation" xml:space="preserve">
     <value>4.Automation</value>
   </data>

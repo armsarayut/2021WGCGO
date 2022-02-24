@@ -655,7 +655,8 @@ namespace GoWMS.Server.Data
                             Client_Ip = rdr["client_ip"].ToString(),
                             Mc_Type = rdr["mc_type"].ToString(),
                             Mc_Name = rdr["mc_name"].ToString(),
-                            Mc_No = rdr["mc_no"] == DBNull.Value ? null : (Int32?)rdr["mc_no"]
+                            Mc_No = rdr["mc_no"] == DBNull.Value ? null : (Int32?)rdr["mc_no"],
+                            Enable = rdr["entity_lock"] == DBNull.Value ? true : !Convert.ToBoolean(rdr["entity_lock"])
                         };
                         lstobj.Add(objrd);
                     }
@@ -675,14 +676,14 @@ namespace GoWMS.Server.Data
         public bool SetOperate(Int64 setcode, bool setval)
         {
             bool bRet = false;
-            Int32 setvalue = 0;
+            Int32 setvalue = 1;
 
             using NpgsqlConnection con = new NpgsqlConnection(connectionString);
             try
             {
                 if (setval)
                 {
-                    setvalue = 1;
+                    setvalue = 0;
                 }
 
 

@@ -48,5 +48,11 @@ namespace GoWMS.Server.Data
         public static string FormatD { get; set; } = "yyyy-MM-dd";
         public static string TableHeight { get; set; } = "600px";
 
+        public static string MessageRoleAddPermit { get; set; } = "You're not authorized to access the add data.";
+        public static string MessageRoleEditPermit { get; set; } = "You're not authorized to access the amendment.";
+        public static string MessageRoleDelPermit { get; set; } = "You're not authorized to access the data deletion.";
+        public static string MessageRoleReportPermit { get; set; } = "You're not authorized to access the report.";
+        public static string MessageRoleApprovePermit { get; set; } = "You're not authorized to access the authorization.";
+        public static string MessageRoleAuthrizedPermit { get; set; } = "You're not authorized.";
     }
 }

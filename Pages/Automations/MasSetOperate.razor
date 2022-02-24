@@ -1,0 +1,151 @@
+﻿@page "/4/4_5_1"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Wcs
+
+@inject WcsService ObjService
+@inject UserServices OpjUserService
+
+@if (Elements == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+
+    @*<MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudSpacer />
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
+    </MudAppBar>*@
+
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              ReadOnly="@ronly"
+              CanCancelEdit="@canCancelEdit"
+              Filter="new Func<Set_Operate,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString"
+                          Placeholder="Search"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Set_Operate, object>(x=>x.Mc_Name)">SRM</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Set_Operate, object>(x=>x.Entity_Lock)">ENABLE</MudTableSortLabel></MudTh>
+            <MudTh>ACTION</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="SRM">@context.Mc_Name</MudTd>
+            <MudTd DataLabel="ENABLE"><MudCheckBox @bind-Checked="@context.Enable" /></MudTd>
+            <MudTd Class="clm-row-small" DataLabel="ACTION">
+                <MudFab @onclick="@(()=>Commitconstance(@context.Idx.Value, @context.Enable.Value))" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(()=>Refreshconstance())" Color="Color.Secondary" Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    private string pageheader { get; set; } = "4.5.1.SRM-ENABLE";
+
+    public string mPagedesc { get; set; } = "4.5.1.SRM-ENABLE";
+    private string mPagename { get; set; } = "/4/4_5_1";
+
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private bool ronly = false;
+    private bool canCancelEdit = true;
+
+    private Set_Operate selectedItem = null;
+    private HashSet<Set_Operate> selectedItems = new HashSet<Set_Operate>();
+    private IEnumerable<Set_Operate> Elements = new List<Set_Operate>();
+    public int elevation = 0;
+
+    private ResultReturn resultReturn = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WcsService objCS = new WcsService();
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+        Elements = await Task.Run(() => objCS.GetOperate());
+
+
+    }
+
+    private void setstr(string str)
+    {
+
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Set_Operate element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Mc_Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private void Commitconstance(Int64 setcoed, bool setval)
+    {
+        bool bSet = setval;
+
+
+
+        bool bcheck = ObjService.SetOperate(setcoed, bSet);
+
+        Refreshconstance();
+
+    }
+
+    private void Refreshconstance()
+    {
+        Elements = ObjService.GetOperate();
+    }
+
+}

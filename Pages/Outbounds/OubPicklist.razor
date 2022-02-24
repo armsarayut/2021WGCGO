@@ -30,13 +30,11 @@ else
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
-                <MudMenuItem OnClick="DownloadExcelDocument">@L["Excel"]</MudMenuItem>
-                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
-            </MudMenu>
-        </MudTooltip>
         <MudSpacer />
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
     </MudAppBar>
 
     <MudTable Items="@Elements" FixedHeader="@fixed_header" FixedFooter="@fixed_footer" Height="@(fixed_header || fixed_footer ?"600px":"")" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<Sap_Storeout,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
@@ -169,11 +167,11 @@ else
     {
         try
         {
-            IbpOrderQueueRptExcel excelReport = new IbpOrderQueueRptExcel();
+            OubPicklistRptExcel excelReport = new OubPicklistRptExcel();
             List<Sap_Storeout> listExcelReport = new List<Sap_Storeout>();
             listExcelReport = Elements.ToList();
             var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
         }
         catch (Exception e)
         {
@@ -187,11 +185,11 @@ else
         {
 
 
-            IbpOrderQueueRptPdf pdfReport = new IbpOrderQueueRptPdf();
-            List<Sap_Storeout> listPdfReport = new List<Sap_Storeout>();
-            listPdfReport = Elements.ToList();
-            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+            //IbpOrderQueueRptPdf pdfReport = new IbpOrderQueueRptPdf();
+            //List<Sap_Storeout> listPdfReport = new List<Sap_Storeout>();
+            //listPdfReport = Elements.ToList();
+            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
 
         }
         catch (Exception e)

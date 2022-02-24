@@ -226,12 +226,12 @@ namespace GoWMS.Server.Reports
             for (var i = 0; i < maxColum; i++) // Set up Colum Size
             {
                 if (i == 0) sizes[i] = 1.75f;
-                else if (i == 1) sizes[i] = 2f;
-                else if (i == 2) sizes[i] = 1f;
+                else if (i == 1) sizes[i] = 1.25f;
+                else if (i == 2) sizes[i] = 2f;
                 else if (i == 3) sizes[i] = 1f;
-                else if (i == 4) sizes[i] = 2f;
+                else if (i == 4) sizes[i] = 1.75f;
                 else if (i == 5) sizes[i] = 3f;
-                else if (i == 6) sizes[i] = 1f;
+                else if (i == 6) sizes[i] = 0.5f;
                 else if (i == 7) sizes[i] = 1f;
                 else sizes[i] = 1f;
             }
@@ -328,7 +328,7 @@ namespace GoWMS.Server.Reports
             iTextSharp.text.BaseColor LineBorderColor = BaseColor.LightGray;
             foreach (var listRpt in ListRpts)
             {
-                cell = new PdfPCell(new Phrase(listRpt.Created.ToString(), _fontstyebody))
+                cell = new PdfPCell(new Phrase(Convert.ToDateTime(listRpt.Created).ToString(VarGlobals.FormatDT), _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -406,7 +406,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Quantity.ToString(), _fontstyebody))
+                cell = new PdfPCell(new Phrase(string.Format(VarGlobals.FormatN0, listRpt.Quantity).ToString(), _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,

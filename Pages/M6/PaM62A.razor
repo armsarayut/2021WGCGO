@@ -3,6 +3,9 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Public
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Reports
+@inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<PaM62A> L
 @inject PublicService ObjPublicService
@@ -16,15 +19,13 @@
 }
 else
 {
-    <MudText Typo="Typo.h6" Color="Color.Primary">@mMenudesc</MudText>
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-            <MudMenu Icon="@Icons.Filled.FileDownload" Color="Color.Inherit">
-                <MudMenuItem OnClick="DownloadExcelDocument">@L["EXCEL"]</MudMenuItem>
-                <MudMenuItem OnClick="DownloadPdfDocument">@L["PDF"]</MudMenuItem>
-            </MudMenu>
-        </MudTooltip>
         <MudSpacer />
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
     </MudAppBar>
 
     <MudTable Items="@Elements"
@@ -73,7 +74,7 @@ else
     private string mPagename { get; set; } = "/5/5_2_1";
 
     private string msgAction = "Enter Palletcode";
-    private string mMenudesc = "5.2.1.Order Receive";
+    private string pageheader = "5.2.1.Order Receive";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
     private string palletcode { get; set; }
@@ -95,7 +96,8 @@ else
     {
         PublicService objCS = new PublicService();
         Elements = await Task.Run(() => objCS.GetAllMenu6_2A());
-        this.InsertAuditrial("View", mMenudesc);
+
+        this.InsertAuditrial("View", pageheader);
 
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
@@ -171,11 +173,11 @@ else
     {
         try
         {
-            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
-            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
-            //listExcelReport = Elements.ToList();
-            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            PaM62ARptExcel excelReport = new PaM62ARptExcel();
+            List<Class6_2_A> listExcelReport = new List<Class6_2_A>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
         }
         catch (Exception e)
         {

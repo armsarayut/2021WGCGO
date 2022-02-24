@@ -396,5 +396,11 @@ namespace GoWMS.Server.Controllers
             return retlist;
         }
         #endregion
+
+        public List<Helpdesk> GetAllHelpdesk()
+        {
+            List<Helpdesk> retlist = objDAL.GetAllHelpdesk().ToList();
+            return retlist;
+        }
     }
 }

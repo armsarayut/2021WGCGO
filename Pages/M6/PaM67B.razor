@@ -3,7 +3,9 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Public
-
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Reports
+@inject IJSRuntime JSRuntime
 
 @inject PublicService ObjPublicService
 @inject ReportService UserlogService
@@ -130,10 +132,10 @@ else
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         if (element.Su_No.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-           return true;
+            return true;
         if (element.Srm_No.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-             return true;
-         if (element.Lpncode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Lpncode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         //if ($"{element.Create_By}".Contains(searchString))
         //    return true;

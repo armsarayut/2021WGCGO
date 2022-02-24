@@ -1,0 +1,158 @@
+﻿@page "/4/4_5_2"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Wcs
+
+@inject WcsService ObjService
+@inject UserServices OpjUserService
+
+@if (Elements == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              ReadOnly="@ronly"
+              CanCancelEdit="@canCancelEdit"
+              Filter="new Func<Set_Srm_Operate,bool>(FilterFunc)" @bind-SelectedItem="selectedItem" SortLabel="Sort By">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Set_Srm_Operate, object>(x=>x.Mc_Name)">SRM</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Set_Srm_Operate, object>(x=>x.Inbound)">IN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Set_Srm_Operate, object>(x=>x.Outbound)">OUT</MudTableSortLabel></MudTh>
+            <MudTh>ACTION</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="SRM">@context.Mc_Name</MudTd>
+            <MudTd DataLabel="IN"><MudCheckBox @bind-Checked="@context.Inbound" /></MudTd>
+            <MudTd DataLabel="OUT"><MudCheckBox @bind-Checked="@context.Outbound" /></MudTd>
+            <MudTd Class="clm-row-small" DataLabel="ACTION">
+                <MudFab @onclick="@(()=>Commitconstance(@context.Idx.Value, @context.Inbound.Value,@context.Outbound.Value))" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(()=>Refreshconstance())" Color="Color.Secondary" Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    private string pageheader { get; set; } = "4.5.2.SRM-INOUT";
+
+    public string mPagedesc { get; set; } = "4.5.2.SRM-INOUT";
+    private string mPagename { get; set; } = "/4/4_5_2";
+
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private bool ronly = false;
+    private bool canCancelEdit = true;
+
+    private Set_Srm_Operate selectedItem = null;
+    private HashSet<Set_Srm_Operate> selectedItems = new HashSet<Set_Srm_Operate>();
+    private IEnumerable<Set_Srm_Operate> Elements = new List<Set_Srm_Operate>();
+    public int elevation = 0;
+    private ResultReturn resultReturn = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WcsService objCS = new WcsService();
+        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+        ///
+        Elements = await Task.Run(() => objCS.GetSRMOperate());
+    }
+
+    private void setstr(string str)
+    {
+        //if (mPalletcode.Length <= 0)
+        //{
+        //    mPalletcode = str;
+        //    msgAction = "Enter Pack ID";
+        //    elevation = 3;
+        //}
+        //else
+        //{
+        //    if (str == mPalletcode)
+        //    {
+        //        elevation = 2;
+        //        msgAction = "Mapping successfully";
+        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
+        //        mPalletcode = "";
+        //    }
+        //    else
+        //    {
+        //        mPackid = str;
+        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
+        //    }
+        //}
+        //CustomerService objGR = new CustomerService();
+        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Set_Srm_Operate element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Mc_Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    private void Commitconstance(Int64 setcoed, bool setvalin, bool setvalout)
+    {
+
+        bool bcheck = ObjService.SetSRMOperate(setcoed, setvalin, setvalout);
+
+        Refreshconstance();
+
+    }
+
+    private void Refreshconstance()
+    {
+        Elements = ObjService.GetSRMOperate();
+    }
+
+}

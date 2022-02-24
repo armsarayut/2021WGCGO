@@ -3652,5 +3652,63 @@ namespace GoWMS.Server.Data
         }
 
         #endregion
+
+        public IEnumerable<Helpdesk> GetAllHelpdesk()
+        {
+            List<Helpdesk> lstobj = new List<Helpdesk>();
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                try
+                {
+                    StringBuilder sql = new StringBuilder();
+                    sql.AppendLine("SELECT");
+                    sql.Append("idx, created, entity_lock, modified, client_id, client_ip, ");
+                    sql.Append("hlp_name, hlp_desc, hlp_tel, hlp_mail");
+                    sql.AppendLine("FROM public.set_helpdesk ");
+                    sql.AppendLine("WHERE 1=1");
+                    //sql.AppendLine("and (w_date >='" & dtpStart.ToString("s") & "' and w_date < '" & dtpStop.ToString("s") & "')");
+                    sql.AppendLine("ORDER BY idx ASC ");
+                    //sql.AppendLine("limit " & LimitRecoard & " offset " & (LimitRecoard * CurrentPage) - LimitRecoard);
+                    sql.AppendLine(";");
+
+
+                    NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                    {
+                        CommandType = CommandType.Text
+                    };
+
+                    con.Open();
+
+                    NpgsqlDataReader rdr = cmd.ExecuteReader();
+                    while (rdr.Read())
+                    {
+                        Helpdesk objrd = new Helpdesk
+                        {
+                            Idx = rdr["idx"] == DBNull.Value ? null : (long?)rdr["idx"],
+                            Created = rdr["created"] == DBNull.Value ? null : (DateTime?)rdr["created"],
+                            Entity_lock = rdr["entity_lock"] == DBNull.Value ? null : (int?)rdr["entity_lock"],
+                            Modified = rdr["modified"] == DBNull.Value ? null : (DateTime?)rdr["modified"],
+                            Client_id = rdr["client_id"] == DBNull.Value ? null : (long?)rdr["client_id"],
+                            Client_ip = rdr["client_ip"].ToString(),
+                            Hlp_name = rdr["hlp_name"].ToString(),
+                            Hlp_desc = rdr["hlp_desc"].ToString(),
+                            Hlp_tel = rdr["hlp_tel"].ToString(),
+                            Hlp_mail = rdr["hlp_mail"].ToString()
+                        };
+                        lstobj.Add(objrd);
+                    }
+                }
+                catch (NpgsqlException ex)
+                {
+                    Log.Error(ex.ToString());
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+            return lstobj;
+        }
+
     }
 }

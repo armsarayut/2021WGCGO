@@ -15,7 +15,7 @@ namespace GoWMS.Server.Reports
         //-----------------------------
 
         #region Attributes
-        readonly string reportCaption = "1.1.Receiving Order - Report";
+        readonly string reportCaption = "1.3.Master Queuing - Report";
         readonly Boolean bPageLanscape = false;
         #endregion
 
@@ -274,41 +274,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("SRM", _fontstyeheader))
-            {
-                HorizontalAlignment = Element.ALIGN_LEFT,
-                VerticalAlignment = Element.ALIGN_MIDDLE,
-                BackgroundColor = headerBackcolor,
-                BorderWidth = Rectangle.NO_BORDER
-            };
-            bodyTable.AddCell(cell);
-
-            cell = new PdfPCell(new Phrase("Location", _fontstyeheader))
-            {
-                HorizontalAlignment = Element.ALIGN_LEFT,
-                VerticalAlignment = Element.ALIGN_MIDDLE,
-                BackgroundColor = headerBackcolor,
-                BorderWidth = Rectangle.NO_BORDER
-            };
-            bodyTable.AddCell(cell);
-
-            cell = new PdfPCell(new Phrase("Starttime", _fontstyeheader))
-            {
-                HorizontalAlignment = Element.ALIGN_LEFT,
-                VerticalAlignment = Element.ALIGN_MIDDLE,
-                BackgroundColor = headerBackcolor,
-                BorderWidth = Rectangle.NO_BORDER
-            };
-            bodyTable.AddCell(cell);
-
-            cell = new PdfPCell(new Phrase("Endtime", _fontstyeheader))
-            {
-                HorizontalAlignment = Element.ALIGN_LEFT,
-                VerticalAlignment = Element.ALIGN_MIDDLE,
-                BackgroundColor = headerBackcolor,
-                BorderWidth = Rectangle.NO_BORDER
-            };
-            bodyTable.AddCell(cell);
+            
 
 
             bodyTable.CompleteRow();

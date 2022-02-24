@@ -118,30 +118,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ACTION" xml:space="preserve">
-    <value />
+    <value>ACTION</value>
   </data>
   <data name="ACTOR" xml:space="preserve">
-    <value />
+    <value>ACTOR</value>
   </data>
   <data name="DATETIME" xml:space="preserve">
-    <value />
+    <value>DATETIME</value>
   </data>
   <data name="EXCEL" xml:space="preserve">
-    <value />
+    <value>Excel</value>
   </data>
   <data name="Export" xml:space="preserve">
-    <value />
+    <value>Export</value>
   </data>
   <data name="IPADDRESS" xml:space="preserve">
-    <value />
+    <value>IPADDRESS</value>
   </data>
   <data name="MENU" xml:space="preserve">
-    <value />
+    <value>MENU</value>
   </data>
   <data name="PDF" xml:space="preserve">
-    <value />
+    <value>Pdf</value>
   </data>
   <data name="Search" xml:space="preserve">
-    <value />
+    <value>Search</value>
   </data>
 </root>
