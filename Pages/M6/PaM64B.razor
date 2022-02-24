@@ -21,6 +21,35 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+    <MudGrid>
+
+        <MudItem Class="d-flex flex-row">
+            <MudItem>
+                <MudDatePicker Class="" Label=@L["FromDate"] @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
+            </MudItem>
+        </MudItem>
+        <MudItem Class="d-flex flex-row">
+            <MudItem>
+                <MudDatePicker Class="" Label=@L["ToDate"] @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
+            </MudItem>
+        </MudItem>
+        <MudItem Class="d-flex flex-row align-self-end">
+
+
+            <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium"
+                       OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Processing</MudText>
+                }
+                else
+                {
+                    <MudText>@L["Search"]</MudText>
+                }
+            </MudButton>
+        </MudItem>
+    </MudGrid>
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
         <MudSpacer />
         <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
@@ -31,7 +60,7 @@ else
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense"
               Hover="@hover"
               Bordered="@bordered"
@@ -91,10 +120,26 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
+    DateTime? fromDate = DateTime.Today.AddDays(-1);
+    TimeSpan? fromTime = DateTime.Now.TimeOfDay;
+    DateTime? toDate = DateTime.Today;
+    TimeSpan? toTime = DateTime.Now.TimeOfDay;
+
+    DateTime? fromDateTime = DateTime.Today.AddDays(-1);
+    DateTime? toDateTime = DateTime.Today;
+
+    private bool _processing = false;
+
     protected override async Task OnInitializedAsync()
     {
         PublicService objCS = new PublicService();
-        Elements = await Task.Run(() => objCS.GetAllMenu6_4B());
+        fromDateTime = fromDate.Value.Date;
+        toDateTime = toDate.Value.Date;
+
+
+        Elements = await Task.Run(() => objCS.GetMenu6_4Bbydate(fromDateTime.Value, toDateTime.Value));
+
+
         this.InsertAuditrial("View", pageheader);
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
@@ -154,6 +199,21 @@ else
         //if ($"{element.Create_By}".Contains(searchString))
         //    return true;
         return false;
+    }
+
+    async Task OnclickSearch()
+    {
+        _processing = true;
+        await DbGetData();
+        _processing = false;
+        this.StateHasChanged();
+    }
+
+    async Task DbGetData()
+    {
+        DateTime newDateTimeFM = fromDate.Value.Date + fromTime.Value;
+        DateTime newDateTimeTO = toDate.Value.Date + toTime.Value;
+        Elements = await Task.Run(() => ObjPublicService.GetMenu6_4Bbydate(newDateTimeFM, newDateTimeTO));
     }
 
     public void Dispose()

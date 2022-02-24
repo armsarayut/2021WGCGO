@@ -27,17 +27,22 @@ else
     <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
 
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-        <MudIconButton OnClick="NavigateToNewTab"
+        <MudIconButton OnClick="@(()=> NavigateToNewTabHHI(linkHmi1))"
                        Icon="@Icons.Material.Filled.TouchApp"
                        Variant="Variant.Filled"
-                       Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI" />
+                       Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI#1" />
+
+        <MudIconButton OnClick="@(()=> NavigateToNewTabHHI(linkHmi2))"
+                       Icon="@Icons.Material.Filled.TouchApp"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI#2" />
         <MudSpacer />
     </MudAppBar>
 
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense"
               Hover="@hover"
               Bordered="@bordered"
@@ -115,14 +120,17 @@ else
     public string mPagedesc { get; set; } = "4.1.ASRS-Status";
     private string mPagename { get; set; } = "/4/4_1";
 
-
+    private string UrlHMI1 { get; set; } = "http://192.168.1.1:8080/";
+    private string UrlHMI2 { get; set; } = "http://192.168.1.2:8080/";
+    int linkHmi1 = 1;
+    int linkHmi2 = 2;
 
     List<Vmachine> Elements = new List<Vmachine>();
 
     private ResultReturn resultReturn = null;
 
 
-
+    private IEnumerable<SetConstance> ConstElements = new List<SetConstance>();
 
 
     void IDisposable.Dispose()
@@ -136,6 +144,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+
+
+        ConstElements = await Task.Run(() => ObjWcsService.GetConstance());
+
+        var result1 = ConstElements.Where(i => i.Set_code == "HMI001").FirstOrDefault(); // = 0
+        var result2 = ConstElements.Where(i => i.Set_code == "HMI002").FirstOrDefault(); // = 0
+
+
+        UrlHMI1 = result1.Val_vhr;
+        UrlHMI2 = result2.Val_vhr;
 
         ExecuteStatus();
 
@@ -197,11 +215,26 @@ else
     }
 
 
-    public async Task NavigateToNewTab()
+    public async Task NavigateToNewTabHHI(int hmino)
     {
-        string url = "http://192.168.200.160:8080/";
-        await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+        string url = null;
+        switch (hmino)
+        {
+            case 1:
+                url = UrlHMI1;
+                await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+                break;
+            case 2:
+                url = UrlHMI2;
+                await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+                break;
+            default:
+                break;
+        }
+
     }
+
+
 
 
     private void OpenDialog(string mccode)

@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Localization;
 
 using System.Globalization;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace GoWMS.Server
 {
@@ -47,6 +48,8 @@ namespace GoWMS.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
+
 
             services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
 
@@ -137,6 +140,8 @@ namespace GoWMS.Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

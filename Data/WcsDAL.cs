@@ -26,7 +26,7 @@ namespace GoWMS.Server.Data
                     StringBuilder sql = new StringBuilder();
                     sql.AppendLine("select mccode, information, st_no, desc_th, is_alert, backcolor, focecolor, is_cmd");
                     sql.AppendLine("from wcs.vmachine_status");
-                    sql.AppendLine("order by mccode");
+                    //sql.AppendLine("order by mccode");
                     NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
                     {
                         CommandType = CommandType.Text
@@ -545,7 +545,7 @@ namespace GoWMS.Server.Data
                 try
                 {
                     StringBuilder sql = new StringBuilder();
-                    sql.AppendLine("SELECT set_code, set_desc, val_int");
+                    sql.AppendLine("SELECT set_code, set_desc, val_dt, val_int, val_num, val_chr, val_vhr ");
                     sql.AppendLine("FROM wcs.set_constant");
                     sql.AppendLine("order by set_code");
 
@@ -564,7 +564,11 @@ namespace GoWMS.Server.Data
                         {
                             Set_code = rdr["set_code"].ToString(),
                             Set_desc = rdr["set_desc"].ToString(),
-                            Val_int = rdr["val_int"] == DBNull.Value ? null : (Int32?)rdr["val_int"]
+                            Val_int = rdr["val_int"] == DBNull.Value ? null : (Int32?)rdr["val_int"],
+                            Val_vhr = rdr["val_vhr"].ToString(),
+                            Val_chr = rdr["val_chr"].ToString(),
+                            Val_dt = rdr["val_dt"] == DBNull.Value ? null : (DateTime?)rdr["val_dt"],
+                            Val_num = rdr["val_num"] == DBNull.Value ? null : (decimal?)rdr["val_num"],
                         };
                         lstobj.Add(objrd);
                     }

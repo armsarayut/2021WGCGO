@@ -21,6 +21,32 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+    <MudGrid>
+        <MudItem Class="d-flex flex-row">
+            <MudItem>
+                <MudDatePicker Class="" Label=@L["FromDate"] @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
+            </MudItem>
+        </MudItem>
+        <MudItem Class="d-flex flex-row">
+            <MudItem>
+                <MudDatePicker Class="" Label=@L["ToDate"] @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
+            </MudItem>
+        </MudItem>
+        <MudItem Class="d-flex flex-row align-self-end">
+            <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium"
+                       OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Processing</MudText>
+                }
+                else
+                {
+                    <MudText>@L["Search"]</MudText>
+                }
+            </MudButton>
+        </MudItem>
+    </MudGrid>
 
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
         <MudSpacer />
@@ -30,27 +56,10 @@ else
         </MudTooltip>
     </MudAppBar>
 
-    <MudItem xs=6>
-        <MudDateRangePicker @ref="_picker"
-                            Label=@L["SearchDate"]
-                            @bind-DateRange="_dateRange"
-                            DateFormat="@VarGlobals.FormatD">
-            <PickerActions>
-                <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.Clear())">@L["Clear"]</MudButton>
-                <MudButton OnClick="@(() => setFindDate(false))">@L["Cancel"]</MudButton>
-                <MudButton Color="Color.Primary" OnClick="@(() => setFindDate(true))">@L["Ok"]</MudButton>
-            </PickerActions>
-        </MudDateRangePicker>
-    </MudItem>
-
-    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-        <MudSpacer />
-    </MudAppBar>
-
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense"
               Hover="@hover"
               Bordered="@bordered"
@@ -116,6 +125,17 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
+    DateTime? fromDate = DateTime.Today.AddDays(-1);
+    TimeSpan? fromTime = DateTime.Now.TimeOfDay;
+    DateTime? toDate = DateTime.Today;
+    TimeSpan? toTime = DateTime.Now.TimeOfDay;
+
+    DateTime? fromDateTime = DateTime.Today.AddDays(-1);
+    DateTime? toDateTime = DateTime.Today;
+
+    private bool _processing = false;
+
+
     MudDateRangePicker _picker;
     DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
 
@@ -123,8 +143,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         PublicService objCS = new PublicService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-        Elementsource = await Task.Run(() => objCS.GetAllMenu6_7F());
+
+        fromDateTime = fromDate.Value.Date;
+        toDateTime = toDate.Value.Date;
+        Elements = await Task.Run(() => objCS.GetMenu6_7Fbydate(fromDateTime.Value, toDateTime.Value));
+
         Elements = Elementsource;
 
         this.InsertAuditrial("View", pageheader);
@@ -187,6 +210,22 @@ else
         //    return true;
         return false;
     }
+
+    async Task OnclickSearch()
+    {
+        _processing = true;
+        await DbGetData();
+        _processing = false;
+        this.StateHasChanged();
+    }
+
+    async Task DbGetData()
+    {
+        DateTime newDateTimeFM = fromDate.Value.Date;
+        DateTime newDateTimeTO = toDate.Value.Date;
+        Elements = await Task.Run(() => ObjPublicService.GetMenu6_7Fbydate(newDateTimeFM, newDateTimeTO));
+    }
+
 
     public void Dispose()
     {

@@ -21,50 +21,87 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
-    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+
+
+    
+<MudGrid>
+
+    <MudItem Class="d-flex flex-row">
+        <MudItem>
+            <MudDatePicker Class="" Label=@L["FromDate"] @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
+        </MudItem>
+        <MudItem>
+            <MudTimePicker Class="px-2" Label=@L["FromTime"] @bind-Time="fromTime" />
+        </MudItem>
+    </MudItem>
+    <MudItem Class="d-flex flex-row">
+        <MudItem>
+            <MudDatePicker Class="" Label=@L["ToDate"] @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
+        </MudItem>
+        <MudItem>
+            <MudTimePicker Class="px-2" Label=@L["ToTime"] @bind-Time="toTime" />
+        </MudItem>
+    </MudItem>
+    <MudItem Class="d-flex flex-row align-self-end">
+        <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium"
+                   OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Processing</MudText>
+            }
+            else
+            {
+                <MudText>@L["Search"]</MudText>
+            }
+        </MudButton>
+    </MudItem>
+</MudGrid>
+
+<MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+    <MudSpacer />
+    <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+        <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+        <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+    </MudTooltip>
+</MudAppBar>
+
+<MudTable Items="@Elements"
+          FixedHeader="@fixed_header"
+          FixedFooter="@fixed_footer"
+          Height="@(fixed_header || fixed_footer ?"500px":"")"
+          Dense="@dense"
+          Hover="@hover"
+          Bordered="@bordered"
+          Striped="@striped"
+          Filter="new Func<Class6_1,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+    <ToolBarContent>
         <MudSpacer />
-        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
-            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
-        </MudTooltip>
-    </MudAppBar>
+        <MudTextField @bind-Value="searchString"
+                      Placeholder=@L["Search"]
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
 
-    <MudTable Items="@Elements"
-              FixedHeader="@fixed_header"
-              FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
-              Dense="@dense"
-              Hover="@hover"
-              Bordered="@bordered"
-              Striped="@striped"
-              Filter="new Func<Class6_1,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
-        <ToolBarContent>
-            <MudSpacer />
-            <MudTextField @bind-Value="searchString"
-                          Placeholder=@L["Search"]
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Created)">@L["DATETIME"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Menu_Name)">@L["MENU"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Action_Desc)">@L["ACTION"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Usid)">@L["ACTOR"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Client_ip)">@L["IPADDRESS"]</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel=@L["DATETIME"]>@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
+        <MudTd DataLabel=@L["MENU"]>@context.Menu_Name</MudTd>
+        <MudTd DataLabel=@L["ACTION"]>@context.Action_Desc</MudTd>
+        <MudTd DataLabel=@L["ACTOR"]>@context.Usid</MudTd>
+        <MudTd DataLabel=@L["IPADDRESS"]>@context.Client_ip</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
 
-        <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Created)">@L["DATETIME"]</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Menu_Name)">@L["MENU"]</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Action_Desc)">@L["ACTION"]</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Usid)">@L["ACTOR"]</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Class6_1, object>(x=>x.Client_ip)">@L["IPADDRESS"]</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel=@L["DATETIME"]>@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>
-            <MudTd DataLabel=@L["MENU"]>@context.Menu_Name</MudTd>
-            <MudTd DataLabel=@L["ACTION"]>@context.Action_Desc</MudTd>
-            <MudTd DataLabel=@L["ACTOR"]>@context.Usid</MudTd>
-            <MudTd DataLabel=@L["IPADDRESS"]>@context.Client_ip</MudTd>
-        </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-
-        </PagerContent>
-    </MudTable>
+    </PagerContent>
+</MudTable>
 }
 
 @code {
@@ -91,10 +128,32 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
+
+    DateTime? fromDate = DateTime.Today.AddDays(-1);
+    TimeSpan? fromTime = DateTime.Now.TimeOfDay;
+    DateTime? toDate = DateTime.Today;
+    TimeSpan? toTime = DateTime.Now.TimeOfDay;
+
+
+
+    DateTime? fromDateTime = DateTime.Today.AddDays(-1);
+    DateTime? toDateTime = DateTime.Today;
+
+    private bool _processing = false;
+
     protected override async Task OnInitializedAsync()
     {
         PublicService objCS = new PublicService();
-        Elements = await Task.Run(() => objCS.GetAllMenu6_1());
+
+        fromDateTime = fromDate.Value.Date + fromTime.Value;
+        toDateTime = toDate.Value.Date + toTime.Value;
+
+
+
+
+
+        Elements = await Task.Run(() => objCS.GetMenu6_1bydate(fromDateTime.Value, toDateTime.Value));
+
         this.InsertAuditrial("View", pageheader);
 
         //////// Intial Menu and Privilege//////
@@ -156,6 +215,24 @@ else
             return true;
         return false;
     }
+
+
+    async Task OnclickSearch()
+    {
+        _processing = true;
+        await DbGetData();
+        _processing = false;
+        this.StateHasChanged();
+    }
+
+    async Task DbGetData()
+    {
+        DateTime newDateTimeFM = fromDate.Value.Date + fromTime.Value;
+        DateTime newDateTimeTO = toDate.Value.Date + toTime.Value;
+        Elements = await Task.Run(() => ObjPublicService.GetMenu6_1bydate(newDateTimeFM, newDateTimeTO));
+    }
+
+
 
     public void Dispose()
     {

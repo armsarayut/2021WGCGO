@@ -47,7 +47,7 @@ else
     {
         <MudTable Items="@Elements" FixedHeader="@fixed_header" 
                   FixedFooter="@fixed_footer" 
-                  Height="@(fixed_header || fixed_footer ?"600px":"")" 
+                  Height="@(fixed_header || fixed_footer ?"500px":"")" 
                   Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
                   Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
             <ToolBarContent>
@@ -88,7 +88,7 @@ else
         <MudTable Items="@Elements_"
                   FixedHeader="@fixed_header"
                   FixedFooter="@fixed_footer"
-                  Height="@(fixed_header || fixed_footer ?"600px":"")"
+                  Height="@(fixed_header || fixed_footer ?"500px":"")"
                   Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
                   Filter="new Func<InvStockSum,bool>(FilterFunc_)" @bind-SelectedItem="selectedItem_">
             <ToolBarContent>

@@ -3,6 +3,9 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Mas
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Reports
+@inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<MasPrivilege> L
 @inject UserServices OpjUserService
@@ -26,7 +29,7 @@ else
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense"
               Hover="@hover"
               Bordered="@bordered"
@@ -120,29 +123,7 @@ else
 
     private void setstr(string str)
     {
-        //if (mPalletcode.Length <= 0)
-        //{
-        //    mPalletcode = str;
-        //    msgAction = "Enter Pack ID";
-        //    elevation = 3;
-        //}
-        //else
-        //{
-        //    if (str == mPalletcode)
-        //    {
-        //        elevation = 2;
-        //        msgAction = "Mapping successfully";
-        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
-        //        mPalletcode = "";
-        //    }
-        //    else
-        //    {
-        //        mPackid = str;
-        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
-        //    }
-        //}
-        //CustomerService objGR = new CustomerService();
-        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+
     }
 
     private string stxtInput { get; set; }
@@ -185,11 +166,11 @@ else
     {
         try
         {
-            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
-            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
-            //listExcelReport = Elements.ToList();
-            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            MasPrivilegeRptExcel excelReport = new MasPrivilegeRptExcel();
+            List<UserPrivilege> listExcelReport = new List<UserPrivilege>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
         }
         catch (Exception e)
         {

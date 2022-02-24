@@ -3,6 +3,9 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Mas
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Reports
+@inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<MasterUsersGroup> L
 
@@ -29,7 +32,7 @@ else
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense"
               Hover="@hover"
               Bordered="@bordered"
@@ -157,11 +160,11 @@ else
     {
         try
         {
-            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
-            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
-            //listExcelReport = Elements.ToList();
-            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            MasterUsersGroupRptExcel excelReport = new MasterUsersGroupRptExcel();
+            List<Usergroups> listExcelReport = new List<Usergroups>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
         }
         catch (Exception e)
         {

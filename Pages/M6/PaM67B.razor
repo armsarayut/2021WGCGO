@@ -21,7 +21,7 @@ else
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense"
               Hover="@hover"
               Bordered="@bordered"
@@ -79,6 +79,8 @@ else
     private IEnumerable<Class6_7_B> Elements = new List<Class6_7_B>();
 
     public int elevation = 0;
+
+
 
     protected override async Task OnInitializedAsync()
     {

@@ -3,6 +3,9 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Mas
+@using GoWMS.Server.Pdf
+@using GoWMS.Server.Reports
+@inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<MasItemPage> L
 @inject MasService ObjService
@@ -28,7 +31,7 @@ else
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
               Filter="new Func<Mas_Item_Go,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
               SortLabel=@L["SortBy"]>
@@ -66,10 +69,10 @@ else
 
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
 
-    public string mPagedesc { get; set; } = "6.1.Material";
+    public string mPagedesc { get; set; } = "6.1.Item";
     private string mPagename { get; set; } = "/6/6_1";
 
-    private readonly string pageheader = "6.1.Material";
+    private readonly string pageheader = "6.1.Item";
     private string msgAction = "Enter Palletcode";
     private string mPalletcode { get; set; } = "";
     private string mPackid { get; set; } = "";
@@ -148,11 +151,11 @@ else
     {
         try
         {
-            //IbpGRNRptExcel excelReport = new IbpGRNRptExcel();
-            //List<Inb_Goodreceipt_Go> listExcelReport = new List<Inb_Goodreceipt_Go>();
-            //listExcelReport = Elements.ToList();
-            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            MasItemPageRptExcel excelReport = new MasItemPageRptExcel();
+            List<Mas_Item_Go> listExcelReport = new List<Mas_Item_Go>();
+            listExcelReport = Elements.ToList();
+            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
         }
         catch (Exception e)
         {

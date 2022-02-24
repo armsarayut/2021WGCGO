@@ -46,7 +46,7 @@ namespace GoWMS.Server.Data
         public static string FormatT { get; set; } = "HH:mm:ss";
         public static string FormatTHM { get; set; } = "HH:mm";
         public static string FormatD { get; set; } = "yyyy-MM-dd";
-        public static string TableHeight { get; set; } = "600px";
+        public static string TableHeight { get; set; } = "500px";
 
         public static string MessageRoleAddPermit { get; set; } = "You're not authorized to access the add data.";
         public static string MessageRoleEditPermit { get; set; } = "You're not authorized to access the amendment.";

@@ -22,13 +22,13 @@ namespace GoWMS.Server.Controllers
 
         public List<Class6_1> GetMenu6_1bydate(DateTime dtStart, DateTime dtStop)
         {
-            List<Class6_1> retlist = GetMenu6_1bydate( dtStart,  dtStop).ToList();
+            List<Class6_1> retlist = objDAL. GetMenu6_1byDate( dtStart,  dtStop).ToList();
             return retlist;
         }
 
         public List<Class6_1> GetMenu6_1bydatelimit(DateTime dtStart, DateTime dtStop, long limitrec, long currentPage)
         {
-            List<Class6_1> retlist = GetMenu6_1bydatelimit(dtStart, dtStop, limitrec, currentPage).ToList();
+            List<Class6_1> retlist = objDAL.GetMenu6_1byDatelimit(dtStart, dtStop, limitrec, currentPage).ToList();
             return retlist;
         }
 

@@ -30,7 +30,7 @@ else
     <MudTable Items="@Elements" 
               FixedHeader="@fixed_header" 
               FixedFooter="@fixed_footer" 
-              Height="@(fixed_header || fixed_footer ?"600px":"")"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
               Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
               Filter="new Func<Tas_Rgvworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
@@ -43,8 +43,8 @@ else
         </ToolBarContent>
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Ctime)">@L["QUEUING"]</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Lpncode)">>@L["PALLET"]</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Work_Code)">>@L["TASKTYPE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Lpncode)">@L["PALLET"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Work_Code)">@L["TASKTYPE"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_No)">@L["RGV"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_From)">@L["SOURCE"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_To)">@L["DESTINATION"]</MudTableSortLabel></MudTh>

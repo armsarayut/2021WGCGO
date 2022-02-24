@@ -39,10 +39,18 @@
             </MudItem>
         </MudItem>
         <MudItem Class="d-flex flex-row align-self-end">
-            <MudButton OnClick="OnclickSearch"
-                       Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium">@L["Search"]</MudButton>
+            <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium"
+                       OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Processing</MudText>
+                }
+                else
+                {
+                    <MudText>@L["Search"]</MudText>
+                }
+            </MudButton>
                 </MudItem>
             </MudGrid>
 
@@ -104,15 +112,15 @@
 
     private IEnumerable<AsrsLoadtime> Elements = new List<AsrsLoadtime>();
 
-    DateTime? fromDate = DateTime.Today;
-    TimeSpan? fromTime = DateTime.Now.AddHours(-1).TimeOfDay;
+    DateTime? fromDate = DateTime.Today.AddDays(-1);
+    TimeSpan? fromTime = DateTime.Now.TimeOfDay;
     DateTime? toDate = DateTime.Today;
     TimeSpan? toTime = DateTime.Now.TimeOfDay;
 
+    DateTime? fromDateTime = DateTime.Today.AddDays(-1);
+    DateTime? toDateTime = DateTime.Today;
 
-
-    DateTime? fromDateTime = DateTime.Today;
-    DateTime? toDateTime = DateTime.Today.AddDays(1);
+    private bool _processing = false;
 
     private bool dense = true;
     private bool hover = true;
@@ -151,28 +159,23 @@
         return false;
     }
 
-    async void OnclickSearch()
+
+
+    async Task OnclickSearch()
     {
-        DbGetData();
-        StateHasChanged();
+        _processing = true;
+        await DbGetData();
+        _processing = false;
+        this.StateHasChanged();
     }
 
-    void DbGetData()
+    async Task DbGetData()
     {
-        //timePortionDateTimePicker.Value
-
         DateTime newDateTimeFM = fromDate.Value.Date + fromTime.Value;
         DateTime newDateTimeTO = toDate.Value.Date + toTime.Value;
-
-
-        // DateTime newDateTime = fromDate.Value.Date.Add(TimeSpan.Parse(fromTime.Value.ToShortTimeString()));
-
-
-
-        Elements = ObjWcsService.GetAsrsloadtime(newDateTimeFM, newDateTimeTO);
-
-
+        Elements = await Task.Run(() => ObjWcsService.GetAsrsloadtime(newDateTimeFM, newDateTimeTO));
     }
+
 
 
     public async Task DownloadExcelDocument()
