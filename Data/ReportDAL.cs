@@ -65,9 +65,9 @@ namespace GoWMS.Server.Data
             }
             return lstobj;
         }
-        public Boolean InsertAudittrial(String actdesc, String munname, string user)
+        public Boolean InsertAudittrial(String actdesc, String munname, long user)
         {
-            long iUser = 0;
+            long iUser = user;
             long iClient = 0;
             string sClient = "127.0.0.1";
             bool bRet = false;

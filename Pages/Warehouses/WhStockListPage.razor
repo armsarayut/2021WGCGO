@@ -12,10 +12,13 @@
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inv
 @using GoWMS.Server.Reports
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject ReportService UserlogService
 @inject InvService ObjService
 @inject UserServices OpjUserService
-@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<WhStockListPage> L
 @attribute [Authorize]
 
@@ -39,16 +42,16 @@ else
 
     <MudGrid>
         <MudItem xs="12" md="3">
-            
+
         </MudItem>
     </MudGrid>
 
     @if (StkGroup)
     {
-        <MudTable Items="@Elements" FixedHeader="@fixed_header" 
-                  FixedFooter="@fixed_footer" 
-                  Height="@(fixed_header || fixed_footer ?"500px":"")" 
-                  Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+        <MudTable Items="@Elements" FixedHeader="@fixed_header"
+                  FixedFooter="@fixed_footer"
+                  Height="@(fixed_header || fixed_footer ?"500px":"")"
+                  Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
                   Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
             <ToolBarContent>
                 <MudToolBarSpacer />
@@ -148,19 +151,44 @@ else
 
     public bool StkGroup { get; set; }
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         InvService objCS = new InvService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-        Elements = await Task.Run(() => objCS.GetStockListInfo());
-        Elements_ = await Task.Run(() => objCS.GetStockSum());
 
-        OnSelectChange();
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
+        Elements = await Task.Run(() => objCS.GetStockListInfo());
+        Elements_ = await Task.Run(() => objCS.GetStockSum());
+
+        this.OnSelectChange();
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
 

@@ -30,8 +30,8 @@ namespace GoWMS.Server.Controllers
             {
                 new Claim(ClaimTypes.Email, value.Email),
                 new Claim(ClaimTypes.Name, value.Email),
-                new Claim(ClaimTypes.Role, "Admin"),
-                new Claim(ClaimTypes.GroupSid, value.GroupID.ToString()),
+                new Claim(ClaimTypes.Role, value.GroupID.ToString()),
+                new Claim(ClaimTypes.Actor, value.UserID.ToString()),
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -62,6 +62,7 @@ namespace GoWMS.Server.Controllers
         /// <summary />
         public string Password { get; set; }
         public long GroupID { get; set; }
+        public long UserID { get; set; }
 
     }
 }

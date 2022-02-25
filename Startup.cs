@@ -62,7 +62,7 @@ namespace GoWMS.Server
             services.AddResponseCaching();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            //services.AddSingleton<WeatherForecastService>();
 
             services.AddSingleton<CustomerService>();
             services.AddSingleton<ErpApiService>();
@@ -85,6 +85,8 @@ namespace GoWMS.Server
 
             services.AddBlazoredModal();
 
+            
+            //services.AddTransient<VarGlobalService>();
             services.AddScoped<BlazorAppContext>();
 
 

@@ -8,10 +8,12 @@
 @using GoWMS.Server.Models.Mas
 @using GoWMS.Server.Models.Wgc
 @using GoWMS.Server.Models.Oub
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-
+@inject ReportService UserlogService
 @inject StoreoutService ObjStoreoutService
 @inject ErpApiService ObjErpApiService
 @inject UserServices OpjUserService
@@ -54,753 +56,777 @@
                Color="Color.Primary"
                OnClick=@SelectOrderPick>@L["SETRETURN"]</MudButton>
             <MudSpacer />
-</MudAppBar>
+        </MudAppBar>
 
-@if (Elements == null)
-{
-
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
-}
-else
-{
-    @if (StkGroup)
-    {
-
-        <MudTable Hover="@hover"
-                  Breakpoint="Breakpoint.Sm"
-                  Height="@(fixed_header || fixed_footer ?"400px":"")"
-                  MultiSelection=@_multiSelect
-                  FixedHeader="@fixed_header"
-                  Items="@Elements"
-                  GroupBy="@_groupDefinition"
-                  GroupHeaderStyle="background-color:var(--mud-palette-background-white)"
-                  GroupFooterClass="mb-4"
-                  Dense="@dense"
-                  FixedFooter="@fixed_footer"
-                  Bordered="@bordered"
-                  Striped="@striped"
-                  HorizontalScrollbar="true"
-                  Filter="new Func<Oub_CustomerReturn,bool>(FilterFunc)" @bind-SelectedItems="selectedItems">
-            <ToolBarContent>
-                
-                <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" 
-                              Placeholder=@L["Search"] 
-                              Adornment="Adornment.Start" 
-                              AdornmentIcon="@Icons.Material.Filled.Search" 
-                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-
-            <ColGroup>
-                @if (_multiSelect)
-                        {
-                    <col style="width: 60px;" />
-                        }
-                @if (_groupDefinition.Expandable)
-                        {
-                    <col style="width: 60px;" />
-                        }
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-            </ColGroup>
-            <HeaderContent>
-                <MudTh Style="width: 150px;"><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Dnno)">@L["DNNO"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Lotno)">@L["Lot"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Batchno)">@L["Batch"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Customer_code)">@L["CUSTOMERCODE"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_description)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Unit)">@L["UNIT"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Package_id)">@L["SEQ"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sono)">@L["SONO"]</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Palletno)">@L["PALLET"]</MudTableSortLabel></MudTh>
-                <MudTh Style="width: 190px;"><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sodate)">@L["DATE"]</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <GroupHeaderTemplate>
-                <MudTh Class="mud-table-cell-custom-group" colspan="11">@($"{context.GroupName}: {context.Key} ") @L["Total"]: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.Quantity))</MudTh>
-            </GroupHeaderTemplate>
-            <RowTemplate>
-                <MudTd DataLabel="@L["DNNO"]">@context.Dnno</MudTd>
-                <MudTd DataLabel="@L["Lot"]">@context.Lotno</MudTd>
-                <MudTd DataLabel="@L["Batch"]">@context.Batchno</MudTd>
-                <MudTd DataLabel="@L["CUSTOMERCODE"]">@context.Customer_code</MudTd>
-                <MudTd DataLabel="@L["ITEMCODE"]">@context.Material_code</MudTd>
-                <MudTd DataLabel="@L["ITEMNAME"]">@context.Material_description</MudTd>
-                <MudTd DataLabel="@L["UNIT"]">@context.Unit</MudTd>
-                <MudTd DataLabel="@L["SEQ"]">@context.Package_id</MudTd>
-                <MudTd DataLabel="@L["SONO"]">@context.Sono</MudTd>
-                <MudTd DataLabel="@L["PALLET"]">@context.Palletno</MudTd>
-                <MudTd DataLabel="@L["DATE"]">@Convert.ToDateTime(context.Sodate).ToString(VarGlobals.FormatD)</MudTd>
-            </RowTemplate>
-            <GroupFooterTemplate>
-                <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="11">@L["Total"]: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.Quantity)) </MudTh>
-            </GroupFooterTemplate>
-
-        </MudTable>
-
-    }
-    else
-    {
-
-    }
-
-
-    <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
-        <MessageContent>
-            @foreach (var item in References)
-            {
-                <br />
-                @item
-            }
-        </MessageContent>
-        <YesButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.DataSaverOn">Confirm!</MudButton>
-        </YesButton>
-    </MudMessageBox>
-}
-
-@code {
-    public string SelectedOption { get; set; }
-
-    MudMessageBox mbox { get; set; }
-
-    public string mPagedesc { get; set; } = "1.4.Return";
-    private string mPagename { get; set; } = "/1/1_4";
-
-
-    private bool _dense = false;
-    private bool _multiSelect = true;
-    public string stringput { get; set; } = "";
-    public string stringputdnno { get; set; } = "";
-    public string stringputpalletgo { get; set; } = "";
-    public string stringputlot { get; set; } = "";
-    public string stringputbatch { get; set; } = "";
-
-    private string pageheader = "1.4.Return";
-    private string msgAction = "Enter Palletcode";
-    private string mPalletcode { get; set; } = "";
-    private string mPackid { get; set; } = "";
-    private string palletcode { get; set; }
-    private bool dense = true;
-    private bool hover = true;
-    private bool striped = true;
-    private bool bordered = false;
-    private bool fixed_header = true;
-    private bool fixed_footer = true;
-    private string searchString = "";
-    private Oub_CustomerReturn selectedItem = null;
-    private HashSet<Oub_CustomerReturn> selectedItems = new HashSet<Oub_CustomerReturn>();
-    private IEnumerable<Oub_CustomerReturn> Elements = new List<Oub_CustomerReturn>();
-
-
-    string state = "Message box hasn't been opened yet";
-
-    string mboxheader { get; set; } = "รายการที่ขอตรวจสอบ";
-    string mboxcontent { get; set; } = "";
-    string mboxmessage { get; set; } = "";
-
-    public int elevation = 0;
-    private ResultReturn resultReturn = null;
-
-    public bool StkGroup { get; set; }
-
-    protected List<string> References { get; set; } = new List<string>();
-
-    private TableGroupDefinition<Oub_CustomerReturn> _groupDefinition = new()
-    {
-        GroupName = "ITEM",
-        Indentation = true,
-        Expandable = true,
-        IsInitiallyExpanded = false,
-        Selector = (e) => e.Material_code,
-        InnerGroup = new TableGroupDefinition<Oub_CustomerReturn>()
+        @if (Elements == null)
         {
-            GroupName = "DNNO",
-            Expandable = true,
-            IsInitiallyExpanded = false,
-            Selector = (e) => e.Dnno,
-            InnerGroup = new TableGroupDefinition<Oub_CustomerReturn>()
+
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+        }
+        else
+        {
+            @if (StkGroup)
             {
-                GroupName = "PALLET",
+
+                <MudTable Hover="@hover"
+                          Breakpoint="Breakpoint.Sm"
+                          Height="@(fixed_header || fixed_footer ?"400px":"")"
+                          MultiSelection=@_multiSelect
+                          FixedHeader="@fixed_header"
+                          Items="@Elements"
+                          GroupBy="@_groupDefinition"
+                          GroupHeaderStyle="background-color:var(--mud-palette-background-white)"
+                          GroupFooterClass="mb-4"
+                          Dense="@dense"
+                          FixedFooter="@fixed_footer"
+                          Bordered="@bordered"
+                          Striped="@striped"
+                          HorizontalScrollbar="true"
+                          Filter="new Func<Oub_CustomerReturn,bool>(FilterFunc)" @bind-SelectedItems="selectedItems">
+                    <ToolBarContent>
+
+                        <MudToolBarSpacer />
+                        <MudTextField @bind-Value="searchString"
+                                      Placeholder=@L["Search"]
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search"
+                                      IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+
+                    <ColGroup>
+                        @if (_multiSelect)
+                                {
+                            <col style="width: 60px;" />
+                                }
+                        @if (_groupDefinition.Expandable)
+                                {
+                            <col style="width: 60px;" />
+                                }
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                        <col />
+                    </ColGroup>
+                    <HeaderContent>
+                        <MudTh Style="width: 150px;"><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Dnno)">@L["DNNO"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Lotno)">@L["Lot"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Batchno)">@L["Batch"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Customer_code)">@L["CUSTOMERCODE"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Material_description)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Unit)">@L["UNIT"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Package_id)">@L["SEQ"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sono)">@L["SONO"]</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Palletno)">@L["PALLET"]</MudTableSortLabel></MudTh>
+                        <MudTh Style="width: 190px;"><MudTableSortLabel SortBy="new Func<Oub_CustomerReturn, object>(x=>x.Sodate)">@L["DATE"]</MudTableSortLabel></MudTh>
+                    </HeaderContent>
+                    <GroupHeaderTemplate>
+                        <MudTh Class="mud-table-cell-custom-group" colspan="11">@($"{context.GroupName}: {context.Key} ") @L["Total"]: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.Quantity))</MudTh>
+                    </GroupHeaderTemplate>
+                    <RowTemplate>
+                        <MudTd DataLabel="@L["DNNO"]">@context.Dnno</MudTd>
+                        <MudTd DataLabel="@L["Lot"]">@context.Lotno</MudTd>
+                        <MudTd DataLabel="@L["Batch"]">@context.Batchno</MudTd>
+                        <MudTd DataLabel="@L["CUSTOMERCODE"]">@context.Customer_code</MudTd>
+                        <MudTd DataLabel="@L["ITEMCODE"]">@context.Material_code</MudTd>
+                        <MudTd DataLabel="@L["ITEMNAME"]">@context.Material_description</MudTd>
+                        <MudTd DataLabel="@L["UNIT"]">@context.Unit</MudTd>
+                        <MudTd DataLabel="@L["SEQ"]">@context.Package_id</MudTd>
+                        <MudTd DataLabel="@L["SONO"]">@context.Sono</MudTd>
+                        <MudTd DataLabel="@L["PALLET"]">@context.Palletno</MudTd>
+                        <MudTd DataLabel="@L["DATE"]">@Convert.ToDateTime(context.Sodate).ToString(VarGlobals.FormatD)</MudTd>
+                    </RowTemplate>
+                    <GroupFooterTemplate>
+                        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="11">@L["Total"]: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.Quantity)) </MudTh>
+                    </GroupFooterTemplate>
+
+                </MudTable>
+
+            }
+            else
+            {
+
+            }
+
+
+            <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
+                <MessageContent>
+                    @foreach (var item in References)
+                    {
+                        <br />
+                        @item
+                    }
+                </MessageContent>
+                <YesButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.DataSaverOn">Confirm!</MudButton>
+                </YesButton>
+            </MudMessageBox>
+        }
+
+        @code {
+            public string SelectedOption { get; set; }
+
+            MudMessageBox mbox { get; set; }
+
+            public string mPagedesc { get; set; } = "1.4.Return";
+            private string mPagename { get; set; } = "/1/1_4";
+
+
+            private bool _dense = false;
+            private bool _multiSelect = true;
+            public string stringput { get; set; } = "";
+            public string stringputdnno { get; set; } = "";
+            public string stringputpalletgo { get; set; } = "";
+            public string stringputlot { get; set; } = "";
+            public string stringputbatch { get; set; } = "";
+
+            private string pageheader = "1.4.Return";
+            private string msgAction = "Enter Palletcode";
+            private string mPalletcode { get; set; } = "";
+            private string mPackid { get; set; } = "";
+            private string palletcode { get; set; }
+            private bool dense = true;
+            private bool hover = true;
+            private bool striped = true;
+            private bool bordered = false;
+            private bool fixed_header = true;
+            private bool fixed_footer = true;
+            private string searchString = "";
+            private Oub_CustomerReturn selectedItem = null;
+            private HashSet<Oub_CustomerReturn> selectedItems = new HashSet<Oub_CustomerReturn>();
+            private IEnumerable<Oub_CustomerReturn> Elements = new List<Oub_CustomerReturn>();
+
+
+            string state = "Message box hasn't been opened yet";
+
+            string mboxheader { get; set; } = "รายการที่ขอตรวจสอบ";
+            string mboxcontent { get; set; } = "";
+            string mboxmessage { get; set; } = "";
+
+            public int elevation = 0;
+            private ResultReturn resultReturn = null;
+
+            public bool StkGroup { get; set; }
+
+            protected List<string> References { get; set; } = new List<string>();
+
+            string sUsername { get; set; } = "";
+            string sRole { get; set; } = "";
+            string sGroupID { get; set; } = "";
+            string sUserID { get; set; } = "";
+
+            private TableGroupDefinition<Oub_CustomerReturn> _groupDefinition = new()
+            {
+                GroupName = "ITEM",
+                Indentation = true,
                 Expandable = true,
                 IsInitiallyExpanded = false,
-                Selector = (e) => e.Palletno
+                Selector = (e) => e.Material_code,
+                InnerGroup = new TableGroupDefinition<Oub_CustomerReturn>()
+                {
+                    GroupName = "DNNO",
+                    Expandable = true,
+                    IsInitiallyExpanded = false,
+                    Selector = (e) => e.Dnno,
+                    InnerGroup = new TableGroupDefinition<Oub_CustomerReturn>()
+                    {
+                        GroupName = "PALLET",
+                        Expandable = true,
+                        IsInitiallyExpanded = false,
+                        Selector = (e) => e.Palletno
+                    }
+                }
+            };
+
+
+            protected override async Task OnInitializedAsync()
+            {
+                StoreoutService objCS = new StoreoutService();
+
+                //////// Intial Menu and Privilege//////
+                resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+                resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+                ////////////////////////////////////////
+                ///
+                await GetUserAthu();
+                this.InsertAuditrial("View", pageheader);
+
+                Elements = await Task.Run(() => objCS.GetAllCustomerReturn());
+
+                this.OnSelectChange();
             }
-        }
-    };
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        StoreoutService objCS = new StoreoutService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-
-        Elements = await Task.Run(() => objCS.GetAllCustomerReturn());
-
-        OnSelectChange();
-
-        //////// Intial Menu and Privilege//////
-        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
-        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
-        ////////////////////////////////////////
-    }
-
-    protected void OnSelectChange()
-    {
-        StkGroup = !StkGroup;
-        SelectedOption = "OPT1";
-    }
-
-    private bool FilterFunc(Oub_CustomerReturn element)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Material_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Customer_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Palletno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Dnno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Lotno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Sono.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if ($"{element.Material_description} ".Contains(searchString))
-            return true;
-        return false;
-    }
-
-
-    async Task SelectOrder()
-    {
-
-
-
-        /*
-        var result = selectedItems.GroupBy(t => t.Material_code)
-        .Select(t => new
-        {
-        Itemcode = t.Key,
-        Qty = t.Sum(ta => ta.Quantity),
-        }).ToList();
-
-        System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
-        Int16 i = 0;
-
-        foreach (var rec in result)
+            async Task GetUserAthu()
             {
-            i++;
-            strPopup.Append(i.ToString() + ". รายการ : ");
-        strPopup.Append(rec.Itemcode.ToString());
-        strPopup.Append(" จำนวน : ");
-        strPopup.AppendLine(rec.Qty.ToString());
-        }
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authState.User;
 
-        System.Text.StringBuilder popup = new System.Text.StringBuilder();
-        popup.AppendLine("รายการที่ขอตรวจสอบ");
-        popup.Append(strPopup.ToString());
+                sGroupID = user.Claims.FirstOrDefault(
+                c => c.Type == ClaimTypes.Role)?.Value;
 
-        string sContentText = popup.ToString();
+                sUserID = user.Claims.FirstOrDefault(
+                    c => c.Type == ClaimTypes.Actor)?.Value;
+            }
 
-        var parameters = new DialogParameters();
-        parameters.Add("ContentText", sContentText);
-        parameters.Add("ButtonText", "Yes");
-        parameters.Add("Color", Color.Success);
-
-        var formModal = DialogService.Show<DialogTemplateExample_Dialog>("Confirm", parameters);
-
-        var resultModal = await Task.Run(() => formModal.Result);
-
-        var formModal1 = await Task.Run(() => DialogService.ShowMessageBox("AA", "XX"));
-            */
-
-    }
-
-    private async void OnButtonOrderSelected()
-    {
-        var resultlist = selectedItems.GroupBy(t => t.Material_code)
-                 .Select(t => new
-                 {
-                     Itemcode = t.Key,
-                     Qty = t.Sum(ta => ta.Quantity),
-                 }).ToList();
-
-        System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
-        Int16 i = 0;
-        mboxcontent = "";
-
-        References.Clear();
-
-        if (resultlist.Count > 0)
-        {
-            foreach (var rec in resultlist)
+            private void InsertAuditrial(String actdesc, String munname)
             {
-                i++;
-                strPopup.Clear();
-                strPopup.Append(i.ToString() + ". รายการ : ");
+                bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
+            }
+
+            protected void OnSelectChange()
+            {
+                StkGroup = !StkGroup;
+                SelectedOption = "OPT1";
+            }
+
+            private bool FilterFunc(Oub_CustomerReturn element)
+            {
+                if (string.IsNullOrWhiteSpace(searchString))
+                    return true;
+                if (element.Material_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (element.Customer_code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (element.Palletno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (element.Dnno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (element.Lotno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (element.Sono.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if ($"{element.Material_description} ".Contains(searchString))
+                    return true;
+                return false;
+            }
+
+
+            async Task SelectOrder()
+            {
+
+
+
+                /*
+                var result = selectedItems.GroupBy(t => t.Material_code)
+                .Select(t => new
+                {
+                Itemcode = t.Key,
+                Qty = t.Sum(ta => ta.Quantity),
+                }).ToList();
+
+                System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
+                Int16 i = 0;
+
+                foreach (var rec in result)
+                    {
+                    i++;
+                    strPopup.Append(i.ToString() + ". รายการ : ");
                 strPopup.Append(rec.Itemcode.ToString());
                 strPopup.Append(" จำนวน : ");
                 strPopup.AppendLine(rec.Qty.ToString());
-
-                References.Add(strPopup.ToString());
-            }
-            bool? result = await mbox.Show();
-            state = result == null ? "Cancelled" : "Confirmed";
-
-            if (state == "Confirmed")
-            {
-                SelectOrderPick();
-            }
-
-            StateHasChanged();
-        }
-
-    }
-
-    private void SelectOrderPick()
-    {
-
-
-        switch (SelectedOption)
-        {
-            case "OPT3":
-
-                break;
-            default:
-                break;
-
-        }
-
-        List<Api_Receivingorders_Go> MapPalletItem = new List<Api_Receivingorders_Go>();
-
-        if (SelectedOption == "OPT2")
-        {
-            var strRES = selectedItems.OrderBy(x => x.Package_id).Select(x => new
-            {
-                package_Id = x.Package_id
-                ,
-                Roll_Id = x.Dnno + "." + x.Package_id
-                ,
-                material_code = x.Material_code
-                ,
-                material_description = x.Material_description
-                ,
-                receiving_date = DateTime.Now.Date
-                ,
-                gr_quantity = 1
-                ,
-                unit = x.Unit
-                ,
-                lotno = x.Lotno
-                ,
-                batchno = x.Batchno
-                ,
-                palletgo = x.Palletno
-                ,
-                Document_Number = x.Dnno
-                ,
-                Gr_Quantity_Kg = 1
-            }).ToList();
-
-            if (strRES.Count > 0)
-            {
-                string sPallet = null;
-
-                foreach (var sel in strRES)
-                {
-                    sPallet = sel.palletgo;
-                    break;
                 }
 
-                var strRESOpt2 = Elements.Where(x => x.Palletno == sPallet).OrderBy(x => x.Package_id).Select(x => new
-                {
-                    package_Id = x.Package_id
-                    ,
-                    Roll_Id = x.Dnno + "." + x.Package_id
-                    ,
-                    material_code = x.Material_code
-                    ,
-                    material_description = x.Material_description
-                    ,
-                    receiving_date = DateTime.Now.Date
-                    ,
-                    gr_quantity = 1
-                    ,
-                    unit = x.Unit
-                    ,
-                    lotno = x.Lotno
-                    ,
-                    batchno = x.Batchno
-                    ,
-                    palletgo = stringputpalletgo
-                    ,
-                    Document_Number = x.Dnno
-                    ,
-                    Gr_Quantity_Kg = 1
-                }).ToList();
+                System.Text.StringBuilder popup = new System.Text.StringBuilder();
+                popup.AppendLine("รายการที่ขอตรวจสอบ");
+                popup.Append(strPopup.ToString());
 
-                foreach (var sel in strRESOpt2)
-                {
+                string sContentText = popup.ToString();
 
-                    MapPalletItem.Add(new Api_Receivingorders_Go
+                var parameters = new DialogParameters();
+                parameters.Add("ContentText", sContentText);
+                parameters.Add("ButtonText", "Yes");
+                parameters.Add("Color", Color.Success);
+
+                var formModal = DialogService.Show<DialogTemplateExample_Dialog>("Confirm", parameters);
+
+                var resultModal = await Task.Run(() => formModal.Result);
+
+                var formModal1 = await Task.Run(() => DialogService.ShowMessageBox("AA", "XX"));
+                    */
+
+            }
+
+            private async void OnButtonOrderSelected()
+            {
+                var resultlist = selectedItems.GroupBy(t => t.Material_code)
+                         .Select(t => new
+                         {
+                             Itemcode = t.Key,
+                             Qty = t.Sum(ta => ta.Quantity),
+                         }).ToList();
+
+                System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
+                Int16 i = 0;
+                mboxcontent = "";
+
+                References.Clear();
+
+                if (resultlist.Count > 0)
+                {
+                    foreach (var rec in resultlist)
                     {
-                        Package_Id = sel.package_Id
-                    ,
-                        Roll_Id = sel.Document_Number + "." + sel.Roll_Id
-                    ,
-                        Material_Code = sel.material_code
-                    ,
-                        Material_Description = sel.material_description
-                    ,
-                        Receiving_Date = sel.receiving_date
-                    ,
-                        Gr_Quantity = sel.gr_quantity
-                    ,
-                        Unit = sel.unit
-                    ,
-                        Gr_Quantity_Kg = sel.Gr_Quantity_Kg
-                    ,
-                        Wh_Code = "WS"
-                    ,
-                        Warehouse = "2000051"
-                    ,
-                        Locationno = "4"
-                    ,
-                        Document_Number = sel.Document_Number
-                    ,
-                        Job = sel.lotno
-                    ,
-                        Job_Code = sel.batchno
-                    ,
-                        Lpncode = sel.palletgo
-                    });
+                        i++;
+                        strPopup.Clear();
+                        strPopup.Append(i.ToString() + ". รายการ : ");
+                        strPopup.Append(rec.Itemcode.ToString());
+                        strPopup.Append(" จำนวน : ");
+                        strPopup.AppendLine(rec.Qty.ToString());
 
-                }
+                        References.Add(strPopup.ToString());
+                    }
+                    bool? result = await mbox.Show();
+                    state = result == null ? "Cancelled" : "Confirmed";
 
-            }
-        }
-        else if (SelectedOption == "OPT3")
-        {
-            var strRES = selectedItems.OrderBy(x => x.Package_id).Select(x => new
-            {
-                package_Id = x.Package_id
-                ,
-                Roll_Id = x.Dnno + "." + x.Package_id
-                ,
-                material_code = x.Material_code
-                ,
-                material_description = x.Material_description
-                ,
-                receiving_date = DateTime.Now.Date
-                ,
-                gr_quantity = 1
-                ,
-                unit = x.Unit
-                ,
-                lotno = x.Lotno
-                ,
-                batchno = x.Batchno
-                ,
-                palletgo = x.Palletno
-                ,
-                Document_Number = x.Dnno
-                ,
-                Gr_Quantity_Kg = 1
-            }).ToList();
-
-            if (strRES.Count > 0)
-            {
-                string sDocno = null;
-
-                foreach (var sel in strRES)
-                {
-                    sDocno = sel.Document_Number;
-                    break;
-                }
-
-                var strRESOpt2 = Elements.Where(x => x.Dnno == sDocno).OrderBy(x => x.Package_id).Select(x => new
-                {
-                    package_Id = x.Package_id
-                    ,
-                    Roll_Id = x.Dnno + "." + x.Package_id
-                    ,
-                    material_code = x.Material_code
-                    ,
-                    material_description = x.Material_description
-                    ,
-                    receiving_date = DateTime.Now.Date
-                    ,
-                    gr_quantity = 1
-                    ,
-                    unit = x.Unit
-                    ,
-                    lotno = x.Lotno
-                    ,
-                    batchno = x.Batchno
-                    ,
-                    palletgo = x.Palletno
-                    ,
-                    Document_Number = x.Dnno
-                    ,
-                    Gr_Quantity_Kg = 1
-                }).ToList();
-
-                foreach (var sel in strRESOpt2)
-                {
-
-                    MapPalletItem.Add(new Api_Receivingorders_Go
+                    if (state == "Confirmed")
                     {
-                        Package_Id = sel.package_Id
-                    ,
-                        Roll_Id = sel.Document_Number + "." + sel.Roll_Id
-                    ,
-                        Material_Code = sel.material_code
-                    ,
-                        Material_Description = sel.material_description
-                    ,
-                        Receiving_Date = sel.receiving_date
-                    ,
-                        Gr_Quantity = sel.gr_quantity
-                    ,
-                        Unit = sel.unit
-                    ,
-                        Gr_Quantity_Kg = sel.Gr_Quantity_Kg
-                    ,
-                        Wh_Code = "WS"
-                    ,
-                        Warehouse = "2000051"
-                    ,
-                        Locationno = "4"
-                    ,
-                        Document_Number = sel.Document_Number
-                    ,
-                        Job = sel.lotno
-                    ,
-                        Job_Code = sel.batchno
-                    ,
-                        Lpncode = sel.palletgo
-                    });
+                        SelectOrderPick();
+                    }
 
+                    StateHasChanged();
                 }
 
             }
-        }
-        else
-        {
-            var strRES = selectedItems.OrderBy(x => x.Package_id).Select(x => new
-            {
-                package_Id = x.Package_id
-                 ,
-                Roll_Id = x.Dnno + "." + x.Package_id
-                 ,
-                material_code = x.Material_code
-                 ,
-                material_description = x.Material_description
-                 ,
-                receiving_date = DateTime.Now.Date
-                 ,
-                gr_quantity = 1
-                 ,
-                unit = x.Unit
-                 ,
-                lotno = x.Lotno
-                 ,
-                batchno = x.Batchno
-                 ,
-                palletgo = stringputpalletgo
-                 ,
-                Document_Number = x.Dnno
-                 ,
-                Gr_Quantity_Kg = 1
-            }).ToList();
 
-            foreach (var sel in strRES)
+            private void SelectOrderPick()
             {
 
-                MapPalletItem.Add(new Api_Receivingorders_Go
+
+                switch (SelectedOption)
                 {
-                    Package_Id = sel.package_Id
-                ,
-                    Roll_Id = sel.Document_Number + "." + sel.Roll_Id
-                ,
-                    Material_Code = sel.material_code
-                ,
-                    Material_Description = sel.material_description
-                ,
-                    Receiving_Date = sel.receiving_date
-                ,
-                    Gr_Quantity = sel.gr_quantity
-                ,
-                    Unit = sel.unit
-                ,
-                    Gr_Quantity_Kg = sel.Gr_Quantity_Kg
-                ,
-                    Wh_Code = "WS"
-                ,
-                    Warehouse = "2000051"
-                ,
-                    Locationno = "4"
-                ,
-                    Document_Number = sel.Document_Number
-                ,
-                    Job = sel.lotno
-                ,
-                    Job_Code = sel.batchno
-                ,
-                    Lpncode = sel.palletgo
-                });
+                    case "OPT3":
 
-            }
+                        break;
+                    default:
+                        break;
 
-        }
+                }
 
+                List<Api_Receivingorders_Go> MapPalletItem = new List<Api_Receivingorders_Go>();
 
-        if (SelectedOption == "OPT3")
-        {
-            if (MapPalletItem.Count > 0)
-            {
-                // Loop Pallet
-                var groupPallet = MapPalletItem
-                .GroupBy(pla => pla.Lpncode)
-                .OrderBy(pla => pla.Key)
-                .Select(g => new { palletgo = g.Key });
-
-                bool bRetCreate = true;
-
-                foreach (var scr in groupPallet)
+                if (SelectedOption == "OPT2")
                 {
-                    stringputpalletgo = scr.palletgo;
-
-                    if (stringputpalletgo.Length > 0)
+                    var strRES = selectedItems.OrderBy(x => x.Package_id).Select(x => new
                     {
-                        try
+                        package_Id = x.Package_id
+                        ,
+                        Roll_Id = x.Dnno + "." + x.Package_id
+                        ,
+                        material_code = x.Material_code
+                        ,
+                        material_description = x.Material_description
+                        ,
+                        receiving_date = DateTime.Now.Date
+                        ,
+                        gr_quantity = 1
+                        ,
+                        unit = x.Unit
+                        ,
+                        lotno = x.Lotno
+                        ,
+                        batchno = x.Batchno
+                        ,
+                        palletgo = x.Palletno
+                        ,
+                        Document_Number = x.Dnno
+                        ,
+                        Gr_Quantity_Kg = 1
+                    }).ToList();
+
+                    if (strRES.Count > 0)
+                    {
+                        string sPallet = null;
+
+                        foreach (var sel in strRES)
                         {
-                            Task<string> retString;
-
-                            retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), stringputpalletgo);
-
-                            ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
-
-                            //Snackbar.Add("Pallet created", Severity.Success);
-
-                        }
-                        catch (Exception exp)
-                        {
-                            Snackbar.Add(exp.Message.ToString(), Severity.Error);
-                            bRetCreate = false;
+                            sPallet = sel.palletgo;
                             break;
                         }
-                    }
-                    else
-                    {
-                        Snackbar.Add("Please enter PalletGO", Severity.Warning);
-                        bRetCreate = false;
-                        break;
+
+                        var strRESOpt2 = Elements.Where(x => x.Palletno == sPallet).OrderBy(x => x.Package_id).Select(x => new
+                        {
+                            package_Id = x.Package_id
+                            ,
+                            Roll_Id = x.Dnno + "." + x.Package_id
+                            ,
+                            material_code = x.Material_code
+                            ,
+                            material_description = x.Material_description
+                            ,
+                            receiving_date = DateTime.Now.Date
+                            ,
+                            gr_quantity = 1
+                            ,
+                            unit = x.Unit
+                            ,
+                            lotno = x.Lotno
+                            ,
+                            batchno = x.Batchno
+                            ,
+                            palletgo = stringputpalletgo
+                            ,
+                            Document_Number = x.Dnno
+                            ,
+                            Gr_Quantity_Kg = 1
+                        }).ToList();
+
+                        foreach (var sel in strRESOpt2)
+                        {
+
+                            MapPalletItem.Add(new Api_Receivingorders_Go
+                            {
+                                Package_Id = sel.package_Id
+                            ,
+                                Roll_Id = sel.Document_Number + "." + sel.Roll_Id
+                            ,
+                                Material_Code = sel.material_code
+                            ,
+                                Material_Description = sel.material_description
+                            ,
+                                Receiving_Date = sel.receiving_date
+                            ,
+                                Gr_Quantity = sel.gr_quantity
+                            ,
+                                Unit = sel.unit
+                            ,
+                                Gr_Quantity_Kg = sel.Gr_Quantity_Kg
+                            ,
+                                Wh_Code = "WS"
+                            ,
+                                Warehouse = "2000051"
+                            ,
+                                Locationno = "4"
+                            ,
+                                Document_Number = sel.Document_Number
+                            ,
+                                Job = sel.lotno
+                            ,
+                                Job_Code = sel.batchno
+                            ,
+                                Lpncode = sel.palletgo
+                            });
+
+                        }
+
                     }
                 }
-                if (bRetCreate)
+                else if (SelectedOption == "OPT3")
                 {
-                    Snackbar.Add("Return created", Severity.Success);
-                }
-            }
-        }
-        else
-        {
-            if (MapPalletItem.Count > 0)
-            {
-                if (stringputpalletgo.Length > 0)
-                {
-                    try
+                    var strRES = selectedItems.OrderBy(x => x.Package_id).Select(x => new
                     {
-                        Task<string> retString;
+                        package_Id = x.Package_id
+                        ,
+                        Roll_Id = x.Dnno + "." + x.Package_id
+                        ,
+                        material_code = x.Material_code
+                        ,
+                        material_description = x.Material_description
+                        ,
+                        receiving_date = DateTime.Now.Date
+                        ,
+                        gr_quantity = 1
+                        ,
+                        unit = x.Unit
+                        ,
+                        lotno = x.Lotno
+                        ,
+                        batchno = x.Batchno
+                        ,
+                        palletgo = x.Palletno
+                        ,
+                        Document_Number = x.Dnno
+                        ,
+                        Gr_Quantity_Kg = 1
+                    }).ToList();
 
-                        retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), stringputpalletgo);
-
-                        ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
-
-                        Snackbar.Add("Pallet created", Severity.Success);
-
-                    }
-                    catch (Exception exp)
+                    if (strRES.Count > 0)
                     {
-                        Snackbar.Add(exp.Message.ToString(), Severity.Error);
+                        string sDocno = null;
+
+                        foreach (var sel in strRES)
+                        {
+                            sDocno = sel.Document_Number;
+                            break;
+                        }
+
+                        var strRESOpt2 = Elements.Where(x => x.Dnno == sDocno).OrderBy(x => x.Package_id).Select(x => new
+                        {
+                            package_Id = x.Package_id
+                            ,
+                            Roll_Id = x.Dnno + "." + x.Package_id
+                            ,
+                            material_code = x.Material_code
+                            ,
+                            material_description = x.Material_description
+                            ,
+                            receiving_date = DateTime.Now.Date
+                            ,
+                            gr_quantity = 1
+                            ,
+                            unit = x.Unit
+                            ,
+                            lotno = x.Lotno
+                            ,
+                            batchno = x.Batchno
+                            ,
+                            palletgo = x.Palletno
+                            ,
+                            Document_Number = x.Dnno
+                            ,
+                            Gr_Quantity_Kg = 1
+                        }).ToList();
+
+                        foreach (var sel in strRESOpt2)
+                        {
+
+                            MapPalletItem.Add(new Api_Receivingorders_Go
+                            {
+                                Package_Id = sel.package_Id
+                            ,
+                                Roll_Id = sel.Document_Number + "." + sel.Roll_Id
+                            ,
+                                Material_Code = sel.material_code
+                            ,
+                                Material_Description = sel.material_description
+                            ,
+                                Receiving_Date = sel.receiving_date
+                            ,
+                                Gr_Quantity = sel.gr_quantity
+                            ,
+                                Unit = sel.unit
+                            ,
+                                Gr_Quantity_Kg = sel.Gr_Quantity_Kg
+                            ,
+                                Wh_Code = "WS"
+                            ,
+                                Warehouse = "2000051"
+                            ,
+                                Locationno = "4"
+                            ,
+                                Document_Number = sel.Document_Number
+                            ,
+                                Job = sel.lotno
+                            ,
+                                Job_Code = sel.batchno
+                            ,
+                                Lpncode = sel.palletgo
+                            });
+
+                        }
+
                     }
                 }
                 else
                 {
-                    Snackbar.Add("Please enter PalletGO", Severity.Warning);
+                    var strRES = selectedItems.OrderBy(x => x.Package_id).Select(x => new
+                    {
+                        package_Id = x.Package_id
+                         ,
+                        Roll_Id = x.Dnno + "." + x.Package_id
+                         ,
+                        material_code = x.Material_code
+                         ,
+                        material_description = x.Material_description
+                         ,
+                        receiving_date = DateTime.Now.Date
+                         ,
+                        gr_quantity = 1
+                         ,
+                        unit = x.Unit
+                         ,
+                        lotno = x.Lotno
+                         ,
+                        batchno = x.Batchno
+                         ,
+                        palletgo = stringputpalletgo
+                         ,
+                        Document_Number = x.Dnno
+                         ,
+                        Gr_Quantity_Kg = 1
+                    }).ToList();
+
+                    foreach (var sel in strRES)
+                    {
+
+                        MapPalletItem.Add(new Api_Receivingorders_Go
+                        {
+                            Package_Id = sel.package_Id
+                        ,
+                            Roll_Id = sel.Document_Number + "." + sel.Roll_Id
+                        ,
+                            Material_Code = sel.material_code
+                        ,
+                            Material_Description = sel.material_description
+                        ,
+                            Receiving_Date = sel.receiving_date
+                        ,
+                            Gr_Quantity = sel.gr_quantity
+                        ,
+                            Unit = sel.unit
+                        ,
+                            Gr_Quantity_Kg = sel.Gr_Quantity_Kg
+                        ,
+                            Wh_Code = "WS"
+                        ,
+                            Warehouse = "2000051"
+                        ,
+                            Locationno = "4"
+                        ,
+                            Document_Number = sel.Document_Number
+                        ,
+                            Job = sel.lotno
+                        ,
+                            Job_Code = sel.batchno
+                        ,
+                            Lpncode = sel.palletgo
+                        });
+
+                    }
+
                 }
+
+
+                if (SelectedOption == "OPT3")
+                {
+                    if (MapPalletItem.Count > 0)
+                    {
+                        // Loop Pallet
+                        var groupPallet = MapPalletItem
+                        .GroupBy(pla => pla.Lpncode)
+                        .OrderBy(pla => pla.Key)
+                        .Select(g => new { palletgo = g.Key });
+
+                        bool bRetCreate = true;
+
+                        foreach (var scr in groupPallet)
+                        {
+                            stringputpalletgo = scr.palletgo;
+
+                            if (stringputpalletgo.Length > 0)
+                            {
+                                try
+                                {
+                                    Task<string> retString;
+
+                                    retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), stringputpalletgo);
+
+                                    ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
+
+                                    //Snackbar.Add("Pallet created", Severity.Success);
+
+                                }
+                                catch (Exception exp)
+                                {
+                                    Snackbar.Add(exp.Message.ToString(), Severity.Error);
+                                    bRetCreate = false;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Snackbar.Add("Please enter PalletGO", Severity.Warning);
+                                bRetCreate = false;
+                                break;
+                            }
+                        }
+                        if (bRetCreate)
+                        {
+                            Snackbar.Add("Return created", Severity.Success);
+                        }
+                    }
+                }
+                else
+                {
+                    if (MapPalletItem.Count > 0)
+                    {
+                        if (stringputpalletgo.Length > 0)
+                        {
+                            try
+                            {
+                                Task<string> retString;
+
+                                retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), stringputpalletgo);
+
+                                ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
+
+                                Snackbar.Add("Pallet created", Severity.Success);
+
+                            }
+                            catch (Exception exp)
+                            {
+                                Snackbar.Add(exp.Message.ToString(), Severity.Error);
+                            }
+                        }
+                        else
+                        {
+                            Snackbar.Add("Please enter PalletGO", Severity.Warning);
+                        }
+                    }
+                }
+
+
+
+                Elements = ObjStoreoutService.GetAllCustomerReturn();
+                this.StateHasChanged();
+
+                /*
+                var serializeOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true
+                };
+
+                string cus = "MANUAL";
+                string so = "CY-" + DateTime.Now.ToString("yyMMddHHmmssffff");
+                string lot = "-";
+                string batch = "-";
+                DateTime requestdate = DateTime.Today.Date;
+
+                var strRES = selectedItems.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
+
+                var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
+
+                var iReturn = 0;
+                var sReturn = "Call";
+
+                ObjApiService.SetPickWgcmanual(jsonRES, ref iReturn, ref sReturn);
+
+                if (selectedItems.Count > 0)
+                {
+                    if (iReturn == 0)
+                    {
+                        Snackbar.Add(sReturn, Severity.Error);
+                    }
+                    else
+                    {
+                        Snackbar.Add("Order picking created", Severity.Success);
+                    }
+                }
+                else
+                {
+                    Snackbar.Add("Please select order picking", Severity.Warning);
+                }
+                */
             }
-        }
 
-
-
-        Elements = ObjStoreoutService.GetAllCustomerReturn();
-        this.StateHasChanged();
-
-        /*
-        var serializeOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-
-        string cus = "MANUAL";
-        string so = "CY-" + DateTime.Now.ToString("yyMMddHHmmssffff");
-        string lot = "-";
-        string batch = "-";
-        DateTime requestdate = DateTime.Today.Date;
-
-        var strRES = selectedItems.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
-
-        var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
-
-        var iReturn = 0;
-        var sReturn = "Call";
-
-        ObjApiService.SetPickWgcmanual(jsonRES, ref iReturn, ref sReturn);
-
-        if (selectedItems.Count > 0)
-        {
-            if (iReturn == 0)
+            void KeyUp(KeyboardEventArgs e)
             {
-                Snackbar.Add(sReturn, Severity.Error);
+                /*
+                if (e.Key == "Enter")
+                {
+
+                    string pallettemp = stringput;
+
+                    setstr(pallettemp);
+                    Reset();
+
+                }
+                 */
             }
-            else
-            {
-                Snackbar.Add("Order picking created", Severity.Success);
-            }
-        }
-        else
-        {
-            Snackbar.Add("Please select order picking", Severity.Warning);
-        }
-        */
-    }
-
-    void KeyUp(KeyboardEventArgs e)
-    {
-        /*
-        if (e.Key == "Enter")
-        {
-
-            string pallettemp = stringput;
-
-            setstr(pallettemp);
-            Reset();
 
         }
-         */
-    }
-
-}

@@ -4,13 +4,17 @@
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Public
 @using System.Threading
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<WhCheckcount> L
 
 @inject WhService ObjWhService
 @inject WcsService ObjWcsService
 @inject MasService ObjMasService
 @inject UserServices OpjUserService
+@inject ReportService UserlogService
 
 @inject ISnackbar Snackbar
 @attribute [Authorize]
@@ -20,7 +24,7 @@
 <MudGrid>
     <MudItem xs="12">
         <div class="form-group">
-            <input style="width: 100%; height: 40px" type="text" 
+            <input style="width: 100%; height: 40px" type="text"
                    class="form-control" @bind-value="stringputkey" @onkeyup="@DoTheThing" placeholder=@L["Inputscan"] />
         </div>
     </MudItem>
@@ -42,10 +46,10 @@ else
             <ToolBarContent>
                 <MudText Typo="Typo.h6">@L["Pallet"]:[@mPalletcode]</MudText>
                 <MudSpacer />
-                <MudTextField @bind-Value="searchString" 
-                              Placeholder=@L["Search"] 
-                              Adornment="Adornment.Start" 
-                              AdornmentIcon="@Icons.Material.Filled.Search" 
+                <MudTextField @bind-Value="searchString"
+                              Placeholder=@L["Search"]
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
                               IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
@@ -95,10 +99,10 @@ else
             <ToolBarContent>
                 <MudText Typo="Typo.h6">@L["Pallet"]:[@mPalletcode]</MudText>
                 <MudSpacer />
-                <MudTextField @bind-Value="searchString" 
-                              Placeholder=@L["Search"] 
-                              Adornment="Adornment.Start" 
-                              AdornmentIcon="@Icons.Material.Filled.Search" 
+                <MudTextField @bind-Value="searchString"
+                              Placeholder=@L["Search"]
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
                               IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
@@ -174,6 +178,10 @@ else
     private Auduits enumValue { get; set; }
     public enum Auduits { Checked, Remove, Reset };
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     private void KeyboardEventHandler(KeyboardEventArgs args)
     {
@@ -190,22 +198,34 @@ else
     protected override async Task OnInitializedAsync()
     {
         WhService objCS = new WhService();
-        cOld = Elements.Count();
-
-        //MasterPallets = await Task.Run(() => ObjMasService.GetAllMasterPallets());
-
-        //MasterPallets = ObjMasService.GetAllMasterPallets();
-
-        Elements = await Task.Run(() => objCS.GetPicklist(mPalletcode));
-
-        cNew = Elements.Count();
-
-        //Elements = await Task.Run(() => objCS.GetReceivivgOrder());
 
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+        cOld = Elements.Count();
+        Elements = await Task.Run(() => objCS.GetPicklist(mPalletcode));
+        cNew = Elements.Count();
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private bool FilterFunc(Sap_StoreoutInfo element)

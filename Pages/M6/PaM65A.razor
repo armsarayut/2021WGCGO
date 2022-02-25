@@ -5,6 +5,9 @@
 @using GoWMS.Server.Models.Public
 @using GoWMS.Server.Pdf
 @using GoWMS.Server.Reports
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<PaM65A> L
@@ -135,10 +138,22 @@ else
 
     private bool _processing = false;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         PublicService objCS = new PublicService();
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
         fromDateTime = fromDate.Value.Date;
         toDateTime = toDate.Value.Date;
 
@@ -146,12 +161,23 @@ else
         toDateTime = fromDate.Value.Date + toTime.Value;
 
         Elements = await Task.Run(() => objCS.GetMenu6_5Abydate(fromDateTime.Value, toDateTime.Value));
+    }
 
-        this.InsertAuditrial("View", pageheader);
-        //////// Intial Menu and Privilege//////
-        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
-        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
-        ////////////////////////////////////////
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private void setstr(string str)
@@ -228,10 +254,6 @@ else
 
     }
 
-    private void InsertAuditrial(String actdesc, String munname)
-    {
-        bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
-    }
     public async Task DownloadExcelDocument()
     {
         try

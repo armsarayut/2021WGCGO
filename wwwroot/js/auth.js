@@ -2,7 +2,7 @@
  * Call the Authentication API
  */
 
-export function SignIn(email, password, groupid, redirect) {
+export function SignIn(email, password, groupid, userid, redirect) {
 
     var url = "/api/auth/signin";
     var xhr = new XMLHttpRequest();
@@ -26,7 +26,8 @@ export function SignIn(email, password, groupid, redirect) {
     var data = {
         email: email,
         password: password,
-        groupid: groupid
+        groupid: groupid,
+        userid: userid
     };
 
     // Call API

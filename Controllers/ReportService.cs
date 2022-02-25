@@ -12,11 +12,11 @@ namespace GoWMS.Server.Controllers
 
         public Boolean InsertAudittrial(String actdesc, String munname)
         {
-            bool bRet = objDAL.InsertAudittrial(actdesc, munname,"");
+            bool bRet = objDAL.InsertAudittrial(actdesc, munname,0);
 
             return bRet;
         }
-        public Boolean InsertAudittrial(String actdesc, String munname, string user)
+        public Boolean InsertAudittrial(String actdesc, String munname, long user)
         {
             bool bRet = objDAL.InsertAudittrial(actdesc, munname, user);
 

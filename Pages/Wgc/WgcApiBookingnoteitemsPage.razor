@@ -3,11 +3,15 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Wgc
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<WgcApiBookingnoteitemsPage> L
 
 @inject WgcService ObjErpService
 @inject UserServices OpjUserService
+@inject ReportService UserlogService
 @attribute [Authorize]
 
 @if (Elements == null)
@@ -36,10 +40,10 @@ else
         <ToolBarContent>
 
             <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" 
-                          Placeholder=@L["Search"] 
-                          Adornment="Adornment.Start" 
-                          AdornmentIcon="@Icons.Material.Filled.Search" 
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
 
@@ -114,16 +118,41 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         WgcService objCS = new WgcService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-        Elements = await Task.Run(() => objCS.GetAllApiBookingnoteWgc());
 
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
+        Elements = await Task.Run(() => objCS.GetAllApiBookingnoteWgc());
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
 

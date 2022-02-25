@@ -6,9 +6,12 @@
 @using System.Threading
 @using System.Threading.Tasks
 @using System.Collections.Generic
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inject IStringLocalizer<PaAuASRSQueue> L
-
+@inject ReportService UserlogService
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
@@ -27,18 +30,18 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
-    <MudTable Items="@Elements" 
-              FixedHeader="@fixed_header" 
-              FixedFooter="@fixed_footer" 
-              Height="@(fixed_header || fixed_footer ?"500px":"")" 
-              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
+              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
               Filter="new Func<Tas_Mcworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" 
-                          Placeholder=@L["Search"] 
-                          Adornment="Adornment.Start" 
-                          AdornmentIcon="@Icons.Material.Filled.Search" 
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
@@ -95,16 +98,41 @@ else
 
     public int elevation = 0;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         WcsService objCS = new WcsService();
 
-        Elements = await Task.Run(() => objCS.GetASRSWorks());
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+        Elements = await Task.Run(() => objCS.GetASRSWorks());
 
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private void setstr(string str)

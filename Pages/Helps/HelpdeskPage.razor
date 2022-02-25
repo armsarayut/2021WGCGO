@@ -2,12 +2,16 @@
 @using GoWMS.Server.Data
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<HelpdeskPage> L
 @inject MasService ObjService
 @inject PublicService ObjPublicService
 @inject UserServices OpjUserService
-
+@inject ReportService UserlogService
 @attribute [Authorize]
 
 @if (Elements == null)
@@ -86,42 +90,46 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         PublicService objCS = new PublicService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-        Elements = await Task.Run(() => objCS.GetAllHelpdesk());
+
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
+        Elements = await Task.Run(() => objCS.GetAllHelpdesk());
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private void setstr(string str)
     {
-        //if (mPalletcode.Length <= 0)
-        //{
-        //    mPalletcode = str;
-        //    msgAction = "Enter Pack ID";
-        //    elevation = 3;
-        //}
-        //else
-        //{
-        //    if (str == mPalletcode)
-        //    {
-        //        elevation = 2;
-        //        msgAction = "Mapping successfully";
-        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
-        //        mPalletcode = "";
-        //    }
-        //    else
-        //    {
-        //        mPackid = str;
-        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
-        //    }
-        //}
-        //CustomerService objGR = new CustomerService();
-        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+
     }
 
     private string stxtInput { get; set; }

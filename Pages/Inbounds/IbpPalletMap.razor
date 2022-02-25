@@ -127,6 +127,11 @@ else
     string KeyPressed = "";
     string EventInfo = "";
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     private void KeyboardEventHandler(KeyboardEventArgs args)
     {
         if (args.Key == "Enter")
@@ -142,11 +147,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         ErpApiService objCS = new ErpApiService();
+
         Elements = await Task.Run(() => objCS.GetAllApiRecevingorderGosypallet(mPalletcode));
         MasterPallets = ObjMasService.GetAllMasterPallets();
 
 
     }
+
+
 
     private void setstr(string str)
     {

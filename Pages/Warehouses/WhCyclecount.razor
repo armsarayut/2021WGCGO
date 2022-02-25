@@ -4,11 +4,15 @@
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inv
 @using System.Text.Json
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 @inject InvService ObjService
 @inject IDialogService DialogService
 @inject PublicFunServices ObjFunService
 
-
+@inject ReportService UserlogService
 @inject WgcService ObjErpService
 @inject ISnackbar Snackbar
 @inject ErpApiService ObjApiService
@@ -29,74 +33,74 @@ else
                    Color="Color.Primary"
                    OnClick=@OnButtonOrderSelected>@L["START"]</MudButton>
                 <MudSpacer />
-    </MudAppBar>
+            </MudAppBar>
 
-    @if (StkGroup)
-    {
-
-
-        <MudTable Items="@Elements"
-                  FixedHeader="@fixed_header"
-                  FixedFooter="@fixed_footer"
-                  Height="@(fixed_header || fixed_footer ?"500px":"")"
-                  MultiSelection="true"
-                  Dense="@dense"
-                  Hover="@hover"
-                  Bordered="@bordered"
-                  Striped="@striped"
-                  Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)"
-                  @bind-SelectedItems="selectedItems">
-            <ToolBarContent>
-                
-                <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString"
-                              Placeholder=@L["Search"]
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Search"
-                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-
-            <HeaderContent>
-                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemcode)">@L["ItemCode"] </MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemname)">@L["ItemName"] </MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Quantity)">@L["Stock"] </MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Docno)">@L["Lot"] </MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallettag)">@L["SEQ"] </MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallteno)">@L["PalletGo"] </MudTableSortLabel></MudTh>
-            </HeaderContent>
-
-
-            <RowTemplate>
-                <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
-                <MudTd DataLabel=@L["ItemName"]>@context.Itemname</MudTd>
-                <MudTd DataLabel=@L["Stock"]>@context.Quantity</MudTd>
-                <MudTd DataLabel=@L["Lot"]>@context.Docno</MudTd>
-                <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
-                <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-            </PagerContent>
-        </MudTable>
-    }
-    else
-    {
-
-    }
-
-    <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
-        <MessageContent>
-            @foreach (var item in References)
+            @if (StkGroup)
             {
-                <br />
-                @item
+
+
+                <MudTable Items="@Elements"
+                          FixedHeader="@fixed_header"
+                          FixedFooter="@fixed_footer"
+                          Height="@(fixed_header || fixed_footer ?"500px":"")"
+                          MultiSelection="true"
+                          Dense="@dense"
+                          Hover="@hover"
+                          Bordered="@bordered"
+                          Striped="@striped"
+                          Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)"
+                          @bind-SelectedItems="selectedItems">
+                    <ToolBarContent>
+
+                        <MudToolBarSpacer />
+                        <MudTextField @bind-Value="searchString"
+                                      Placeholder=@L["Search"]
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search"
+                                      IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
+
+                    <HeaderContent>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemcode)">@L["ItemCode"] </MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemname)">@L["ItemName"] </MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Quantity)">@L["Stock"] </MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Docno)">@L["Lot"] </MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallettag)">@L["SEQ"] </MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallteno)">@L["PalletGo"] </MudTableSortLabel></MudTh>
+                    </HeaderContent>
+
+
+                    <RowTemplate>
+                        <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
+                        <MudTd DataLabel=@L["ItemName"]>@context.Itemname</MudTd>
+                        <MudTd DataLabel=@L["Stock"]>@context.Quantity</MudTd>
+                        <MudTd DataLabel=@L["Lot"]>@context.Docno</MudTd>
+                        <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
+                        <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+                    </PagerContent>
+                </MudTable>
             }
-        </MessageContent>
-        <YesButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.DataSaverOn">Confirm!</MudButton>
-        </YesButton>
-    </MudMessageBox>
-}
+            else
+            {
+
+            }
+
+            <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
+                <MessageContent>
+                    @foreach (var item in References)
+                    {
+                        <br />
+                        @item
+                    }
+                </MessageContent>
+                <YesButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.DataSaverOn">Confirm!</MudButton>
+                </YesButton>
+            </MudMessageBox>
+        }
 
 @code {
 
@@ -137,20 +141,43 @@ else
 
     protected List<string> References { get; set; } = new List<string>();
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         InvService objCS = new InvService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-
-        Elements = await Task.Run(() => objCS.GetStockListInfo());
-
-        OnSelectChange();
 
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
+         Elements = await Task.Run(() => objCS.GetStockListInfo());
+
+        this.OnSelectChange();
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     protected void OnSelectChange()

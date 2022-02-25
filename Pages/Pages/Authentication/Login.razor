@@ -76,12 +76,13 @@
 
             if (UserElements.Count() > 0)
             {
+             
                 var grouid = UserElements.Select(x => x.Usgid).FirstOrDefault();
 
-                VarGlobals.User.GroupID = grouid.Value;
+                var result1 = UserElements.Where(i => i.Usgid == grouid.Value).FirstOrDefault(); // = 0
 
                 var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
-                await authModule.InvokeVoidAsync("SignIn", Userword, encrypted, grouid.ToString(), "/gowms");
+                await authModule.InvokeVoidAsync("SignIn", Userword, encrypted, grouid.ToString(), result1.Usid.ToString(), "/gowms");
                 var authModules = authModule;
             }
             else

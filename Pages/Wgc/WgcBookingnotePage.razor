@@ -6,11 +6,15 @@
 @using System.Globalization
 @using System.Reflection
 @using System.Text.Json
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 @inject WgcService ObjErpService
 @inject ISnackbar Snackbar
 @inject ErpApiService ObjApiService
 @inject UserServices OpjUserService
+@inject ReportService UserlogService
 @inject IStringLocalizer<WgcBookingnotePage> L
 @attribute [Authorize]
 
@@ -58,10 +62,10 @@ else
                       Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItems="selectedItems">
                 <ToolBarContent>
                     <MudToolBarSpacer />
-                    <MudTextField @bind-Value="searchString" 
-                                  Placeholder=@L["Search"] 
-                                  Adornment="Adornment.Start" 
-                                  AdornmentIcon="@Icons.Material.Filled.Search" 
+                    <MudTextField @bind-Value="searchString"
+                                  Placeholder=@L["Search"]
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search"
                                   IconSize="Size.Medium" Class="mt-0"></MudTextField>
                 </ToolBarContent>
 
@@ -143,6 +147,10 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     private TableGroupDefinition<BOOKING_NOTE_ITEMS> _groupDefinition = new()
     {
@@ -163,12 +171,33 @@ else
     protected override async Task OnInitializedAsync()
     {
         WgcService objCS = new WgcService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-        Elements = await Task.Run(() => objCS.GetAllApiNewBookingnoteWgc());
+
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
+        Elements = await Task.Run(() => objCS.GetAllApiNewBookingnoteWgc());
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
 

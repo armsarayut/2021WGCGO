@@ -5,9 +5,12 @@
 @using GoWMS.Server.Models.Wcs;
 @using GoWMS.Server.Models;
 @using System.Net.NetworkInformation;
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inject IStringLocalizer<PuAuConveyorStatus> L
-
+@inject ReportService UserlogService
 @inject WcsService ObjWcsService;
 @implements IDisposable;
 @inject NavigationManager UriHelper
@@ -50,7 +53,7 @@ else
               Filter="new Func<Vmachine,bool>(FilterFunc)"
               SortLabel=@L["SortBy"]>
         <ToolBarContent>
-         
+
             <MudSpacer />
             <MudTextField @bind-Value="searchString"
                           Placeholder=@L["Search"]
@@ -69,7 +72,7 @@ else
             <MudTd DataLabel=@L["MCCODE"]>@context.Mccode</MudTd>
             <MudTd DataLabel=@L["INFO"]>@context.Information</MudTd>
             <MudTd DataLabel=@L["STATUS"]>
-                @{if (@context.Is_alert == true)
+                @{if (@context.Is_alert == true && @context.Mccode != "")
                         {
                         <MudAlert Severity="Severity.Error"
                                   Variant="Variant.Filled"
@@ -78,7 +81,7 @@ else
                             @context.St_no - @context.Desc_th
                         </MudAlert>
                         }
-                        else
+                        else if (@context.Is_alert == false && @context.Mccode != "")
                         {
                         <MudAlert Severity="Severity.Normal"
                                   Variant="Variant.Filled"
@@ -86,6 +89,10 @@ else
                                   Style="@($"color:{context.Focecolor}; background:{context.Backcolor};")">
                             @context.St_no - @context.Desc_th
                         </MudAlert>
+                        }
+                        else
+                        {
+                        <MudText>...</MudText>
                         }
                 }
             </MudTd>
@@ -129,9 +136,12 @@ else
 
     private ResultReturn resultReturn = null;
 
-
     private IEnumerable<SetConstance> ConstElements = new List<SetConstance>();
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     void IDisposable.Dispose()
     {
@@ -146,6 +156,15 @@ else
     {
 
 
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
         ConstElements = await Task.Run(() => ObjWcsService.GetConstance());
 
         var result1 = ConstElements.Where(i => i.Set_code == "HMI001").FirstOrDefault(); // = 0
@@ -155,15 +174,27 @@ else
         UrlHMI1 = result1.Val_vhr;
         UrlHMI2 = result2.Val_vhr;
 
-        ExecuteStatus();
+        this.ExecuteStatus();
 
         await Task.Run(() => InitialTimer());
 
-        //////// Intial Menu and Privilege//////
-        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
-        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
-        ////////////////////////////////////////
+    }
 
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     async void ExecuteStatus()
@@ -233,8 +264,6 @@ else
         }
 
     }
-
-
 
 
     private void OpenDialog(string mccode)

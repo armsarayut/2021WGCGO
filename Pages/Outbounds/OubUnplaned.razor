@@ -4,6 +4,9 @@
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inv
 @using System.Text.Json
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject InvService ObjService
 @inject IDialogService DialogService
 @inject PublicFunServices ObjFunService
@@ -13,6 +16,7 @@
 @inject ISnackbar Snackbar
 @inject ErpApiService ObjApiService
 @inject UserServices OpjUserService
+@inject ReportService UserlogService
 @inject IStringLocalizer<OubUnplaned> L
 @attribute [Authorize]
 
@@ -27,58 +31,58 @@ else
 
     @if (StkGroup)
     {
-<MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+        <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
 
-<MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
-               Color="Color.Primary"
-               OnClick=@OnButtonOrderSelected>@L["START"]</MudButton>
-            <MudSpacer />
-        </MudAppBar>
+        <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
+                       Color="Color.Primary"
+                       OnClick=@OnButtonOrderSelected>@L["START"]</MudButton>
+                    <MudSpacer />
+                </MudAppBar>
 
-        <MudTable Items="@Elements"
-                  FixedHeader="@fixed_header"
-                  FixedFooter="@fixed_footer"
-                  Height="@(fixed_header || fixed_footer ?"500px":"")"
-                  MultiSelection="true"
-                  Dense="@dense"
-                  Hover="@hover"
-                  Bordered="@bordered"
-                  Striped="@striped"
-                  Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)"
-                  @bind-SelectedItems="selectedItems">
-            <ToolBarContent>
-                <MudToolBarSpacer />
-                <MudTextField @bind-Value="searchString" 
-                              Placeholder=@L["Search"] 
-                              Adornment="Adornment.Start" 
-                              AdornmentIcon="@Icons.Material.Filled.Search" 
-                              IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
+                <MudTable Items="@Elements"
+                          FixedHeader="@fixed_header"
+                          FixedFooter="@fixed_footer"
+                          Height="@(fixed_header || fixed_footer ?"500px":"")"
+                          MultiSelection="true"
+                          Dense="@dense"
+                          Hover="@hover"
+                          Bordered="@bordered"
+                          Striped="@striped"
+                          Filter="new Func<Inv_Stock_GoInfo,bool>(FilterFunc)"
+                          @bind-SelectedItems="selectedItems">
+                    <ToolBarContent>
+                        <MudToolBarSpacer />
+                        <MudTextField @bind-Value="searchString"
+                                      Placeholder=@L["Search"]
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search"
+                                      IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </ToolBarContent>
 
-            <HeaderContent>
-                <MudTh>@L["ItemCode"]</MudTh>
-                <MudTh>@L["ItemName"]</MudTh>
-                <MudTh>@L["Stock"]</MudTh>
-                <MudTh>@L["SEQ"]</MudTh>
-                <MudTh>@L["PalletGo"]</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
-                <MudTd DataLabel=@L["ItemName"]>@context.Itemname</MudTd>
-                <MudTd DataLabel=@L["Stock"]>@string.Format(VarGlobals.FormatN0, context.Quantity)</MudTd>
-                <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
-                <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
-            </PagerContent>
-        </MudTable>
-    }
-    else
-    {
+                    <HeaderContent>
+                        <MudTh>@L["ItemCode"]</MudTh>
+                        <MudTh>@L["ItemName"]</MudTh>
+                        <MudTh>@L["Stock"]</MudTh>
+                        <MudTh>@L["SEQ"]</MudTh>
+                        <MudTh>@L["PalletGo"]</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
+                        <MudTd DataLabel=@L["ItemName"]>@context.Itemname</MudTd>
+                        <MudTd DataLabel=@L["Stock"]>@string.Format(VarGlobals.FormatN0, context.Quantity)</MudTd>
+                        <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
+                        <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
+                    </RowTemplate>
+                    <PagerContent>
+                        <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+                    </PagerContent>
+                </MudTable>
+            }
+            else
+            {
 
-    }
+            }
 
     <MudMessageBox @ref="mbox" Title="@mboxheader" CancelText="Cancel">
         <MessageContent>
@@ -132,25 +136,49 @@ else
 
     protected List<string> References { get; set; } = new List<string>();
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         InvService objCS = new InvService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
 
-        Elements = await Task.Run(() => objCS.GetStockListInfo());
-
-        OnSelectChange();
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
+        Elements = await Task.Run(() => objCS.GetStockListInfo());
+
+        this.OnSelectChange();
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     protected void OnSelectChange()
     {
         StkGroup = !StkGroup;
-       
+
     }
 
 

@@ -12,9 +12,12 @@
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Inb
 @using GoWMS.Server.Models.Wcs
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inject IStringLocalizer<PaAuRGVQueue> L
-
+@inject ReportService UserlogService
 @inject WcsService ObjWcsService
 @inject UserServices OpjUserService
 @attribute [Authorize]
@@ -27,18 +30,18 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
-    <MudTable Items="@Elements" 
-              FixedHeader="@fixed_header" 
-              FixedFooter="@fixed_footer" 
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
               Height="@(fixed_header || fixed_footer ?"500px":"")"
-              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" 
+              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
               Filter="new Func<Tas_Rgvworks,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
             <MudSpacer />
-            <MudTextField @bind-Value="searchString" 
-                          Placeholder=@L["Search"] 
-                          Adornment="Adornment.Start" 
-                          AdornmentIcon="@Icons.Material.Filled.Search" 
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
                           IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
@@ -49,7 +52,7 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_From)">@L["SOURCE"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Rgv_To)">@L["DESTINATION"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Rgvworks, object>(x=>x.Stime)">@L["STARTED"]</MudTableSortLabel></MudTh>
-</HeaderContent>
+        </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel=@L["QUEUING"]>@Convert.ToDateTime(context.Ctime).ToString(VarGlobals.FormatDT)</MudTd>
             <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
@@ -94,16 +97,42 @@ else
 
     private ResultReturn resultReturn = null;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         WcsService objCS = new WcsService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
-        Elements = await Task.Run(() => objCS.GetRGVWorks());
+
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
 
+        Elements = await Task.Run(() => objCS.GetRGVWorks());
+
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private void setstr(string str)

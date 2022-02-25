@@ -7,19 +7,19 @@
 <MudCard Elevation="0" Square="true" Class="@Class" Style="@Style">
     <MudCardHeader>
         <CardHeaderAvatar>
-            @if (VarGlobals.User.GroupID == 1)
+            @if (sGroupID == "1")
             {
                 <MudAvatar Image="images/programmer.png" /> }
-            else if (VarGlobals.User.GroupID == 2)
+            else if (sGroupID == "2")
             {
                 <MudAvatar Image="images/man.png" /> }
-            else if (VarGlobals.User.GroupID == 3)
+            else if (sGroupID == "3")
             {
                 <MudAvatar Image="images/businessman.png" /> }
-            else if (VarGlobals.User.GroupID == 4)
+            else if (sGroupID == "4")
             {
                 <MudAvatar Image="images/man.png" /> }
-            else if (VarGlobals.User.GroupID == 5)
+            else if (sGroupID == "5")
             {
                 <MudAvatar Image="images/guest-icon.jpg" /> }
             else
@@ -48,14 +48,15 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         sUsername = user.Identity.Name;
+
         sRole = user.Claims.FirstOrDefault(
-             c => c.Type == ClaimTypes.Email)?.Value;
+        c => c.Type == ClaimTypes.Email)?.Value;
 
         sGroupID = user.Claims.FirstOrDefault(
-        c => c.Type == ClaimTypes.GroupSid)?.Value;
+        c => c.Type == ClaimTypes.Role)?.Value;
 
         sUserID = user.Claims.FirstOrDefault(
-     c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            c => c.Type == ClaimTypes.Actor)?.Value;
     }
 
 

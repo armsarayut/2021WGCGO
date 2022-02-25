@@ -5,6 +5,9 @@
 @using GoWMS.Server.Models.Public
 @using GoWMS.Server.Pdf
 @using GoWMS.Server.Reports
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 
 @inject IStringLocalizer<PaM62A> L
@@ -45,57 +48,57 @@ else
                     <MudText>@L["Search"]</MudText>
                 }
             </MudButton>
-                </MudItem>
-            </MudGrid>
+        </MudItem>
+    </MudGrid>
 
-            <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-                <MudSpacer />
-                <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-                    <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
-                    <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
-                </MudTooltip>
-            </MudAppBar>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudSpacer />
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
+    </MudAppBar>
 
-            <MudTable Items="@Elements"
-                      FixedHeader="@fixed_header"
-                      FixedFooter="@fixed_footer"
-                      Height="@(fixed_header || fixed_footer ?"500px":"")"
-                      Dense="@dense"
-                      Hover="@hover"
-                      Bordered="@bordered"
-                      Striped="@striped"
-                      Filter="new Func<Class6_2_A,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
-                <ToolBarContent>
-                    <MudSpacer />
-                    <MudTextField @bind-Value="searchString"
-                                  Placeholder=@L["Search"]
-                                  Adornment="Adornment.Start"
-                                  AdornmentIcon="@Icons.Material.Filled.Search"
-                                  IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<Class6_2_A,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
 
-                <HeaderContent>
-                    <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Created)">@L["DATETIME"]</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Po_No)">@L["ORDERNO"]</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Item_Code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Item_Name)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Result_Qty)">@L["QTY"]</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Su_No)">@L["SEQ"]</MudTableSortLabel></MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel=@L["DATETIME"]>@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatD)</MudTd>
-                    <MudTd DataLabel=@L["ORDERNO"]>@context.Po_No</MudTd>
-                    <MudTd DataLabel=@L["ITEMCODE"]>@context.Item_Code</MudTd>
-                    <MudTd DataLabel=@L["ITEMNAME"]>@context.Item_Name</MudTd>
-                    <MudTd DataLabel=@L["QTY"]>@string.Format(VarGlobals.FormatN2, context.Result_Qty)</MudTd>
-                    <MudTd DataLabel=@L["SEQ"]>@context.Su_No</MudTd>
-                </RowTemplate>
-                <PagerContent>
-                    <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Created)">@L["DATETIME"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Po_No)">@L["ORDERNO"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Item_Code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Item_Name)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Result_Qty)">@L["QTY"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_2_A, object>(x=>x.Su_No)">@L["SEQ"]</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel=@L["DATETIME"]>@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatD)</MudTd>
+            <MudTd DataLabel=@L["ORDERNO"]>@context.Po_No</MudTd>
+            <MudTd DataLabel=@L["ITEMCODE"]>@context.Item_Code</MudTd>
+            <MudTd DataLabel=@L["ITEMNAME"]>@context.Item_Name</MudTd>
+            <MudTd DataLabel=@L["QTY"]>@string.Format(VarGlobals.FormatN2, context.Result_Qty)</MudTd>
+            <MudTd DataLabel=@L["SEQ"]>@context.Su_No</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
 
-                </PagerContent>
-            </MudTable>
-        }
+        </PagerContent>
+    </MudTable>
+}
 
 @code {
     public string mPagedesc { get; set; } = "5.2.1.Order Receive";
@@ -132,20 +135,44 @@ else
 
     private bool _processing = false;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
+
     protected override async Task OnInitializedAsync()
     {
         PublicService objCS = new PublicService();
-        fromDateTime = fromDate.Value.Date;
-        toDateTime = toDate.Value.Date ;
-
-        Elements = await Task.Run(() => objCS.GetMenu6_2AbyDate(fromDateTime.Value, toDateTime.Value));
-
-        this.InsertAuditrial("View", pageheader);
 
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+
+        fromDateTime = fromDate.Value.Date;
+        toDateTime = toDate.Value.Date;
+        Elements = await Task.Run(() => objCS.GetMenu6_2AbyDate(fromDateTime.Value, toDateTime.Value));
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private void setstr(string str)
@@ -212,7 +239,7 @@ else
 
     async Task DbGetData()
     {
-        DateTime newDateTimeFM = fromDate.Value.Date ;
+        DateTime newDateTimeFM = fromDate.Value.Date;
         DateTime newDateTimeTO = toDate.Value.Date;
         Elements = await Task.Run(() => ObjPublicService.GetMenu6_2AbyDate(newDateTimeFM, newDateTimeTO));
     }
@@ -220,11 +247,6 @@ else
     public void Dispose()
     {
 
-    }
-
-    private void InsertAuditrial(String actdesc, String munname)
-    {
-        bool bRet = UserlogService.InsertAudittrial(actdesc, munname);
     }
 
     public async Task DownloadExcelDocument()

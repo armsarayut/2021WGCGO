@@ -3,9 +3,14 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Wcs
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 @inject WcsService ObjService
 @inject UserServices OpjUserService
+@inject ReportService UserlogService
 
 @if (Elements == null)
 {
@@ -14,15 +19,6 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary"> @pageheader </MudText>
-
-    @*<MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-        <MudSpacer />
-        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
-            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
-        </MudTooltip>
-    </MudAppBar>*@
-
     <MudTable Items="@Elements"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
@@ -93,6 +89,11 @@ else
 
     private ResultReturn resultReturn = null;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         WcsService objCS = new WcsService();
@@ -103,7 +104,27 @@ else
         ////////////////////////////////////////
         Elements = await Task.Run(() => objCS.GetOperate());
 
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
 
+
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private void setstr(string str)

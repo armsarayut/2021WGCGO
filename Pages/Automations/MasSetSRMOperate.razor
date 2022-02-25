@@ -3,9 +3,12 @@
 @using GoWMS.Server.Controllers
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Wcs
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject WcsService ObjService
 @inject UserServices OpjUserService
+@inject ReportService UserlogService
 
 @if (Elements == null)
 {
@@ -81,10 +84,14 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         WcsService objCS = new WcsService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
 
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
@@ -92,33 +99,31 @@ else
         ////////////////////////////////////////
         ///
         Elements = await Task.Run(() => objCS.GetSRMOperate());
+
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     private void setstr(string str)
     {
-        //if (mPalletcode.Length <= 0)
-        //{
-        //    mPalletcode = str;
-        //    msgAction = "Enter Pack ID";
-        //    elevation = 3;
-        //}
-        //else
-        //{
-        //    if (str == mPalletcode)
-        //    {
-        //        elevation = 2;
-        //        msgAction = "Mapping successfully";
-        //        ObjCustomService.UpdateReceivingOrderbypallet(mPalletcode);
-        //        mPalletcode = "";
-        //    }
-        //    else
-        //    {
-        //        mPackid = str;
-        //        ObjCustomService.UpdateReceivingOrderbypack(mPalletcode, mPackid);
-        //    }
-        //}
-        //CustomerService objGR = new CustomerService();
-        //Elements = objGR.GetReceivingOrdersbypallet(mPalletcode);
+
     }
 
     private string stxtInput { get; set; }

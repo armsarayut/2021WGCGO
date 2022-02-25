@@ -6,13 +6,15 @@
 @using GoWMS.Server.Models;
 @using GoWMS.Server.Pdf
 @using GoWMS.Server.Reports
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
 @inject IStringLocalizer<PaAuASRSLoadtimelist> L
-
+@inject ReportService UserlogService
 @inject WcsService ObjWcsService
 @inject UserServices OpjUserService
 @inject NavigationManager navigationManager
-@inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
 @if (Elements != null)
@@ -51,57 +53,57 @@
                     <MudText>@L["Search"]</MudText>
                 }
             </MudButton>
-                </MudItem>
-            </MudGrid>
+        </MudItem>
+    </MudGrid>
 
-            <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
-                <MudSpacer />
-                <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
-                    <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
-                    <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
-                </MudTooltip>
-            </MudAppBar>
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudSpacer />
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
+    </MudAppBar>
 
-            <MudTable Items="@Elements"
-                      FixedHeader="@fixed_header"
-                      FixedFooter="@fixed_footer"
-                      Height="@(fixed_header || fixed_footer ? "500px" : "")"
-                      Dense="@dense"
-                      Hover="@hover"
-                      Bordered="@bordered" Striped="@striped" Filter="new Func<AsrsLoadtime, bool>(FilterFunc)" Style="width:100%;">
-                <ToolBarContent>
-                    <MudToolBarSpacer />
-                    <MudTextField @bind-Value="searchString" Placeholder=@L["Search"] Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>@L["PALLET"]</MudTh>
-                    <MudTh>@L["TASKCODE"]</MudTh>
-                    <MudTh>@L["TASKTYPE"]</MudTh>
-                    <MudTh>@L["SRM"]</MudTh>
-                    <MudTh>@L["SOURCE"]</MudTh>
-                    <MudTh>@L["DESTINATION"]</MudTh>
-                    <MudTh>@L["START"]</MudTh>
-                    <MudTh>@L["END"]</MudTh>
-                    <MudTh>@L["TIME"]</MudTh>
-                </HeaderContent>
-                <RowTemplate>
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ? "500px" : "")"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered" Striped="@striped" Filter="new Func<AsrsLoadtime, bool>(FilterFunc)" Style="width:100%;">
+        <ToolBarContent>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString" Placeholder=@L["Search"] Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>@L["PALLET"]</MudTh>
+            <MudTh>@L["TASKCODE"]</MudTh>
+            <MudTh>@L["TASKTYPE"]</MudTh>
+            <MudTh>@L["SRM"]</MudTh>
+            <MudTh>@L["SOURCE"]</MudTh>
+            <MudTh>@L["DESTINATION"]</MudTh>
+            <MudTh>@L["START"]</MudTh>
+            <MudTh>@L["END"]</MudTh>
+            <MudTh>@L["TIME"]</MudTh>
+        </HeaderContent>
+        <RowTemplate>
 
-                    <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
-                    <MudTd DataLabel=@L["TASKCODE"]>@context.Work_code</MudTd>
-                    <MudTd DataLabel=@L["TASKTYPE"]>@context.Work_text_th</MudTd>
-                    <MudTd DataLabel=@L["SRM"]>@string.Format(VarGlobals.FormatD2, context.Srm_no)</MudTd>
-                    <MudTd DataLabel=@L["SOURCE"]>@string.Format(VarGlobals.FormatD9, context.Srm_from)</MudTd>
-                    <MudTd DataLabel=@L["DESTINATION"]>@string.Format(VarGlobals.FormatD9, context.Srm_to)</MudTd>
-                    <MudTd DataLabel=@L["START"]>@Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)</MudTd>
-                    <MudTd DataLabel=@L["END"]>@Convert.ToDateTime(context.Etime).ToString(VarGlobals.FormatDT)</MudTd>
-                    <MudTd DataLabel=@L["TIME"]>@context.Loadtime</MudTd>
-                </RowTemplate>
-                <PagerContent>
-                    <MudTablePager PageSizeOptions="new int[] { 10, 20, 50, 100 }" />
-                </PagerContent>
-            </MudTable>
+            <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
+            <MudTd DataLabel=@L["TASKCODE"]>@context.Work_code</MudTd>
+            <MudTd DataLabel=@L["TASKTYPE"]>@context.Work_text_th</MudTd>
+            <MudTd DataLabel=@L["SRM"]>@string.Format(VarGlobals.FormatD2, context.Srm_no)</MudTd>
+            <MudTd DataLabel=@L["SOURCE"]>@string.Format(VarGlobals.FormatD9, context.Srm_from)</MudTd>
+            <MudTd DataLabel=@L["DESTINATION"]>@string.Format(VarGlobals.FormatD9, context.Srm_to)</MudTd>
+            <MudTd DataLabel=@L["START"]>@Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel=@L["END"]>@Convert.ToDateTime(context.Etime).ToString(VarGlobals.FormatDT)</MudTd>
+            <MudTd DataLabel=@L["TIME"]>@context.Loadtime</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 10, 20, 50, 100 }" />
+        </PagerContent>
+    </MudTable>
 
-        }
+}
 
 
 @code {
@@ -132,22 +134,47 @@
 
     private ResultReturn resultReturn = null;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         WcsService objCS = new WcsService();
-        //Elements = await Task.Run(() => objCS.GetReceivingOrdersbypallet(mPalletcode));
 
+
+
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+     
         fromDateTime = fromDate.Value.Date + fromTime.Value;
         toDateTime = toDate.Value.Date + toTime.Value;
 
 
         Elements = await Task.Run(() => objCS.GetAsrsloadtime(fromDateTime.Value, toDateTime.Value));
 
-        //////// Intial Menu and Privilege//////
-        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
-        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
-        ////////////////////////////////////////
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
     bool FilterFunc(AsrsLoadtime element)
