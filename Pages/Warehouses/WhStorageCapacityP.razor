@@ -107,6 +107,8 @@ else
     string sRole { get; set; } = "";
     string sGroupID { get; set; } = "";
     string sUserID { get; set; } = "";
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+    [Inject] private IDialogService DialogService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -169,11 +171,16 @@ else
     {
         try
         {
-            WhStorageCapacityPRptExcel excelReport = new WhStorageCapacityPRptExcel();
-            List<WhStorageCapacity> listExcelReport = new List<WhStorageCapacity>();
-            listExcelReport = Elements.ToList();
-            var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
-            await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            bool? result = await CheckRoleReport();
+            if (result == true)
+            {
+                WhStorageCapacityPRptExcel excelReport = new WhStorageCapacityPRptExcel();
+                List<WhStorageCapacity> listExcelReport = new List<WhStorageCapacity>();
+                listExcelReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+            }
+
 
         }
         catch (Exception e)
@@ -186,18 +193,186 @@ else
     {
         try
         {
-            //WhStockListRptPdf pdfReport = new WhStockListRptPdf();
+            bool? result = await CheckRoleReport();
+            if (result == true)
+            {
+                //WhStockListRptPdf pdfReport = new WhStockListRptPdf();
 
-            //List<Inv_Stock_GoInfo> listPdfReport = new List<Inv_Stock_GoInfo>();
-            //listPdfReport = Elements.ToList();
-            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                //List<Inv_Stock_GoInfo> listPdfReport = new List<Inv_Stock_GoInfo>();
+                //listPdfReport = Elements.ToList();
+                //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+            }
+
         }
         catch (Exception e)
         {
             var exmsg = e.Message.ToString();
         }
     }
+
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
 
 }

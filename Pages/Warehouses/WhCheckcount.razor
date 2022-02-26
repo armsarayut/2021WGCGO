@@ -77,9 +77,9 @@ else
                 <MudTd Class="clm-row-small" DataLabel=@L["QTY"]>@string.Format(VarGlobals.FormatN2, context.Stock_Qty)</MudTd>
                 <MudTd Class="clm-row-small" DataLabel=@L["UNIT"]>@context.Unit</MudTd>
                 <MudTd Class="clm-row-small" DataLabel=@L["ACTION"]>
-                    <MudFab @onclick="@(()=>CountMap(@context.Su_No))" Color="Color.Primary" Icon="@Icons.Material.Filled.Check" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(()=>DeleteMap(@context.Su_No))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Clear" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(()=>ResetMap(@context.Su_No))" Color="Color.Warning" Icon="@Icons.Material.Filled.Restore" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>CountMap(@context.Su_No))" Color="Color.Error" Icon="@Icons.Material.Filled.Check" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>DeleteMap(@context.Su_No))" Color="Color.Warning" Icon="@Icons.Material.Filled.Clear" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>ResetMap(@context.Su_No))" Color="Color.Primary" Icon="@Icons.Material.Filled.Restore" Size="Size.Small" IconSize="Size.Small" />
                 </MudTd>
             </RowTemplate>
 
@@ -126,9 +126,9 @@ else
                 <MudTd DataLabel=@L["PACKID"]>@context.Su_No</MudTd>
                 <MudTd DataLabel=@L["QTY"]>@context.Stock_Qty</MudTd>
                 <MudTd DataLabel=@L["ACTION"]>
-                    <MudFab @onclick="@(()=>CountMap(@context.Su_No))" Color="Color.Primary" Icon="@Icons.Material.Filled.Check" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(()=>DeleteMap(@context.Su_No))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Clear" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(()=>ResetMap(@context.Su_No))" Color="Color.Warning" Icon="@Icons.Material.Filled.Restore" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>CountMap(@context.Su_No))" Color="Color.Error" Icon="@Icons.Material.Filled.Check" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>DeleteMap(@context.Su_No))" Color="Color.Warning" Icon="@Icons.Material.Filled.Clear" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(()=>ResetMap(@context.Su_No))" Color="Color.Primary" Icon="@Icons.Material.Filled.Restore" Size="Size.Small" IconSize="Size.Small" />
                 </MudTd>
 
             </RowTemplate>
@@ -182,6 +182,8 @@ else
     string sRole { get; set; } = "";
     string sGroupID { get; set; } = "";
     string sUserID { get; set; } = "";
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+    [Inject] private IDialogService DialogService { get; set; }
 
     private void KeyboardEventHandler(KeyboardEventArgs args)
     {
@@ -247,30 +249,14 @@ else
     {
         if (eventArgs.Key == "Enter")        // fire on enter
         {
-
-            string pallettemp = stringputkey;
-            await Task.Run(() => setstr(pallettemp));
-            this.stringputkey = null;
-            this.mPackid = null;
-            /*
-            cOld = Elements.Count();
-
-            Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
-
-                cNew = Elements.Count();
-
-                if (cOld == cNew)
-                {
-                Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
-                }
-                else
-                {
-                if (mPalletcode.Length > 0)
-                    {
-                    Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
+            bool? result = await CheckRoleApprove();
+            if (result == true)
+            {
+                string pallettemp = stringputkey;
+                await Task.Run(() => setstr(pallettemp));
+                this.stringputkey = null;
+                this.mPackid = null;
             }
-            }
-            */
             this.StateHasChanged();
         }
     }
@@ -370,48 +356,57 @@ else
         }
     }
 
-    private void DeleteMap(string pack)
+    private async void DeleteMap(string pack)
     {
         /**/
 
-        var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
-
-        //----------------------
-
-        if (iCorrect >= 0)
+        bool? result = await CheckRoleDelete();
+        if (result == true)
         {
-            Elements.ToList()[iCorrect].Bcount = true;
-            Elements.ToList()[iCorrect].Movement_Type = "Z01";
-            Elements.ToList()[iCorrect].Request_Qty = Elements.ToList()[iCorrect].Stock_Qty;
-            Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+            var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+            //----------------------
+
+            if (iCorrect >= 0)
+            {
+                Elements.ToList()[iCorrect].Bcount = true;
+                Elements.ToList()[iCorrect].Movement_Type = "Z01";
+                Elements.ToList()[iCorrect].Request_Qty = Elements.ToList()[iCorrect].Stock_Qty;
+                Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+            }
         }
-        else
-        {
-            Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
-        }
+
         this.StateHasChanged();
 
     }
 
-    private void CountMap(string pack)
+    private async void CountMap(string pack)
     {
-        /**/
-
-        var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
-
-        //----------------------
-
-        if (iCorrect >= 0)
+        bool? result = await CheckRoleApprove();
+        if (result == true)
         {
-            Elements.ToList()[iCorrect].Bcount = true;
-            Elements.ToList()[iCorrect].Movement_Type = "CYC";
-            Elements.ToList()[iCorrect].Request_Qty = 0;
-            Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+            var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+            //----------------------
+
+            if (iCorrect >= 0)
+            {
+                Elements.ToList()[iCorrect].Bcount = true;
+                Elements.ToList()[iCorrect].Movement_Type = "CYC";
+                Elements.ToList()[iCorrect].Request_Qty = 0;
+                Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+            }
         }
-        else
-        {
-            Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
-        }
+
+
         this.StateHasChanged();
 
     }
@@ -438,5 +433,168 @@ else
         this.StateHasChanged();
 
     }
+
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
 
 }

@@ -37,7 +37,7 @@ else
 
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
         <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
-                   Color="Color.Primary"
+                   Color="Color.Error"
                    OnClick=@SetOrderpicking>@L["Start ASRS"]</MudButton>
                 <MudSpacer />
             </MudAppBar>
@@ -127,6 +127,8 @@ else
     string sRole { get; set; } = "";
     string sGroupID { get; set; } = "";
     string sUserID { get; set; } = "";
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+    [Inject] private IDialogService DialogService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -201,79 +203,248 @@ else
         return false;
     }
 
-    private void SetOrderpicking()
+    private async Task SetOrderpicking()
     {
-        string strRunning = ObjService.GetRunnning("sq002", 4);
-
-        var strLON1 = selectedItems.GroupBy(c => new
+        bool? result = await CheckRoleApprove();
+        if (result == true)
         {
-            c.Delivery_Date,
-            c.Delivery_Priority,
-            c.Order_No,
-            c.Ship_To_Code
-        })
-        .Select(gcs => new
-        {
-            delivery_date = gcs.Key.Delivery_Date,
-            delivery_priority = gcs.Key.Delivery_Priority,
-            order_no = gcs.Key.Order_No,
-            ship_to_code = gcs.Key.Ship_To_Code,
-        }).ToList();
+            string strRunning = ObjService.GetRunnning("sq002", 4);
 
-        Int32 iTotal = strLON1.Count;
-        Int32 iCount = 0;
-        Boolean bCheck;
-        foreach (var recItem in strLON1)
-        {
-            DateTime delivery_date = (DateTime)recItem.delivery_date;
-            Int32 delivery_priority = (Int32)recItem.delivery_priority;
-            string order_no = recItem.order_no;
-            string ship_to_code = recItem.ship_to_code;
-
-            // Create Batch Order
-
-            bCheck = false;
-            bCheck = ObjService.CreateBatchOrder(delivery_date, delivery_priority, order_no, ship_to_code, strRunning);
-
-            if (bCheck == true)
+            var strLON1 = selectedItems.GroupBy(c => new
             {
-                iCount++;
+                c.Delivery_Date,
+                c.Delivery_Priority,
+                c.Order_No,
+                c.Ship_To_Code
+            })
+            .Select(gcs => new
+            {
+                delivery_date = gcs.Key.Delivery_Date,
+                delivery_priority = gcs.Key.Delivery_Priority,
+                order_no = gcs.Key.Order_No,
+                ship_to_code = gcs.Key.Ship_To_Code,
+            }).ToList();
+
+            Int32 iTotal = strLON1.Count;
+            Int32 iCount = 0;
+            Boolean bCheck;
+            foreach (var recItem in strLON1)
+            {
+                DateTime delivery_date = (DateTime)recItem.delivery_date;
+                Int32 delivery_priority = (Int32)recItem.delivery_priority;
+                string order_no = recItem.order_no;
+                string ship_to_code = recItem.ship_to_code;
+
+                // Create Batch Order
+
+                bCheck = false;
+                bCheck = ObjService.CreateBatchOrder(delivery_date, delivery_priority, order_no, ship_to_code, strRunning);
+
+                if (bCheck == true)
+                {
+                    iCount++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // Create Batch Setting
+            if (iCount == iTotal)
+            {
+                bCheck = false;
+                bCheck = ObjService.CreateBatchSetting(strRunning, 0);
             }
             else
             {
-                break;
+                bCheck = false;
+                bCheck = ObjService.RollbackBatch(strRunning);
+                Snackbar.Add("Create Wave >>  Order Losss", Severity.Error);
+            }
+
+            // Start Batch
+
+            if (bCheck == true)
+            {
+                bCheck = false;
+                bCheck = ObjService.StartBatchsetting(strRunning, 0);
+            }
+
+            if (bCheck == true)
+            {
+                Snackbar.Add("Create Wave >> Success", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Create Wave >> Start Losss", Severity.Error);
+            }
+            Elements = ObjService.GetSapStoreoutSetBatch();
+        }
+
+
+    }
+
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
             }
         }
-
-        // Create Batch Setting
-        if (iCount == iTotal)
-        {
-            bCheck = false;
-            bCheck = ObjService.CreateBatchSetting(strRunning, 0);
-        }
         else
         {
-            bCheck = false;
-            bCheck = ObjService.RollbackBatch(strRunning);
-            Snackbar.Add("Create Wave >>  Order Losss", Severity.Error);
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
         }
 
-        // Start Batch
-
-        if (bCheck == true)
-        {
-            bCheck = false;
-            bCheck = ObjService.StartBatchsetting(strRunning, 0);
-        }
-
-        if (bCheck == true)
-        {
-            Snackbar.Add("Create Wave >> Success", Severity.Success);
-        }
-        else
-        {
-            Snackbar.Add("Create Wave >> Start Losss", Severity.Error);
-        }
-        Elements = ObjService.GetSapStoreoutSetBatch();
+        return bRet;
     }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
 }

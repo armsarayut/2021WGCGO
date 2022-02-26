@@ -1,22 +1,22 @@
 ﻿@page "/4/4_1"
-@using System.Runtime.Serialization;
-@using Newtonsoft.Json;
-@using GoWMS.Server.Controllers;
-@using GoWMS.Server.Models.Wcs;
-@using GoWMS.Server.Models;
-@using System.Net.NetworkInformation;
+@using System.Runtime.Serialization
+@using Newtonsoft.Json
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models.Wcs
+@using GoWMS.Server.Models
+@using GoWMS.Server.Data
+@using System.Net.NetworkInformation
 @using System.Security.Claims
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @inject IStringLocalizer<PuAuConveyorStatus> L
 @inject ReportService UserlogService
-@inject WcsService ObjWcsService;
-@implements IDisposable;
+@inject WcsService ObjWcsService
+@implements IDisposable
 @inject NavigationManager UriHelper
 @inject IJSRuntime jsRuntime
 @inject UtilityServices ObjUtitityservice
-@inject IDialogService DialogService
 @inject UserServices OpjUserService
 @attribute [Authorize]
 
@@ -33,12 +33,12 @@ else
         <MudIconButton OnClick="@(()=> NavigateToNewTabHHI(linkHmi1))"
                        Icon="@Icons.Material.Filled.TouchApp"
                        Variant="Variant.Filled"
-                       Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI#1" />
+                       Color="Color.Error" Size="Size.Medium" Class="ma-2" Title="HMI#1" />
 
         <MudIconButton OnClick="@(()=> NavigateToNewTabHHI(linkHmi2))"
                        Icon="@Icons.Material.Filled.TouchApp"
                        Variant="Variant.Filled"
-                       Color="Color.Primary" Size="Size.Large" Class="ma-2" Title="HMI#2" />
+                       Color="Color.Error" Size="Size.Medium" Class="ma-2" Title="HMI#2" />
         <MudSpacer />
     </MudAppBar>
 
@@ -101,7 +101,7 @@ else
 
                 @if (@context.Is_cmd == true)
                     {
-                    <MudFab @onclick="@(()=>OpenDialog(@context.Mccode))" Color="Color.Secondary" Icon="@Icons.Material.Filled.MenuOpen" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab  @onclick="@(()=>OpenDialog(@context.Mccode))" Color="Color.Error" Icon="@Icons.Material.Filled.MenuOpen" Size="Size.Small" IconSize="Size.Small" />
                     }
             </MudTd>
         </RowTemplate>
@@ -142,6 +142,8 @@ else
     string sRole { get; set; } = "";
     string sGroupID { get; set; } = "";
     string sUserID { get; set; } = "";
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+    [Inject] private IDialogService DialogService { get; set; }
 
     void IDisposable.Dispose()
     {
@@ -248,33 +250,202 @@ else
 
     public async Task NavigateToNewTabHHI(int hmino)
     {
-        string url = null;
-        switch (hmino)
+        bool? result = await CheckRoleApprove();
+        if (result==true)
         {
-            case 1:
-                url = UrlHMI1;
-                await jsRuntime.InvokeAsync<object>("open", url, "_blank");
-                break;
-            case 2:
-                url = UrlHMI2;
-                await jsRuntime.InvokeAsync<object>("open", url, "_blank");
-                break;
-            default:
-                break;
+            string url = null;
+            switch (hmino)
+            {
+                case 1:
+                    url = UrlHMI1;
+                    await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+                    break;
+                case 2:
+                    url = UrlHMI2;
+                    await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+                    break;
+                default:
+                    break;
+            }
         }
 
     }
 
 
-    private void OpenDialog(string mccode)
+    private async Task OpenDialog(string mccode)
     {
-        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseButton = true };
-        var parameters = new DialogParameters { ["Mccode"] = mccode };
+        bool? result = await CheckRoleApprove();
+        if (result==true)
+        {
+            DialogOptions closeOnEscapeKey = new DialogOptions() { CloseButton = true };
+            var parameters = new DialogParameters { ["Mccode"] = mccode };
 
 
-        var dialog = DialogService.Show<DialogKeyboardNavigationExample_Dialog>(mccode, parameters);
-
-
+            var dialog = DialogService.Show<DialogKeyboardNavigationExample_Dialog>(mccode, parameters);
+        }
     }
+
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
 
 }

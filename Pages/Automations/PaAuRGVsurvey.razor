@@ -3,6 +3,7 @@
 @using GoWMS.Server.Controllers;
 @using GoWMS.Server.Models.Wcs;
 @using GoWMS.Server.Models;
+@using GoWMS.Server.Data;
 @using System.Security.Claims
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -71,14 +72,14 @@
 
             <MudGrid>
                 <MudItem xs="12">
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.TransferWithinAStation" Color="Color.Primary" OnClick="@(()=>SetPotocal())">@L["MOVE"]</MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FirstPage" Color="Color.Secondary" OnClick="@(()=>SetComand(2))">@L["HOME-FONT"]</MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.LastPage" Color="Color.Secondary" OnClick="@(()=>SetComand(12))">@L["HOME-BACK"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.TransferWithinAStation" Color="Color.Error" OnClick="@(()=>SetPotocal())">@L["MOVE"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FirstPage" Color="Color.Error" OnClick="@(()=>SetComand(2))">@L["HOME-FONT"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.LastPage" Color="Color.Error" OnClick="@(()=>SetComand(12))">@L["HOME-BACK"]</MudButton>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DirectionsRun" Color="Color.Success" OnClick="@(()=>SetComand(1))">@L["RUN"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DirectionsRun" Color="Color.Error" OnClick="@(()=>SetComand(1))">@L["RUN"]</MudButton>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Stop" Color="Color.Error" OnClick="@(()=>SetComand(90))">@L["STOP"]</MudButton>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AlarmOff" Color="Color.Warning" OnClick="@(()=>SetComand(9))">@L["ACKNOWLEDGE"]</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AlarmOff" Color="Color.Error" OnClick="@(()=>SetComand(9))">@L["ACKNOWLEDGE"]</MudButton>
                 </MudItem>
 
             </MudGrid>
@@ -122,6 +123,8 @@
     string sRole { get; set; } = "";
     string sGroupID { get; set; } = "";
     string sUserID { get; set; } = "";
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+    [Inject] private IDialogService DialogService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -181,49 +184,211 @@
     }
 
 
-    void SetPotocal()
+    private async Task SetPotocal()
     {
-
-        var queryFM = (from c in Elements
-                       where c.Mccode == valueFM
-                       select new { c.St_no, c.Mccode }).Single();
-
-        var queryTO = (from c in Elements
-                       where c.Mccode == valueTO
-                       select new { c.St_no, c.Mccode }).Single();
-
-
-        int Gateno_FM = queryFM.St_no.Value;
-        int Gateno_TO = queryTO.St_no.Value;
-
-
-
-
-
-
-
-
-
-        if (Gateno_FM != null && Gateno_TO != null)
+        bool? result = await CheckRoleApprove();
+        if (result==true)
         {
+            var queryFM = (from c in Elements
+                           where c.Mccode == valueFM
+                           select new { c.St_no, c.Mccode }).Single();
 
+            var queryTO = (from c in Elements
+                           where c.Mccode == valueTO
+                           select new { c.St_no, c.Mccode }).Single();
+
+
+            int Gateno_FM = queryFM.St_no.Value;
+            int Gateno_TO = queryTO.St_no.Value;
+
+
+            if (Gateno_FM != null && Gateno_TO != null)
+            {
+
+                bool bRet;
+                Int32 iCmd = 10;
+
+                bRet = ObjWcsService.CreatePotocalMC(Mccode, Gateno_FM, Gateno_TO, 1, "WGC-SURVEY", 0, iCmd);
+
+            }
+        }
+
+
+    }
+
+    private async Task SetComand(Int32 iCmd)
+    {
+        bool? result = await CheckRoleApprove();
+        if (result==true)
+        {
             bool bRet;
-            Int32 iCmd = 10;
-
-            bRet = ObjWcsService.CreatePotocalMC(Mccode, Gateno_FM, Gateno_TO, 1, "WGC-SURVEY", 0, iCmd);
-
-
-
-
+            bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
         }
 
     }
 
-    void SetComand(Int32 iCmd)
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
     {
-        bool bRet;
-        bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
     }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
 
 
 }

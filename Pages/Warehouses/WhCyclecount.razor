@@ -9,7 +9,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @inject InvService ObjService
-@inject IDialogService DialogService
 @inject PublicFunServices ObjFunService
 
 @inject ReportService UserlogService
@@ -30,7 +29,7 @@ else
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
         <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Done"
-                   Color="Color.Primary"
+                   Color="Color.Success"
                    OnClick=@OnButtonOrderSelected>@L["START"]</MudButton>
                 <MudSpacer />
             </MudAppBar>
@@ -145,6 +144,8 @@ else
     string sRole { get; set; } = "";
     string sGroupID { get; set; } = "";
     string sUserID { get; set; } = "";
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+    [Inject] private IDialogService DialogService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -158,7 +159,7 @@ else
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
 
-         Elements = await Task.Run(() => objCS.GetStockListInfo());
+        Elements = await Task.Run(() => objCS.GetStockListInfo());
 
         this.OnSelectChange();
     }
@@ -256,42 +257,47 @@ else
 
     private async void OnButtonOrderSelected()
     {
-        var resultlist = selectedItems.GroupBy(t => t.Itemcode)
-                 .Select(t => new
-                 {
-                     Itemcode = t.Key,
-                     Qty = t.Sum(ta => ta.Quantity),
-                 }).ToList();
-
-        System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
-        Int16 i = 0;
-        mboxcontent = "";
-
-        References.Clear();
-
-        if (resultlist.Count > 0)
+        bool? result = await CheckRoleAdd();
+        if (result == true)
         {
-            foreach (var rec in resultlist)
+            var resultlist = selectedItems.GroupBy(t => t.Itemcode)
+         .Select(t => new
+         {
+             Itemcode = t.Key,
+             Qty = t.Sum(ta => ta.Quantity),
+         }).ToList();
+
+            System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
+            Int16 i = 0;
+            mboxcontent = "";
+
+            References.Clear();
+
+            if (resultlist.Count > 0)
             {
-                i++;
-                strPopup.Clear();
-                strPopup.Append(i.ToString() + ". รายการ : ");
-                strPopup.Append(rec.Itemcode.ToString());
-                strPopup.Append(" จำนวน : ");
-                strPopup.AppendLine(rec.Qty.ToString());
+                foreach (var rec in resultlist)
+                {
+                    i++;
+                    strPopup.Clear();
+                    strPopup.Append(i.ToString() + ". รายการ : ");
+                    strPopup.Append(rec.Itemcode.ToString());
+                    strPopup.Append(" จำนวน : ");
+                    strPopup.AppendLine(rec.Qty.ToString());
 
-                References.Add(strPopup.ToString());
+                    References.Add(strPopup.ToString());
+                }
+                result = await mbox.Show();
+                state = result == null ? "Cancelled" : "Confirmed";
+
+                if (state == "Confirmed")
+                {
+                    SelectOrderPick();
+                }
+
+                StateHasChanged();
             }
-            bool? result = await mbox.Show();
-            state = result == null ? "Cancelled" : "Confirmed";
-
-            if (state == "Confirmed")
-            {
-                SelectOrderPick();
-            }
-
-            StateHasChanged();
         }
+
 
     }
 
@@ -367,5 +373,168 @@ else
             Snackbar.Add("Please select order picking", Severity.Warning);
         }
     }
+
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
 
 }

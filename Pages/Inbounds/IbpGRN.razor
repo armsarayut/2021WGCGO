@@ -96,9 +96,6 @@ else
 
 @code {
 
-
-
-
     private string msgAction = "Enter Palletcode";
 
     public string pageheader { get; set; } = "1.1.Receiving Order";
@@ -140,11 +137,13 @@ else
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
-        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, VarGlobals.User.GroupID));
+
         ////////////////////////////////////////
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetAllInbGoodreceiptGos());
     }
@@ -269,7 +268,7 @@ else
 
         if (Roles.ToList().Count > 0)
         {
-            var iCorrect = Roles.ToList().FindIndex(a => a.Role_acc == true);
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
 
             if (iCorrect >= 0)
             {
