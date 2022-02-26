@@ -153,6 +153,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetStockListInfo());
 
@@ -281,12 +282,14 @@ else
 
                     References.Add(strPopup.ToString());
                 }
-                 result = await mbox.Show();
+                result = await mbox.Show();
                 state = result == null ? "Cancelled" : "Confirmed";
 
                 if (state == "Confirmed")
                 {
+                    this.InsertAuditrial("Set Unplaned List : " + strPopup.ToString(), pageheader);
                     SelectOrderPick();
+
                 }
 
                 this.StateHasChanged();
@@ -314,10 +317,6 @@ else
 
         var strRES = selectedItems.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
 
-        //var strLON = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { SEQ_NO = x.SEQ_NO, SO_NO = x.SO_NO, DN_SEQ = x.DN_SEQ, ITEM_CODE = x.ITEM_CODE, PALLET_GO = x.PALLET_GO, DN_QTY = x.DN_QTY }).ToList();
-
-        //var jsonLON = JsonSerializer.Serialize(strLON, serializeOptions);
-
         var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
 
         var iReturn = 0;
@@ -333,8 +332,8 @@ else
             }
             else
             {
+                this.InsertAuditrial("Start Unplaned : " + so.ToString(), pageheader);
                 RefreshData();
-
                 Snackbar.Add("Order picking created", Severity.Success);
 
             }

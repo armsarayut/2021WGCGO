@@ -1,7 +1,9 @@
 ﻿@inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 
-
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ReportService UserlogService
 @inject NavigationManager NavigationManager
 @inject IConfiguration Configuration
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -105,7 +107,7 @@
         cultures = Configuration.GetSection("Cultures")
        .GetChildren().ToDictionary(x => x.Key, x => x.Value);
 
-      
+
     }
 
 
@@ -286,10 +288,28 @@
 
     private async void btnLogout_Click()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        string sUserID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Actor)?.Value;
+
+        string sRole = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Email)?.Value;
+        string pageheader = "Gowms";
+
+        this.InsertAuditrial("SignOff User : " + sRole, pageheader, sUserID);
+
         var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
         await authModule.InvokeVoidAsync("SignOut", "/");
     }
 
-   
+    private void InsertAuditrial(String actdesc, String munname, string sUserID)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
+    }
+
+
+
+
 
 }

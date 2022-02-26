@@ -258,6 +258,8 @@
                 await GetUserAthu();
                 this.InsertAuditrial("View", pageheader);
 
+                Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
+
                 Elements = await Task.Run(() => objCS.GetAllCustomerReturn());
 
                 this.OnSelectChange();
@@ -311,45 +313,6 @@
             async Task SelectOrder()
             {
 
-
-
-                /*
-                var result = selectedItems.GroupBy(t => t.Material_code)
-                .Select(t => new
-                {
-                Itemcode = t.Key,
-                Qty = t.Sum(ta => ta.Quantity),
-                }).ToList();
-
-                System.Text.StringBuilder strPopup = new System.Text.StringBuilder();
-                Int16 i = 0;
-
-                foreach (var rec in result)
-                    {
-                    i++;
-                    strPopup.Append(i.ToString() + ". รายการ : ");
-                strPopup.Append(rec.Itemcode.ToString());
-                strPopup.Append(" จำนวน : ");
-                strPopup.AppendLine(rec.Qty.ToString());
-                }
-
-                System.Text.StringBuilder popup = new System.Text.StringBuilder();
-                popup.AppendLine("รายการที่ขอตรวจสอบ");
-                popup.Append(strPopup.ToString());
-
-                string sContentText = popup.ToString();
-
-                var parameters = new DialogParameters();
-                parameters.Add("ContentText", sContentText);
-                parameters.Add("ButtonText", "Yes");
-                parameters.Add("Color", Color.Success);
-
-                var formModal = DialogService.Show<DialogTemplateExample_Dialog>("Confirm", parameters);
-
-                var resultModal = await Task.Run(() => formModal.Result);
-
-                var formModal1 = await Task.Run(() => DialogService.ShowMessageBox("AA", "XX"));
-                    */
 
             }
 
@@ -697,7 +660,6 @@
 
                     }
 
-
                     if (SelectedOption == "OPT3")
                     {
                         if (MapPalletItem.Count > 0)
@@ -741,9 +703,11 @@
                                     break;
                                 }
                             }
+
                             if (bRetCreate)
                             {
                                 Snackbar.Add("Return created", Severity.Success);
+                                this.InsertAuditrial("Setting Return from order is successful", pageheader);
                             }
                         }
                     }
@@ -762,6 +726,8 @@
                                     ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
 
                                     Snackbar.Add("Pallet created", Severity.Success);
+
+                                    this.InsertAuditrial("Setting Return pallet [" + stringputpalletgo + "] is successful", pageheader);
 
                                 }
                                 catch (Exception exp)

@@ -153,6 +153,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         fromDateTime = fromDate.Value.Date;
         toDateTime = toDate.Value.Date;
@@ -262,6 +263,7 @@ else
                 listExcelReport = Elements.ToList();
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+                this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
             }
 
         }
@@ -278,12 +280,12 @@ else
             bool? result = await CheckRoleReport();
             if (result == true)
             {
-                //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
-                //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
-                //listPdfReport = Elements.ToList();
-                //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
-                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                PaM67ARptPdf pdfReport = new PaM67ARptPdf();
+                List<Class6_7_A> listPdfReport = new List<Class6_7_A>();
+                listPdfReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
             }
 
 

@@ -166,6 +166,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         ConstElements = await Task.Run(() => ObjWcsService.GetConstance());
 
@@ -259,10 +260,12 @@ else
                 case 1:
                     url = UrlHMI1;
                     await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+                    this.InsertAuditrial("Acess HMI Url " + UrlHMI1 , pageheader);
                     break;
                 case 2:
                     url = UrlHMI2;
                     await jsRuntime.InvokeAsync<object>("open", url, "_blank");
+                    this.InsertAuditrial("Acess HMI Url " + UrlHMI2, pageheader);
                     break;
                 default:
                     break;

@@ -208,6 +208,8 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
+
         cOld = Elements.Count();
         Elements = await Task.Run(() => objCS.GetPicklist(mPalletcode));
         cNew = Elements.Count();
@@ -273,11 +275,13 @@ else
             if (bValidate)
             {
                 mPalletcode = str.ToUpper();
-                msgAction = "Enter PackID";
+                msgAction = "Enter DnSEQ";
                 elevation = 1;
-                Snackbar.Add("Enter PackID", Severity.Normal);
+                Snackbar.Add("Enter DnSEQ", Severity.Normal);
 
                 Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
+
+                this.InsertAuditrial("Start Counting Pallet : [" + mPalletcode + "]", pageheader);
 
             }
             else
@@ -302,7 +306,7 @@ else
 
                     // Set Update Count
                     bool bCheck = ObjWhService.UpdateCount(Elements.ToList());
-
+                    this.InsertAuditrial("Update Counting Pallet : [" + mPalletcode + "]", pageheader);
                     // Set SAP Complete
                     if (bCheck)
                     {
@@ -312,6 +316,8 @@ else
                             //bCheck = ObjWcsService.CreateCommandMC("G04", 88);
                             mPalletcode = "";
                             Snackbar.Add("Audit successfully", Severity.Success);
+
+                            this.InsertAuditrial("Comfirm Counting Pallet : [" + mPalletcode + "]", pageheader);
                         }
                         else
                         {
@@ -325,7 +331,7 @@ else
                 }
                 else
                 {
-                    Snackbar.Add("Please enter PackID", Severity.Info);
+                    Snackbar.Add("Please enter DnSEQ", Severity.Info);
                 }
             }
             else
@@ -345,11 +351,13 @@ else
                     Elements.ToList()[iCorrect].Bcount = true;
                     Elements.ToList()[iCorrect].Movement_Type = "CYC";
                     Elements.ToList()[iCorrect].Request_Qty = 0;
-                    Snackbar.Add("Count PackID: [" + mPackid + "] is OK", Severity.Success);
+                    this.InsertAuditrial("Counting DnSEQ: [" + mPackid + "] is OK", pageheader);
+
+                    Snackbar.Add("Counting DnSEQ: [" + mPackid + "] is OK", Severity.Success);
                 }
                 else
                 {
-                    Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+                    Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
                 }
 
             }
@@ -372,11 +380,13 @@ else
                 Elements.ToList()[iCorrect].Bcount = true;
                 Elements.ToList()[iCorrect].Movement_Type = "Z01";
                 Elements.ToList()[iCorrect].Request_Qty = Elements.ToList()[iCorrect].Stock_Qty;
-                Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+                this.InsertAuditrial("Counting DnSEQ: [" + pack + "] is not found", pageheader);
+
+                Snackbar.Add("Count DnSEQ: [" + pack + "] is OK", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+                Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
             }
         }
 
@@ -398,11 +408,14 @@ else
                 Elements.ToList()[iCorrect].Bcount = true;
                 Elements.ToList()[iCorrect].Movement_Type = "CYC";
                 Elements.ToList()[iCorrect].Request_Qty = 0;
-                Snackbar.Add("Count PackID: [" + pack + "] is OK", Severity.Success);
+                this.InsertAuditrial("Counting DnSEQ: [" + pack + "] is OK", pageheader);
+
+                Snackbar.Add("Count DnSEQ: [" + pack + "] is OK", Severity.Success);
+
             }
             else
             {
-                Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+                Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
             }
         }
 
@@ -424,11 +437,12 @@ else
             Elements.ToList()[iCorrect].Bcount = false;
             Elements.ToList()[iCorrect].Movement_Type = "CYC";
             Elements.ToList()[iCorrect].Request_Qty = 0;
-            Snackbar.Add("Reset PackID: [" + pack + "] is OK", Severity.Success);
+
+            Snackbar.Add("Reset DnSEQ: [" + pack + "] is OK", Severity.Success);
         }
         else
         {
-            Snackbar.Add("Find not found PackID please enter again", Severity.Warning);
+            Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
         }
         this.StateHasChanged();
 

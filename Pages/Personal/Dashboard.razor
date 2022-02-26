@@ -260,11 +260,11 @@
     protected override async Task OnInitializedAsync()
     {
         //Ticker();
-      
+        ///-- Get from ERP
+        palletGR = await ObjErpService.GetSumPalletAllApiNewDelivery_note();
+        orderGR = await ObjErpService.GetSumOrderAllApiNewDelivery_note();
+        //--------------------
 
-
-       // palletGR = await ObjErpService.GetSumPalletAllApiNewDelivery_note();
-        //orderGR = await ObjErpService.GetSumOrderAllApiNewDelivery_note();
 
         palletPut = await ObjInbService.GetSumPalletAllInbGoodreceiptGo();
         orderPut = await ObjInbService.GetSumOrderAllInbGoodreceiptGo();

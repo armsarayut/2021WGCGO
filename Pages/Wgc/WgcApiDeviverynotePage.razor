@@ -144,6 +144,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetAllApiDeliverynoteWgc());
     }

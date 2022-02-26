@@ -44,7 +44,7 @@ else
             <MudTd DataLabel="IN"><MudCheckBox @bind-Checked="@context.Inbound" /></MudTd>
             <MudTd DataLabel="OUT"><MudCheckBox @bind-Checked="@context.Outbound" /></MudTd>
             <MudTd Class="clm-row-small" DataLabel="ACTION">
-                <MudFab @onclick="@(()=>Commitconstance(@context.Idx.Value, @context.Inbound.Value,@context.Outbound.Value))" Color="Color.Error" Icon="@Icons.Material.Filled.Save" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(()=>Commitconstance(@context.Idx.Value, @context.Inbound.Value,@context.Outbound.Value, @context.Mc_Name.ToString()))" Color="Color.Error" Icon="@Icons.Material.Filled.Save" Size="Size.Small" IconSize="Size.Small" />
                 <MudFab @onclick="@(()=>Refreshconstance())" Color="Color.Info" Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" IconSize="Size.Small" />
             </MudTd>
         </RowTemplate>
@@ -150,12 +150,14 @@ else
         return false;
     }
 
-    private async Task Commitconstance(Int64 setcoed, bool setvalin, bool setvalout)
+    private async Task Commitconstance(Int64 setcoed, bool setvalin, bool setvalout, string smsg)
     {
         bool? result = await CheckRoleApprove();
         if  (result==true)
         {
             bool bcheck = ObjService.SetSRMOperate(setcoed, setvalin, setvalout);
+
+            this.InsertAuditrial("Setting " + smsg + " IN= " + setvalin.ToString() + " OUT= " + setvalout.ToString(), pageheader);
 
             this.Refreshconstance();
         }

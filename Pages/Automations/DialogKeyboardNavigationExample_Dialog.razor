@@ -1,6 +1,9 @@
 ﻿@using GoWMS.Server.Controllers;
 @using GoWMS.Server.Models.Wcs;
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ReportService UserlogService
 @inject WcsService ObjWcsService;
 @inject ISnackbar Snackbar
 
@@ -31,11 +34,16 @@
 
     private HashSet<Vmachine_command> selectedItems = new HashSet<Vmachine_command>();
     private IEnumerable<Vmachine_command> Elements = new List<Vmachine_command>();
+    private string pageheader = "4.1.ASRS-Status";
 
-
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
+        await GetUserAthu();
         Elements = await Task.Run(() => ObjWcsService.GetCommandMachine(Mccode));
     }
 
@@ -53,10 +61,13 @@
             if (bRet)
             {
                 Snackbar.Add("Set Command OK", Severity.Success);
+
+                this.InsertAuditrial("Setting " + Mccode + " Command = " + iCmd.ToString() + " is successful", pageheader);
             }
             else
             {
                 Snackbar.Add("Set Command Failed", Severity.Error);
+                this.InsertAuditrial("Setting " + Mccode + " Command = " + iCmd.ToString() + " is fail", pageheader);
             }
             MudDialog.Close(DialogResult.Ok(true));
         }
@@ -79,6 +90,23 @@
             }
             bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
         }
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
 }

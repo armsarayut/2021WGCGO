@@ -309,6 +309,30 @@ namespace GoWMS.Server.Reports
             }
             #endregion
 
+            #region Table No Data
+            if (ListRpts.Count <= 0)
+            {
+                string snull = "";
+                for (var i = 0; i < maxColum; i++)
+                {
+                    cell = new PdfPCell(new Phrase(snull.ToString(), _fontstyebody))
+                    {
+                        HorizontalAlignment = Element.ALIGN_LEFT,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        BackgroundColor = bodyBackcolor,
+                        BorderWidthTop = 0.5f,
+                        BorderWidthRight = 0f,
+                        BorderWidthBottom = 0f,
+                        BorderWidthLeft = 0f,
+                        BorderColorTop = LineBorderColor
+                    };
+                    bodyTable.AddCell(cell);
+                }
+
+                bodyTable.CompleteRow();
+            }
+            #endregion
+
             bodyTable.HeaderRows = 1; // Setup table headers in all the pages
             document.Add(bodyTable);
         }

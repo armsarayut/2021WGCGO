@@ -5,17 +5,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GoWMS.Server.Models.Mas;
+using GoWMS.Server.Models.Public;
 using GoWMS.Server.Data;
 
 namespace GoWMS.Server.Reports
 {
-    public class MasPalletPageRptPdf : PdfPageEvents
+    public class PaM6RptPdf : PdfPageEvents
     {
         //-----------------------------
 
         #region Attributes
-        readonly string reportCaption = "6.4.Pallet - Report";
+        readonly string reportCaption = "5.1.Audit trail - Report";
         readonly Boolean bPageLanscape = false;
         #endregion
 
@@ -184,9 +184,9 @@ namespace GoWMS.Server.Reports
         /// </summary>
         /// <param name="ListRpt">List Data</param>
         /// <returns></returns>
-        public byte[] ExportPDF(List<Mas_Pallet_Go> ListRpt)
+        public byte[] ExportPDF(List<Class6_1> ListRpt)
         {
-            MasPalletPageRptPdf pdfReport = new MasPalletPageRptPdf();
+            PaM6RptPdf pdfReport = new PaM6RptPdf();
             Document document;
             if (bPageLanscape)
             {
@@ -217,24 +217,26 @@ namespace GoWMS.Server.Reports
         /// <param name="document"></param>
         /// <param name="ListRpts">List<Vrpt_shelf_listInfo></param>
         /// <returns></returns>
-        private void ReportBody(Document document, List<Mas_Pallet_Go> ListRpts)
+        private void ReportBody(Document document, List<Class6_1> ListRpts)
         {
             BaseFont baseFont = BaseFontForHeaderFooter;
 
-            int maxColum = 2;
+            int maxColum = 4;
             float[] sizes = new float[maxColum];
             for (var i = 0; i < maxColum; i++) // Set up Colum Size
             {
-                if (i == 0) sizes[i] = 1.5f;
-                else if (i == 1) sizes[i] = 2.5f;
+                if (i == 0) sizes[i] = 1;
+                else if (i == 1) sizes[i] = 1f;
                 else if (i == 2) sizes[i] = 1f;
-                else if (i == 3) sizes[i] = 0.7f;
-                else if (i == 4) sizes[i] = 0.7f;
+                else if (i == 3) sizes[i] = 2f;
+                else if (i == 4) sizes[i] = 2f;
                 else if (i == 5) sizes[i] = 0.7f;
                 else if (i == 6) sizes[i] = 0.7f;
                 else if (i == 7) sizes[i] = 0.7f;
+                else if (i == 8) sizes[i] = 0.7f;
                 else sizes[i] = 1f;
             }
+
             PdfPTable bodyTable = new PdfPTable(sizes)
             {
                 WidthPercentage = 100,
@@ -247,7 +249,7 @@ namespace GoWMS.Server.Reports
 
             #region Table Header
             iTextSharp.text.BaseColor headerBackcolor = BaseColor.White;
-            cell = new PdfPCell(new Phrase("PALLETCODE", _fontstyeheader))
+            cell = new PdfPCell(new Phrase("DATETIME", _fontstyeheader))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -256,7 +258,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("TYPECODE", _fontstyeheader))
+            cell = new PdfPCell(new Phrase("MENU", _fontstyeheader))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -265,9 +267,23 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-           
+            cell = new PdfPCell(new Phrase("ACTION", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+            bodyTable.AddCell(cell);
 
-
+            cell = new PdfPCell(new Phrase("ACTOR", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+            bodyTable.AddCell(cell);
 
             bodyTable.CompleteRow();
             #endregion
@@ -279,8 +295,7 @@ namespace GoWMS.Server.Reports
             foreach (var listRpt in ListRpts)
             {
 
-
-                cell = new PdfPCell(new Phrase(listRpt.Palletno.ToString(), _fontstyebody))
+                cell = new PdfPCell(new Phrase(Convert.ToDateTime(listRpt.Created).ToString(VarGlobals.FormatDT), _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -293,7 +308,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Pallettype.ToString(), _fontstyebody))
+                cell = new PdfPCell(new Phrase(listRpt.Menu_Name.ToString(), _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -306,7 +321,31 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
+                cell = new PdfPCell(new Phrase(listRpt.Action_Desc.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
 
+                cell = new PdfPCell(new Phrase(listRpt.Usid.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
 
                 bodyTable.CompleteRow();
             }

@@ -121,6 +121,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetAllSapStoreout());
     }
@@ -206,6 +207,7 @@ else
                 listExcelReport = Elements.ToList();
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+                this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
             }
 
         }
@@ -222,11 +224,14 @@ else
             bool? result = await CheckRoleReport();
             if (result == true)
             {
-                //IbpOrderQueueRptPdf pdfReport = new IbpOrderQueueRptPdf();
-                //List<Sap_Storeout> listPdfReport = new List<Sap_Storeout>();
-                //listPdfReport = Elements.ToList();
-                //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+                OubPicklistRptPdf pdfReport = new OubPicklistRptPdf();
+                List<Sap_Storeout> listPdfReport = new List<Sap_Storeout>();
+                listPdfReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
             }
 
 

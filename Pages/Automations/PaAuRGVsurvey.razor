@@ -136,6 +136,7 @@
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         mPagecaption = Mccode;
         Elements = await Task.Run(() => ObjWcsService.GetGateRgv());
@@ -210,6 +211,9 @@
 
                 bRet = ObjWcsService.CreatePotocalMC(Mccode, Gateno_FM, Gateno_TO, 1, "WGC-SURVEY", 0, iCmd);
 
+                this.InsertAuditrial("Setting " + Mccode + "- SURVEY Gate " + Gateno_FM.ToString() + ">>" + Gateno_TO.ToString(), pageheader);
+
+
             }
         }
 
@@ -223,6 +227,9 @@
         {
             bool bRet;
             bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
+
+            this.InsertAuditrial("Setting " + Mccode + "- Command" + iCmd.ToString() , pageheader);
+
         }
 
     }

@@ -221,7 +221,7 @@ namespace GoWMS.Server.Reports
         {
             BaseFont baseFont = BaseFontForHeaderFooter;
 
-            int maxColum = 7;
+            int maxColum = 3;
             float[] sizes = new float[maxColum];
             for (var i = 0; i < maxColum; i++) // Set up Colum Size
             {
@@ -325,58 +325,29 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Storagearea.ToString(), _fontstyebody))
-                {
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    VerticalAlignment = Element.ALIGN_MIDDLE,
-                    BackgroundColor = bodyBackcolor,
-                    BorderWidthTop = 0.5f,
-                    BorderWidthRight = 0f,
-                    BorderWidthBottom = 0f,
-                    BorderWidthLeft = 0f,
-                    BorderColorTop = LineBorderColor
-                };
-                bodyTable.AddCell(cell);
+                bodyTable.CompleteRow();
+            }
+            #endregion
 
-                cell = new PdfPCell(new Phrase(listRpt.Storagebin.ToString(), _fontstyebody))
+            #region Table No Data
+            if (ListRpts.Count <= 0)
+            {
+                string snull = "";
+                for (var i = 0; i < maxColum; i++)
                 {
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    VerticalAlignment = Element.ALIGN_MIDDLE,
-                    BackgroundColor = bodyBackcolor,
-                    BorderWidthTop = 0.5f,
-                    BorderWidthRight = 0,
-                    BorderWidthBottom = 0,
-                    BorderWidthLeft = 0,
-                    BorderColorTop = LineBorderColor
-                };
-                bodyTable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase(listRpt.Storagetime.ToString(), _fontstyebody))
-                {
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    VerticalAlignment = Element.ALIGN_MIDDLE,
-                    BackgroundColor = bodyBackcolor,
-                    BorderWidthTop = 0.5f,
-                    BorderWidthRight = 0f,
-                    BorderWidthBottom = 0f,
-                    BorderWidthLeft = 0f,
-                    BorderColorTop = LineBorderColor
-                };
-                bodyTable.AddCell(cell);
-
-                cell = new PdfPCell(new Phrase(listRpt.Completed.ToString(), _fontstyebody))
-                {
-                    HorizontalAlignment = Element.ALIGN_LEFT,
-                    VerticalAlignment = Element.ALIGN_MIDDLE,
-                    BackgroundColor = bodyBackcolor,
-                    BorderWidthTop = 0.5f,
-                    BorderWidthRight = 0f,
-                    BorderWidthBottom = 0f,
-                    BorderWidthLeft = 0f,
-                    BorderColorTop = LineBorderColor
-                };
-                bodyTable.AddCell(cell);
-
+                    cell = new PdfPCell(new Phrase(snull.ToString(), _fontstyebody))
+                    {
+                        HorizontalAlignment = Element.ALIGN_LEFT,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        BackgroundColor = bodyBackcolor,
+                        BorderWidthTop = 0.5f,
+                        BorderWidthRight = 0f,
+                        BorderWidthBottom = 0f,
+                        BorderWidthLeft = 0f,
+                        BorderColorTop = LineBorderColor
+                    };
+                    bodyTable.AddCell(cell);
+                }
 
                 bodyTable.CompleteRow();
             }

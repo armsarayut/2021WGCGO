@@ -169,6 +169,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetStockListInfo());
         Elements_ = await Task.Run(() => objCS.GetStockSum());
@@ -251,6 +252,7 @@ else
                     listExcelReport = Elements.ToList();
                     var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                     await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+                    this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
                 }
                 else
                 {
@@ -259,6 +261,7 @@ else
                     listExcelReport = Elements_.ToList();
                     var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                     await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+                    this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
                 }
             }
 
@@ -286,6 +289,7 @@ else
                     var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
                     //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
                     await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                    this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
 
                 }
                 else
@@ -297,6 +301,7 @@ else
                     var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
                     //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
                     await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                    this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
                 }
             }
 

@@ -74,7 +74,7 @@ else
 
 
             <MudTd Class="clm-row-small" DataLabel=@L["ACTION"]>
-                <MudFab @onclick="@(()=>Commitconstance(@context.Idx.Value, @context.Role_acc.Value , @context.Role_add.Value, @context.Role_edit.Value, @context.Role_del.Value , @context.Role_rpt.Value, @context.Role_apv.Value))" Color="Color.Error" Icon="@Icons.Material.Filled.Save" Size="Size.Small" IconSize="Size.Small" />
+                <MudFab @onclick="@(()=>Commitconstance(@context.Idx.Value, @context.Role_acc.Value , @context.Role_add.Value, @context.Role_edit.Value, @context.Role_del.Value , @context.Role_rpt.Value, @context.Role_apv.Value, @context.Ugdesc, @context.Menu_desc))" Color="Color.Error" Icon="@Icons.Material.Filled.Save" Size="Size.Small" IconSize="Size.Small" />
                 <MudFab @onclick="@(()=>Refreshconstance())" Color="Color.Info" Icon="@Icons.Material.Filled.Refresh" Size="Size.Small" IconSize="Size.Small" />
             </MudTd>
         </RowTemplate>
@@ -132,6 +132,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetPrivilegeAll());
     }
@@ -180,14 +181,19 @@ else
         return false;
     }
 
-    private async Task Commitconstance(long idx, bool acc, bool add, bool edi, bool del, bool rpt, bool apv)
+    private async Task Commitconstance(long idx, bool acc, bool add, bool edi, bool del, bool rpt, bool apv, string sgroup, string smenu)
     {
         bool? result = await CheckRoleApprove();
         if (result == true)
         {
             bool bcheck = OpjUserService.SetPrivilege(idx, acc, add, edi, del, rpt, apv);
 
-            Refreshconstance();
+            this.InsertAuditrial("Setting Privilege Group : " + sgroup + " Menu : " + smenu 
+                + " [ Access is " + acc.ToString() + " Add is " + add.ToString() 
+                + " Edit is " + edi.ToString() + " Delete is " + del.ToString() 
+                + " Report is " + rpt.ToString() + " Approve is " + apv.ToString(), pageheader);
+
+            this.Refreshconstance();
         }
 
 
@@ -210,6 +216,7 @@ else
                 listExcelReport = Elements.ToList();
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+                this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
             }
 
         }
@@ -226,12 +233,12 @@ else
             bool? result = await CheckRoleReport();
             if (result == true)
             {
-                //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
-                //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
-                //listPdfReport = Elements.ToList();
-                //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
-                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                MasPrivilegeRptPdf pdfReport = new MasPrivilegeRptPdf();
+                List<UserPrivilege> listPdfReport = new List<UserPrivilege>();
+                listPdfReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
             }
 
 

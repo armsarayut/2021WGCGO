@@ -141,6 +141,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetSapStoreoutSetBatch());
     }
@@ -242,6 +243,8 @@ else
 
                 if (bCheck == true)
                 {
+                    this.InsertAuditrial("Create batch order [Delivery : " + delivery_date.ToString() + " Order : " + order_no.ToString() + "Batchno : " + strRunning.ToString(), pageheader);
+
                     iCount++;
                 }
                 else
@@ -255,12 +258,13 @@ else
             {
                 bCheck = false;
                 bCheck = ObjService.CreateBatchSetting(strRunning, 0);
+                this.InsertAuditrial("Create Batchno : " + strRunning.ToString(), pageheader);
             }
             else
             {
                 bCheck = false;
                 bCheck = ObjService.RollbackBatch(strRunning);
-                Snackbar.Add("Create Wave >>  Order Losss", Severity.Error);
+                Snackbar.Add("Order Losss", Severity.Error);
             }
 
             // Start Batch
@@ -269,16 +273,18 @@ else
             {
                 bCheck = false;
                 bCheck = ObjService.StartBatchsetting(strRunning, 0);
+                this.InsertAuditrial("Start Batchno : " + strRunning.ToString(), pageheader);
             }
 
             if (bCheck == true)
             {
-                Snackbar.Add("Create Wave >> Success", Severity.Success);
+                Snackbar.Add("Success", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Create Wave >> Start Losss", Severity.Error);
+                Snackbar.Add("Start Losss", Severity.Error);
             }
+
             Elements = ObjService.GetSapStoreoutSetBatch();
         }
 

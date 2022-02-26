@@ -3,19 +3,15 @@ using iTextSharp.text.pdf;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using GoWMS.Server.Models.Mas;
 using GoWMS.Server.Data;
+using GoWMS.Server.Models;
 
 namespace GoWMS.Server.Reports
 {
-    public class MasPalletPageRptPdf : PdfPageEvents
+    public class WhStorageCapacityPRptPdf : PdfPageEvents
     {
-        //-----------------------------
-
         #region Attributes
-        readonly string reportCaption = "6.4.Pallet - Report";
+        readonly string reportCaption = "2.2.Capacity - Report";
         readonly Boolean bPageLanscape = false;
         #endregion
 
@@ -75,26 +71,6 @@ namespace GoWMS.Server.Reports
             cell.Phrase = new Paragraph("", font_headerContent);
             header.AddCell(cell);
             return header;
-        }
-
-        private static PdfPCell ImageCell(string path, float scale, int align)
-        {
-            iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance(path);
-            image.ScalePercent(scale);
-            PdfPCell cell = new PdfPCell(image)
-            {
-                //cell.BorderColor = Color.WHITE;
-                VerticalAlignment = PdfCell.ALIGN_TOP,
-                HorizontalAlignment = align,
-                PaddingBottom = 0f,
-                PaddingTop = 0f,
-                BorderWidthBottom = 1,
-                BorderWidthLeft = 0,
-                BorderWidthTop = 0,
-                BorderWidthRight = 0,
-                FixedHeight = 35
-            };
-            return cell;
         }
 
 
@@ -184,9 +160,9 @@ namespace GoWMS.Server.Reports
         /// </summary>
         /// <param name="ListRpt">List Data</param>
         /// <returns></returns>
-        public byte[] ExportPDF(List<Mas_Pallet_Go> ListRpt)
+        public byte[] ExportPDF(List<WhStorageCapacity> ListRpt)
         {
-            MasPalletPageRptPdf pdfReport = new MasPalletPageRptPdf();
+            WhStorageCapacityPRptPdf pdfReport = new WhStorageCapacityPRptPdf();
             Document document;
             if (bPageLanscape)
             {
@@ -196,8 +172,6 @@ namespace GoWMS.Server.Reports
             {
                 document = new Document(PageSize.A4, 10f, 10f, 60f, 30f); // Setup page Protrait
             }
-
-
             MemoryStream ms = new MemoryStream();
             PdfWriter pdfWriter = PdfWriter.GetInstance(document, ms);
             pdfWriter.PageEvent = pdfReport;//You must assign a value here to trigger the processing of the header and footer
@@ -217,22 +191,22 @@ namespace GoWMS.Server.Reports
         /// <param name="document"></param>
         /// <param name="ListRpts">List<Vrpt_shelf_listInfo></param>
         /// <returns></returns>
-        private void ReportBody(Document document, List<Mas_Pallet_Go> ListRpts)
+        private void ReportBody(Document document, List<WhStorageCapacity> ListRpts)
         {
             BaseFont baseFont = BaseFontForHeaderFooter;
 
-            int maxColum = 2;
+            int maxColum = 7;
             float[] sizes = new float[maxColum];
             for (var i = 0; i < maxColum; i++) // Set up Colum Size
             {
-                if (i == 0) sizes[i] = 1.5f;
-                else if (i == 1) sizes[i] = 2.5f;
+                if (i == 0) sizes[i] = 0.7f;
+                else if (i == 1) sizes[i] = 1f;
                 else if (i == 2) sizes[i] = 1f;
-                else if (i == 3) sizes[i] = 0.7f;
-                else if (i == 4) sizes[i] = 0.7f;
-                else if (i == 5) sizes[i] = 0.7f;
-                else if (i == 6) sizes[i] = 0.7f;
-                else if (i == 7) sizes[i] = 0.7f;
+                else if (i == 3) sizes[i] = 1f;
+                else if (i == 4) sizes[i] = 1f;
+                else if (i == 5) sizes[i] = 1f;
+                else if (i == 6) sizes[i] = 1f;
+                else if (i == 7) sizes[i] = 1f;
                 else sizes[i] = 1f;
             }
             PdfPTable bodyTable = new PdfPTable(sizes)
@@ -247,7 +221,7 @@ namespace GoWMS.Server.Reports
 
             #region Table Header
             iTextSharp.text.BaseColor headerBackcolor = BaseColor.White;
-            cell = new PdfPCell(new Phrase("PALLETCODE", _fontstyeheader))
+            cell = new PdfPCell(new Phrase("Lane", _fontstyeheader))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -256,7 +230,7 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("TYPECODE", _fontstyeheader))
+            cell = new PdfPCell(new Phrase("Occupied", _fontstyeheader))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -265,8 +239,50 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-           
+            cell = new PdfPCell(new Phrase("Mass", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+            bodyTable.AddCell(cell);
 
+            cell = new PdfPCell(new Phrase("Block/Error", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+            bodyTable.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("ProhibitedLocation", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+            bodyTable.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("Total", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+            bodyTable.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("OccupancyRate", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+            bodyTable.AddCell(cell);
 
 
             bodyTable.CompleteRow();
@@ -278,9 +294,7 @@ namespace GoWMS.Server.Reports
             iTextSharp.text.BaseColor LineBorderColor = BaseColor.LightGray;
             foreach (var listRpt in ListRpts)
             {
-
-
-                cell = new PdfPCell(new Phrase(listRpt.Palletno.ToString(), _fontstyebody))
+                cell = new PdfPCell(new Phrase(listRpt.Srmname.ToString(), _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -293,7 +307,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Pallettype.ToString(), _fontstyebody))
+                cell = new PdfPCell(new Phrase(listRpt.Locavlt1.ToString(), _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -306,11 +320,75 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
+                cell = new PdfPCell(new Phrase(listRpt.Locemp.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
 
+                cell = new PdfPCell(new Phrase(listRpt.Perr.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase(listRpt.Prohloc.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase(listRpt.Total.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase(listRpt.OccRate.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
 
                 bodyTable.CompleteRow();
             }
             #endregion
+
 
             #region Table No Data
             if (ListRpts.Count <= 0)
@@ -340,7 +418,5 @@ namespace GoWMS.Server.Reports
             document.Add(bodyTable);
         }
         #endregion
-
-        //-----------------------------
     }
 }

@@ -115,6 +115,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetAllApiPackeingWgc());
     }
@@ -178,13 +179,13 @@ else
             if (result == true)
             {
                 //IbpGRNRprPdf pdfReport = new IbpGRNRprPdf();
-            //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
-            //listPdfReport = Elements.ToList();
-            //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-            ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
-            //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));s
+                //List<Inb_Goodreceipt_Go> listPdfReport = new List<Inb_Goodreceipt_Go>();
+                //listPdfReport = Elements.ToList();
+                //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
+                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));s
             }
-            
+
 
         }
         catch (Exception e)

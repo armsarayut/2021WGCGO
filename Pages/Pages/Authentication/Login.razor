@@ -11,6 +11,7 @@
 @using GoWMS.Server.Models;
 @inject IConfiguration Configuration
 @inject UserServices ObjUserService
+@inject ReportService UserlogService
 @inject ISnackbar Snackbar
 
 @inject NavigationManager navigationManager
@@ -41,6 +42,15 @@
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+    public string mPagedesc { get; set; } = "Gowms";
+    private string mPagename { get; set; } = "/Login";
+
+    private string pageheader = "Gowms";
+
     void TogglePasswordVisibility()
     {
         @if (PasswordVisibility)
@@ -57,6 +67,12 @@
         }
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+      
+      await Task.Run(() => ObjUserService.InsertMenu(mPagename, mPagedesc));
+      
+    }
 
     private async Task btnLogin_Click()
     {
@@ -71,13 +87,17 @@
 
             if (UserElements.Count() > 0)
             {
-             
+
                 var grouid = UserElements.Select(x => x.Usgid).FirstOrDefault();
 
                 var result1 = UserElements.Where(i => i.Usgid == grouid.Value).FirstOrDefault(); // = 0
 
+                sUserID = result1.Usid.ToString();
+
+                this.InsertAuditrial("SignIn User : " + Userword, pageheader);
+
                 var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
-                await authModule.InvokeVoidAsync("SignIn", Userword, encrypted, grouid.ToString(), result1.Usid.ToString(), "/gowms");
+                await authModule.InvokeVoidAsync("SignIn", Userword, encrypted, grouid.ToString(), sUserID, "/gowms");
                 var authModules = authModule;
             }
             else
@@ -133,5 +153,10 @@
 
         //navigationManager.NavigateTo("");
 
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 }

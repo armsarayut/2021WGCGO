@@ -158,6 +158,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetStockListInfo());
 
@@ -291,6 +292,7 @@ else
 
                 if (state == "Confirmed")
                 {
+                    this.InsertAuditrial("Set Cycle count List : " + strPopup.ToString(), pageheader);
                     SelectOrderPick();
                 }
 
@@ -317,16 +319,6 @@ else
         string batch = "-";
         DateTime requestdate = DateTime.Today.Date;
 
-        /*
-        var results = from p in selectedItems
-                      group p.Pallteno by p.Pallettag into g
-                      select new { Tag = g.Key, Pallet = g.ToList() };
-
-        var pallets = from student in selectedItems
-                      group student.Pallteno by student.Pallteno into StudentGroup
-                      orderby StudentGroup.Key
-                      select StudentGroup.Key;
-        */
 
         var pallets = selectedItems.GroupBy(g => g.Pallteno).OrderBy(o => o.Key).Select(s => s.Key);
 
@@ -365,6 +357,8 @@ else
             }
             else
             {
+                this.InsertAuditrial("Start Cycel count : " + so.ToString(), pageheader);
+
                 Snackbar.Add("Order picking created", Severity.Success);
             }
         }

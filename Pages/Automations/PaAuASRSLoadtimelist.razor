@@ -152,14 +152,16 @@
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
 
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
+
         fromDateTime = fromDate.Value.Date + fromTime.Value;
         toDateTime = toDate.Value.Date + toTime.Value;
 
 
         Elements = await Task.Run(() => objCS.GetAsrsloadtime(fromDateTime.Value, toDateTime.Value));
 
-        await GetUserAthu();
-        this.InsertAuditrial("View", pageheader);
     }
 
     async Task GetUserAthu()
@@ -219,6 +221,8 @@
                 listExcelReport = Elements.ToList();
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+
+                this.InsertAuditrial("Export excel file :" + fileName.ToString() , pageheader);
             }
 
         }
@@ -241,6 +245,8 @@
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
                 ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+
+                this.InsertAuditrial("Export pdf file : " + fileName.ToString(), pageheader);
             }
 
 

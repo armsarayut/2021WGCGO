@@ -340,7 +340,7 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
-                cell = new PdfPCell(new Phrase(listRpt.Itemunit.ToString(), _fontstyebody))
+                cell = new PdfPCell(new Phrase(listRpt.Itemunit, _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,
@@ -392,6 +392,30 @@ namespace GoWMS.Server.Reports
                 };
                 bodyTable.AddCell(cell);
 
+
+                bodyTable.CompleteRow();
+            }
+            #endregion
+
+            #region Table No Data
+            if (ListRpts.Count <= 0)
+            {
+                string snull = "";
+                for (var i = 0; i < maxColum; i++)
+                {
+                    cell = new PdfPCell(new Phrase(snull.ToString(), _fontstyebody))
+                    {
+                        HorizontalAlignment = Element.ALIGN_LEFT,
+                        VerticalAlignment = Element.ALIGN_MIDDLE,
+                        BackgroundColor = bodyBackcolor,
+                        BorderWidthTop = 0.5f,
+                        BorderWidthRight = 0f,
+                        BorderWidthBottom = 0f,
+                        BorderWidthLeft = 0f,
+                        BorderColorTop = LineBorderColor
+                    };
+                    bodyTable.AddCell(cell);
+                }
 
                 bodyTable.CompleteRow();
             }

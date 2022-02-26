@@ -181,6 +181,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetAllApiNewBookingnoteWgc());
     }
@@ -223,57 +224,60 @@ else
     {
         bool? result = await CheckRoleAdd();
         if (result == true)
-        { 
+        {
             var serializeOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-        // For Sim Test
-        /*
-        string pallet = "WGC-001503";
-        string pack = "289";
-        string mat = "MP1095O";
-        string matDesc = "Organaic Maltodextrin Powder";
-        */
-        //var strRES = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { efidx = x.SEQ_NO, quantity = x.DN_QTY, packageid = pack, materialcode = mat, palletno = pallet, sono = x.SO_NO, customer = x.CUSTOMER_CODE, lotno = x.LOT_NO, batchno = x.BATCH_NO, matematerialdescription = matDesc, unit = x.DN_UM, deliverydate = x.REQUEST_DATE }).ToList();
-        //-------------------------
-
-        // For Production
-        var strRES = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { efidx = x.SEQ_NO, quantity = x.DN_QTY, packageid = x.DN_SEQ, materialcode = x.ITEM_CODE, palletno = x.PALLET_GO, sono = x.SO_NO, customer = x.CUSTOMER_CODE, lotno = x.LOT_NO, batchno = x.BATCH_NO, matematerialdescription = x.ITEM_NAME, unit = x.DN_UM, deliverydate = x.REQUEST_DATE }).ToList();
-        //-----------------
-
-        var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
-
-        var iReturn = 0;
-        var sReturn = "Call";
-
-
-
-        ObjApiService.SetPickWgc(jsonRES, ref iReturn, ref sReturn);
-
-        if (selectedItems.Count > 0)
-        {
-            if (iReturn == 0)
             {
-                Snackbar.Add(sReturn, Severity.Error);
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            // For Sim Test
+            /*
+            string pallet = "WGC-001503";
+            string pack = "289";
+            string mat = "MP1095O";
+            string matDesc = "Organaic Maltodextrin Powder";
+            */
+            //var strRES = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { efidx = x.SEQ_NO, quantity = x.DN_QTY, packageid = pack, materialcode = mat, palletno = pallet, sono = x.SO_NO, customer = x.CUSTOMER_CODE, lotno = x.LOT_NO, batchno = x.BATCH_NO, matematerialdescription = matDesc, unit = x.DN_UM, deliverydate = x.REQUEST_DATE }).ToList();
+            //-------------------------
+
+            // For Production
+            var strRES = selectedItems.OrderBy(x => x.SEQ_NO).Select(x => new { efidx = x.SEQ_NO, quantity = x.DN_QTY, packageid = x.DN_SEQ, materialcode = x.ITEM_CODE, palletno = x.PALLET_GO, sono = x.SO_NO, customer = x.CUSTOMER_CODE, lotno = x.LOT_NO, batchno = x.BATCH_NO, matematerialdescription = x.ITEM_NAME, unit = x.DN_UM, deliverydate = x.REQUEST_DATE }).ToList();
+            //-----------------
+
+            var jsonRES = JsonSerializer.Serialize(strRES, serializeOptions);
+
+            var iReturn = 0;
+            var sReturn = "Call";
+
+
+
+            ObjApiService.SetPickWgc(jsonRES, ref iReturn, ref sReturn);
+            this.InsertAuditrial("Create Order picking ", pageheader);
+            if (selectedItems.Count > 0)
+            {
+                if (iReturn == 0)
+                {
+                    Snackbar.Add(sReturn, Severity.Error);
+                }
+                else
+                {
+
+                    await ObjErpService.UpdateNewBooking_notebylist(selectedItems.ToList());
+
+                    this.InsertAuditrial("Update Order picking to ERP ", pageheader);
+
+                    Snackbar.Add("Order picking created", Severity.Success);
+
+                    this.InsertAuditrial("Order picking Created", pageheader);
+
+                }
             }
             else
             {
-
-                ObjErpService.UpdateNewBooking_notebylist(selectedItems.ToList());
-
-
-                Snackbar.Add("Order picking created", Severity.Success);
-
+                Snackbar.Add("Please select order picking", Severity.Warning);
             }
         }
-        else
-        {
-            Snackbar.Add("Please select order picking", Severity.Warning);
-        }
-        }
-        
+
     }
 
     #region "Role"

@@ -121,6 +121,7 @@ else
         ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetWhStorageCapacities());
     }
@@ -179,6 +180,7 @@ else
                 listExcelReport = Elements.ToList();
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+                this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
             }
 
 
@@ -196,13 +198,12 @@ else
             bool? result = await CheckRoleReport();
             if (result == true)
             {
-                //WhStockListRptPdf pdfReport = new WhStockListRptPdf();
-
-                //List<Inv_Stock_GoInfo> listPdfReport = new List<Inv_Stock_GoInfo>();
-                //listPdfReport = Elements.ToList();
-                //var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
-                //await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                WhStorageCapacityPRptPdf pdfReport = new WhStorageCapacityPRptPdf();
+                List<WhStorageCapacity> listPdfReport = new List<WhStorageCapacity>();
+                listPdfReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
             }
 
         }

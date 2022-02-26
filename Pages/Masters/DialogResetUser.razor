@@ -5,9 +5,12 @@
 @using GoWMS.Server.Models
 @using GoWMS.Server.Models.Mas
 @using Microsoft.Extensions.Configuration
+@using System.Security.Claims
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IConfiguration Configuration
 @inject UserServices ObjUserService
+@inject ReportService UserlogService
 @inject NavigationManager navigationManager
 
 <MudDialog>
@@ -53,6 +56,12 @@
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
+    private readonly string pageheader = "7.2.User";
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
     void TogglePasswordVisibility()
     {
         @if (PasswordVisibility)
@@ -75,7 +84,7 @@
         //var encrypted = Security.EncryptString(Password, key);
         var encrypted = EncryptProvider.DESDecrypt(MPassword, key);
         MPassword = encrypted;
-
+        await GetUserAthu();
         Elements = await Task.Run(() => ObjUserService.GetUsergroups());
 
     }
@@ -87,9 +96,11 @@
         {
 
             long iCmd = 0;
+            string sGroup = "";
             foreach (var item in selectedItems)
             {
                 iCmd = item.Idx.Value;
+                sGroup = item.Ugdesc;
             }
 
             var key = Configuration.GetSection("Appkey")["Pass"].ToString();
@@ -101,24 +112,10 @@
 
             if (resultReturn.Bret == true)
             {
+                this.InsertAuditrial("Setting User : " + MEmail + " in Usergroup : " + sGroup, pageheader);
+
                 MudDialog.Close(DialogResult.Ok(true));
             }
-
-
-
-            //pages / authentication / login
-
-            /*
-            bRet = ObjWcsService.CreateCommandMC(Mccode, iCmd);
-            if (bRet)
-            {
-                Snackbar.Add("Set Command OK", Severity.Success);
-            }
-            else
-            {
-                Snackbar.Add("Set Command Failed", Severity.Error);
-            }
-            */
 
         }
 
@@ -127,4 +124,21 @@
     }
 
     void Cancel() => MudDialog.Cancel();
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
+    }
 }

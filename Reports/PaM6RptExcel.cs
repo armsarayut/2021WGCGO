@@ -37,7 +37,6 @@ namespace GoWMS.Server.Reports
                 worksheet.Cell(rptRows, 2).Value = "MENU";
                 worksheet.Cell(rptRows, 3).Value = "ACTION";
                 worksheet.Cell(rptRows, 4).Value = "ACTOR";
-                worksheet.Cell(rptRows, 5).Value = "IPADDRESS";
 
                 foreach (var rpt in rptElements)
                 {
@@ -46,7 +45,6 @@ namespace GoWMS.Server.Reports
                     worksheet.Cell(rptRows, 2).Value = rpt.Menu_Name;
                     worksheet.Cell(rptRows, 3).Value = rpt.Action_Desc;
                     worksheet.Cell(rptRows, 4).Value = rpt.Usid;
-                    worksheet.Cell(rptRows, 5).Value = rpt.Client_ip;
                 }
                 #endregion
                 workbook.SaveAs(_memoryStream);
