@@ -49,8 +49,6 @@ namespace GoWMS.Server
         public void ConfigureServices(IServiceCollection services)
         {
 
-
-
             services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
 
             // Add Controllers for WebAPI
@@ -106,22 +104,6 @@ namespace GoWMS.Server
 
                     });
             services.AddScoped<Controllers.CookieAuthenticationEvents>();
-
-
-
-
-            //services.AddLocalization(opt => opt.ResourcesPath = "Resources");
-
-
-            //services.AddLocalization(options => options.ResourcesPath = "Resources");
-            //var supportedCultures = new List<CultureInfo> { new CultureInfo("en"), new CultureInfo("th") };
-            //services.Configure<RequestLocalizationOptions>(options =>
-            //{
-            //  options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("th");
-            //options.SupportedUICultures = supportedCultures;
-            //});
-
-
 
 
         }

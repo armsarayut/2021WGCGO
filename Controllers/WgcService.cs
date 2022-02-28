@@ -90,7 +90,6 @@ namespace GoWMS.Server.Controllers
             return objDAL.GetSumPalletAllApiNewDelivery_note();
         }
 
-
         public async Task<string> UpdateNewBooking_notebylist(List<BOOKING_NOTE_ITEMS> listOrder)
         {
             await objDAL.UpdateNewBooking_notebylist(listOrder);
