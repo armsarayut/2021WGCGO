@@ -210,6 +210,9 @@
   <data name="5.5.6.ASRS-LOADTIME" xml:space="preserve">
     <value>5.5.6.ASRS-โหลดไทม์</value>
   </data>
+  <data name="5.5.7.ASRS-EJECT" xml:space="preserve">
+    <value>5.5.7.ASRS-ดีดออก</value>
+  </data>
   <data name="5.6.ASRS Throughput" xml:space="preserve">
     <value>5.6.ASRS ปริมาณงาน</value>
   </data>
@@ -285,8 +288,20 @@
   <data name="History" xml:space="preserve">
     <value>ประวัติ</value>
   </data>
+  <data name="HlpAdmin" xml:space="preserve">
+    <value>8.1.2 คู่มือผู้ดูแลระบบ</value>
+  </data>
   <data name="HlpHelpdesk" xml:space="preserve">
     <value>8.2.ฝ่ายช่วยเหลือ</value>
+  </data>
+  <data name="HlpMachine" xml:space="preserve">
+    <value>8.1.3 คู่มือควบคุม</value>
+  </data>
+  <data name="HlpMaintan" xml:space="preserve">
+    <value>8.1.4 คู่มือเครื่องจักร</value>
+  </data>
+  <data name="HlpUser" xml:space="preserve">
+    <value>8.1.1 คู่มือผู้ใช้</value>
   </data>
   <data name="HlpUserguide" xml:space="preserve">
     <value>8.1.คู่มือ</value>

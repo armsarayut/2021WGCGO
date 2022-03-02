@@ -596,6 +596,108 @@ namespace GoWMS.Server.Data
             }
         }
 
+        public IEnumerable<Functionreturn> SetPalletDepositIn(string pallet)
+        {
+            Int32? iRet = 0;
+            string sRet = "Calling";
+            List<Functionreturn> lstobj = new List<Functionreturn>();
+            NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            try
+            {
+                con.Open();
+                StringBuilder sql = new StringBuilder();
+                sql.AppendLine("Call wms.poc_inb_depositpallet(");
+                sql.AppendLine("@spalletno,@retchk,@retmsg)");
+                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                cmd.Parameters.AddWithValue("@spalletno", pallet);
+                cmd.Parameters.AddWithValue("@retchk", iRet);
+                cmd.Parameters.AddWithValue("@retmsg", sRet);
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Functionreturn objrd = new Functionreturn
+                    {
+
+                        Retchk = rdr["retchk"] == DBNull.Value ? null : (Int32?)rdr["retchk"],
+                        Retmsg = rdr["retmsg"].ToString()
+                    };
+                    lstobj.Add(objrd);
+                }
+            }
+            catch (NpgsqlException exp)
+            {
+                Functionreturn objrd = new Functionreturn
+                {
+                    Retchk = 0,
+                    Retmsg = exp.Message.ToString()
+                };
+                lstobj.Add(objrd); 
+
+                sRet = exp.Message.ToString();
+                //Response.Write(exp.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+            return lstobj;
+        }
+
+        public IEnumerable<Functionreturn> SetPalletDepositOut(string pallet)
+        {
+            Int32? iRet = 0;
+            string sRet = "Calling";
+            List<Functionreturn> lstobj = new List<Functionreturn>();
+            NpgsqlConnection con = new NpgsqlConnection(connectionString);
+            try
+            {
+                con.Open();
+                StringBuilder sql = new StringBuilder();
+                sql.AppendLine("Call wms.poc_oub_depositpallet(");
+                sql.AppendLine("@spalletno,@retchk,@retmsg)");
+                NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                cmd.Parameters.AddWithValue("@spalletno", pallet);
+                cmd.Parameters.AddWithValue("@retchk", iRet);
+                cmd.Parameters.AddWithValue("@retmsg", sRet);
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    Functionreturn objrd = new Functionreturn
+                    {
+
+                        Retchk = rdr["retchk"] == DBNull.Value ? null : (Int32?)rdr["retchk"],
+                        Retmsg = rdr["retmsg"].ToString()
+                    };
+                    lstobj.Add(objrd);
+                }
+            }
+            catch (NpgsqlException exp)
+            {
+                Functionreturn objrd = new Functionreturn
+                {
+                    Retchk = 0,
+                    Retmsg = exp.Message.ToString()
+                };
+                lstobj.Add(objrd);
+
+                sRet = exp.Message.ToString();
+                //Response.Write(exp.ToString());
+            }
+            finally
+            {
+                con.Close();
+            }
+            return lstobj;
+        }
+
         public void SetMappPalletReturn(string pallet)
         {
             Int32? iRet = 0;

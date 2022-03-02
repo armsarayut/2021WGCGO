@@ -1,0 +1,424 @@
+﻿@page "/6/602"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
+
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Inv
+@using GoWMS.Server.Reports
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JSRuntime
+@inject ReportService UserlogService
+@inject InvService ObjService
+@inject UserServices OpjUserService
+@inject ErpApiService ObjErpApiService
+@inject ISnackbar Snackbar
+@inject IStringLocalizer<DepositOutPage> L
+@attribute [Authorize]
+
+@if (Elements == null)
+{
+
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+
+    <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+        <MudSpacer />
+        @*
+        <MudTooltip Text=@L["Export"] Color="Color.Inherit" Placement="Placement.Top">
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FileExcel" Color="Color.Success" OnClick="DownloadExcelDocument"></MudIconButton>
+            <MudIconButton Icon="@Icons.Custom.FileFormats.FilePdf" Color="Color.Error" OnClick="DownloadPdfDocument"></MudIconButton>
+        </MudTooltip>
+        *@
+    </MudAppBar>
+
+    <MudTable Items="@Elements"
+              FixedHeader="@fixed_header"
+              FixedFooter="@fixed_footer"
+              Height="@(fixed_header || fixed_footer ?"500px":"")"
+              Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
+              Filter="new Func<Vrpt_shelf_listInfo,bool>(FilterFunc)" @bind-SelectedItem="selectedItem"
+              SortLabel="Sort By">
+        <ToolBarContent>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.Shelfcode)">@L["Location"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.Srm_no)">@L["LANE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.Shelfbank)">@L["BANK"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.Shelfbay)">@L["BAY"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.Shelflevel)">@L["LEVEL"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.Lpncode)">@L["MasterPallet"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.St_desc)">@L["Status"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Vrpt_shelf_listInfo, object>(x=>x.Modified)">@L["LastUpdate"]</MudTableSortLabel></MudTh>
+            <MudTh>ACTION</MudTh>
+
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="@L["Location"]">@context.Shelfcode</MudTd>
+            <MudTd DataLabel="@L["LANE"]">@context.Srm_no</MudTd>
+            <MudTd DataLabel="@L["BANK"]">@context.Shelfbank</MudTd>
+            <MudTd DataLabel="@L["BAY"]">@context.Shelfbay</MudTd>
+            <MudTd DataLabel="@L["LEVEL"]">@context.Shelflevel</MudTd>
+            <MudTd DataLabel="@L["MasterPallet"]">@context.Lpncode</MudTd>
+            <MudTd DataLabel="@L["Status"]">@context.St_desc</MudTd>
+            <MudTd DataLabel="@L["LastUpdate"]">@context.Modified</MudTd>
+            <MudTd DataLabel="">
+                <MudFab @onclick="@(()=>RetrivePallet(@context.Lpncode))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Outbox" Size="Size.Small" IconSize="Size.Small" />
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
+
+    public string mPagedesc { get; set; } = "Outbound Pallet deposit take out";
+    private string mPagename { get; set; } = "/2/2_3";
+
+    private readonly string pageheader = "Outbound Pallet deposit take out";
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private bool fixed_header = true;
+    private bool fixed_footer = true;
+    private string searchString = "";
+    private Vrpt_shelf_listInfo selectedItem = null;
+    private HashSet<Vrpt_shelf_listInfo> selectedItems = new HashSet<Vrpt_shelf_listInfo>();
+    private IEnumerable<Vrpt_shelf_listInfo> Elements = new List<Vrpt_shelf_listInfo>();
+
+    private IEnumerable<Functionreturn> Funcreturn = new List<Functionreturn>();
+
+    public int elevation = 0;
+    private ResultReturn resultReturn = null;
+
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+    List<Userroleinfo> Roles = new List<Userroleinfo>();
+    [Inject] private IDialogService DialogService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        InvService objCS = new InvService();
+        /*
+        //////// Intial Menu and Privilege//////
+        resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
+        resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
+        ////////////////////////////////////////
+        ///
+        await GetUserAthu();
+        this.InsertAuditrial("View", pageheader);
+        Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
+        */
+
+        Elements = await Task.Run(() => objCS.GetShelfList().Where(s => s.Shelfstatus == 66));
+    }
+
+    async Task GetUserAthu()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        sGroupID = user.Claims.FirstOrDefault(
+        c => c.Type == ClaimTypes.Role)?.Value;
+
+        sUserID = user.Claims.FirstOrDefault(
+            c => c.Type == ClaimTypes.Actor)?.Value;
+    }
+
+    private void InsertAuditrial(String actdesc, String munname)
+    {
+        bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
+    }
+
+    private void setstr(string str)
+    {
+
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(Vrpt_shelf_listInfo element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Shelfcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Lpncode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    public async Task DownloadExcelDocument()
+    {
+        try
+        {
+            bool? result = await CheckRoleReport();
+            if (result == true)
+            {
+                WhShelfListPageRptExcel excelReport = new WhShelfListPageRptExcel();
+                List<Vrpt_shelf_listInfo> listExcelReport = new List<Vrpt_shelf_listInfo>();
+                listExcelReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
+                this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
+
+            }
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    public async Task DownloadPdfDocument()
+    {
+        try
+        {
+            bool? result = await CheckRoleReport();
+            if (result == true)
+            {
+                WhShelfListPageRptPdf pdfReport = new WhShelfListPageRptPdf();
+                List<Vrpt_shelf_listInfo> listPdfReport = new List<Vrpt_shelf_listInfo>();
+                listPdfReport = Elements.ToList();
+                var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
+                await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
+                this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            var exmsg = e.Message.ToString();
+        }
+    }
+
+    private void RetrivePallet(string pack)
+    {
+
+
+        Funcreturn = ObjErpApiService.SetPalletDepositOut(mPalletcode);
+
+        var Retchk = Funcreturn.Select(x => x.Retchk).LastOrDefault();
+        var Retmsg = Funcreturn.Select(x => x.Retmsg).LastOrDefault();
+
+        if (Retchk == 0)
+        {
+            mPalletcode = "";
+            Snackbar.Add("Set Outbound Disposit " + mPalletcode + " >> Loss " + Retmsg, Severity.Error);
+        }
+        else
+        {
+            mPalletcode = "";
+            Snackbar.Add("Set Outbound Disposit " + mPalletcode + " >> successfully", Severity.Success);
+        }
+
+        this.StateHasChanged();
+
+
+    }
+
+    #region "Role"
+    private async Task<bool> CheckRoleAdd()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_add == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
+            }
+
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleEdit()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_edit == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleEditPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleDelete()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_del == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleDelPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleApprove()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_apv == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleApprovePermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+        return bRet;
+    }
+
+    private async Task<bool> CheckRoleReport()
+    {
+        bool bRet = false;
+
+        if (Roles.ToList().Count > 0)
+        {
+            var iCorrect = Roles.ToList().FindIndex(a => a.Role_rpt == true);
+
+            if (iCorrect >= 0)
+            {
+                bRet = true;
+            }
+            else
+            {
+                bRet = false;
+            }
+
+            if (bRet == false)
+            {
+                bool? result = await DialogService.ShowMessageBox(
+                        "Warning", VarGlobals.MessageRoleReportPermit, yesText: "OK");
+            }
+        }
+        else
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                                "Warning", VarGlobals.MessageRoleAuthrizedPermit, yesText: "OK");
+        }
+
+        return bRet;
+    }
+    #endregion
+
+
+}

@@ -64,6 +64,7 @@
             <MudNavLink Href="/5/5_5_4" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.TableView">@L["5.5.4.ASRS-Outbound/hour"]</MudNavLink>
             <MudNavLink Href="/5/5_5_5" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.TableView">@L["5.5.5.ASRS-End of day"]</MudNavLink>
             <MudNavLink Href="/5/5_5_6" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.TableView">@L["5.5.6.ASRS-LOADTIME"]</MudNavLink>
+            <MudNavLink Href="/5/5_5_7" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.TableView">@L["5.5.7.ASRS-EJECT"]</MudNavLink>
         </MudNavGroup>
 
         <MudNavLink Href="5/5_6" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Speed">@L["5.6.ASRS Throughput"]</MudNavLink>
@@ -85,7 +86,13 @@
     </MudNavGroup>
 
     <MudNavGroup Title=@L["8.Help"] IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">
-        <MudNavLink Href="pages/error/404" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">@L["HlpUserguide"]</MudNavLink>
+        <MudNavGroup Title="@L["HlpUserguide"]" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">
+            <MudNavLink Href="/8/8_1_1" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">@L["HlpUser"]</MudNavLink>
+            <MudNavLink Href="/8/8_1_2" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">@L["HlpAdmin"]</MudNavLink>
+            <MudNavLink Href="/8/8_1_3" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">@L["HlpMachine"]</MudNavLink>
+            <MudNavLink Href="/8/8_1_4" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">@L["HlpMaintan"]</MudNavLink>
+        </MudNavGroup>
+       
         <MudNavLink Href="/8/8_2" Match="NavLinkMatch.Prefix" IconColor="Color.Secondary" Icon="@Icons.Material.Filled.Help">@L["HlpHelpdesk"]</MudNavLink>
     </MudNavGroup>
 

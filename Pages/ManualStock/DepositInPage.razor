@@ -1,0 +1,194 @@
+﻿@page "/6/601"
+@using GoWMS.Server.Data
+@using GoWMS.Server.Controllers
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Api
+@using GoWMS.Server.Models.Mas
+@using GoWMS.Server.Models.Wgc
+
+
+@inject ErpService ObjErpService
+@inject ErpApiService ObjErpApiService
+@inject MasService ObjMasService
+@inject WgcService ObjWgcService
+@inject UserServices OpjUserService
+@inject ISnackbar Snackbar
+@inject IStringLocalizer<DepositInPage> L
+@attribute [Authorize]
+
+<MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
+
+<MudGrid>
+    <MudItem xs="12">
+        <div class="form-group">
+            <input style="width: 100%; height: 40px" type="text" class="form-control" @bind-value="@stringput" @onkeyup="@KeyUp" placeholder="Input scan" />
+        </div>
+    </MudItem>
+
+</MudGrid>
+
+<br />
+
+@if (Elements == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+
+}
+
+@code {
+    public string mPagedesc { get; set; } = "1.1.Receiving Order";
+    private string mPagename { get; set; } = "/1/1_1";
+
+
+    private string pageheader = "Inbound Pallet deposit mapping" ;
+    private string msgAction = "Enter MasterPallet";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    public string stringput { get; set; } = "";
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = false;
+    private string searchString = "";
+    private Api_Receivingorders_Go selectedItem = null;
+    private HashSet<Api_Receivingorders_Go> selectedItems = new HashSet<Api_Receivingorders_Go>();
+    private IEnumerable<Api_Receivingorders_Go> Elements = new List<Api_Receivingorders_Go>();
+
+    private IEnumerable<Api_Receivingorders_Go> MapPalletItem = new List<Api_Receivingorders_Go>();
+
+    private IEnumerable<Mas_Pallet_Go> MasterPallets = new List<Mas_Pallet_Go>();
+
+    private IEnumerable<Functionreturn> Funcreturn = new List<Functionreturn>();
+
+
+    public int elevation = 0;
+    private ResultReturn resultReturn = null;
+
+    public string StringKeyPressed = "AAA";
+
+    string KeyPressed = "";
+    string EventInfo = "";
+
+    string sUsername { get; set; } = "";
+    string sRole { get; set; } = "";
+    string sGroupID { get; set; } = "";
+    string sUserID { get; set; } = "";
+
+    private void KeyboardEventHandler(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            StringKeyPressed = "";
+            KeyPressed = "Key Pressed is " + args.Key;
+            EventInfo = "Event Type " + args.Type;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        MasterPallets = await Task.Run(() => ObjMasService.GetAllMasterPallets());
+    }
+
+    private void setstr(string str)
+    {
+        if (str.Length == 10)
+        {
+            var allCorrect = MasterPallets.Where(a => a.Palletno == str).ToList();
+
+            if (allCorrect.ToList().Count > 0)
+            {
+                mPalletcode = str;
+
+                Funcreturn = ObjErpApiService.SetPalletDepositIn(mPalletcode);
+
+                var Retchk = Funcreturn.Select(x => x.Retchk).LastOrDefault();
+                var Retmsg = Funcreturn.Select(x => x.Retmsg).LastOrDefault();
+
+                if (Retchk == 0)
+                {
+                    mPalletcode = "";
+                    Snackbar.Add("Set Inbound Disposit " + mPalletcode + " >> Loss " + Retmsg, Severity.Error);
+                }
+                else
+                {
+                    mPalletcode = "";
+                    Snackbar.Add("Set Inbound Disposit " + mPalletcode + " >> successfully", Severity.Success);
+                }
+            }
+            else
+            {
+                mPalletcode = "";
+                Snackbar.Add("PalletGo " + str + " find not found", Severity.Error);
+            }
+        }
+        else
+        {
+            if (str.Length>0)
+            {
+                mPalletcode = "";
+                Snackbar.Add("PalletGo " + str + " find not found", Severity.Error);
+            }
+            else
+            {
+                mPalletcode = "";
+                Snackbar.Add("Please Enter PalletGo", Severity.Error);
+            }
+
+        }
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            string pallettemp = stringput;
+            setstr(pallettemp);
+        }
+    }
+
+    void KeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            string pallettemp = stringput;
+            setstr(pallettemp);
+            Reset();
+        }
+    }
+
+    private bool FilterFunc(Api_Receivingorders_Go element)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Package_Id.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Material_Code.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Material_Description} {element.Job_Code} {element.Document_Number}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    private void DeleteMap(string pack)
+    {
+        msgAction = "Cancle successfully";
+        ObjErpApiService.CancelReceivingOrderbypack(mPalletcode, pack);
+
+
+        ErpApiService objGR = new ErpApiService();
+        Elements = objGR.GetAllApiRecevingorderGosypallet(mPalletcode);
+
+    }
+
+    private void Reset()
+    {
+        this.stringput = string.Empty;
+        StateHasChanged();
+    }
+
+}

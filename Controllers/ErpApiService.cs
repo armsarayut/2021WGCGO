@@ -125,9 +125,17 @@ namespace GoWMS.Server.Controllers
             return sret;
         }
 
-        
+        public List<Functionreturn> SetPalletDepositIn(string pallet)
+        {
+            List<Functionreturn> retlist = objDAL.SetPalletDepositIn(pallet).ToList();
+            return retlist;
+        }
 
-
+        public List<Functionreturn> SetPalletDepositOut(string pallet)
+        {
+            List<Functionreturn> retlist = objDAL.SetPalletDepositOut(pallet).ToList();
+            return retlist;
+        }
 
 
     }

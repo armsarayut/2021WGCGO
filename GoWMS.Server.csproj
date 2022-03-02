@@ -43,7 +43,6 @@
     <Folder Include="Pages\Admins\" />
     <Folder Include="Pages\Services\" />
     <Folder Include="Pages\Setups\" />
-    <Folder Include="Pages\Reports\" />
   </ItemGroup>
 
 </Project>
