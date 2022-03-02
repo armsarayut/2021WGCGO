@@ -61,16 +61,17 @@ else
         </ToolBarContent>
 
         <HeaderContent>
-            <MudTh>@L["DNDate"]</MudTh>
-            <MudTh>@L["DNNo"]</MudTh>
-            <MudTh>@L["DNSeq"]</MudTh>
-            <MudTh>@L["ItemCode"]</MudTh>
-            <MudTh>@L["ItemName"]</MudTh>
-            <MudTh>@L["Qty"]</MudTh>
-            <MudTh>@L["Unit"]</MudTh>
-            <MudTh>@L["Weight"]</MudTh>
-            <MudTh>@L["LotNo"]</MudTh>
-            <MudTh>@L["BatchNo"]</MudTh>
+
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Docdate)">@L["WorDNDatektype"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Pono)">@L["DNNo"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Pallettag)">@L["DNSeq"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Itemcode)">@L["ItemCode"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Itemname)">@L["ItemName"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Quantity)">@L["Qty"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Unit)">@L["Unit"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Weight)">@L["Weight"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Docno)">@L["LotNo"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceipt_Go, object>(x=>x.Docnote)">@L["BatchNo"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="@L["DNDate"]">@Convert.ToDateTime(context.Docdate).ToString(VarGlobals.FormatD)</MudTd>

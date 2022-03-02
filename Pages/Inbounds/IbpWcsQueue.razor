@@ -58,9 +58,9 @@ else
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>@L["Queuetime"]</MudTh>
-            <MudTh>@L["PalletGo"]</MudTh>
-            <MudTh>@L["Worktype"]</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Putaway_Go, object>(x=>x.Created)">@L["Queuetime"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Putaway_Go, object>(x=>x.Palletno)">@L["PalletGo"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Putaway_Go, object>(x=>x.Puttype)">@L["Worktype"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="@L["Queuetime"]">@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatDT)</MudTd>

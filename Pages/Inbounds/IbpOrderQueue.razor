@@ -90,16 +90,16 @@ else
             <col />
         </ColGroup>
         <HeaderContent>
-            <MudTh>@L["GRDatetime"]</MudTh>
-            <MudTh>@L["DNDate"]</MudTh>
-            <MudTh>@L["DNNo"]</MudTh>
-            <MudTh>@L["ItemCode"]</MudTh>
-            <MudTh>@L["ItemName"]</MudTh>
-            <MudTh>@L["Qty"]</MudTh>
-            <MudTh>@L["Unit"]</MudTh>
-            <MudTh>@L["Weight"]</MudTh>
-            <MudTh>@L["LotNo"]</MudTh>
-            <MudTh>@L["BatchNo"]</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Created)">@L["GRDatetime"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Docdate)">@L["DNDate"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Pono)">@L["DNNo"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Itemcode)">@L["ItemCode"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Itemname)">@L["ItemName"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Quantity)">@L["Qty"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Unit)">@L["Unit"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Weight)">@L["Weight"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Docno)">@L["LotNo"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Inb_Goodreceive_Go, object>(x=>x.Docnote)">@L["BatchNo"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <GroupHeaderTemplate>
             <MudTh Class="mud-table-cell-custom-group" colspan="10">@($"{context.GroupName}: {context.Key} ") Total: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.Quantity))</MudTh>

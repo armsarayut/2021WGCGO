@@ -50,15 +50,15 @@ else
                           IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>@L["QUEUEDATE"]</MudTh>
-            <MudTh>@L["SONO"]</MudTh>
-            <MudTh>@L["REQUESTDATE"]</MudTh>
-            <MudTh>@L["ITEMCODE"]</MudTh>
-            <MudTh>@L["ITEMNAME"]</MudTh>
-            <MudTh>@L["PALLETGO"]</MudTh>
-            <MudTh>@L["DNSEQ"]</MudTh>
-            <MudTh>@L["QTY"]</MudTh>
-            <MudTh>@L["UNIT"]</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Created)">@L["QUEUEDATE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Order_No)">@L["SONO"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Delivery_Date)">@L["REQUESTDATE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Item_Code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Item_Name)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Pallet_No)">@L["PALLETGO"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Su_No)">@L["DNSEQ"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Request_Qty)">@L["QTY"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Unit)">@L["UNIT"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
 

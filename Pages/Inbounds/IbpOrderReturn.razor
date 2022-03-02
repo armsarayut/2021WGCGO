@@ -201,7 +201,6 @@
             private HashSet<Oub_CustomerReturn> selectedItems = new HashSet<Oub_CustomerReturn>();
             private IEnumerable<Oub_CustomerReturn> Elements = new List<Oub_CustomerReturn>();
 
-
             string state = "Message box hasn't been opened yet";
 
             string mboxheader { get; set; } = "รายการที่ขอตรวจสอบ";
@@ -309,10 +308,8 @@
                 return false;
             }
 
-
             async Task SelectOrder()
             {
-
 
             }
 
@@ -682,7 +679,7 @@
                                     {
                                         Task<string> retString;
 
-                                        retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.ToList(), stringputpalletgo);
+                                        retString = ObjErpApiService.InsertReceivingOrderbypackAsync(MapPalletItem.Where(s => s.Lpncode == stringputpalletgo).ToList(), stringputpalletgo);
 
                                         ObjErpApiService.SetMappedPalletReturn(stringputpalletgo);
 

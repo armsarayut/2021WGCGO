@@ -16,7 +16,7 @@ namespace GoWMS.Server.Data
         //private static readonly string NpgServer = "localhost"; // Develop
         private static readonly string NpgServer = "192.168.1.14"; // Production
 
-        //private static readonly string NpgDB = "GOWGC"; // Develop
+        //private static readonly string NpgDB = "WCG-QA"; // Develop
         private static readonly string NpgDB = "Gowes"; // Production
 
         private static readonly string NpgPort = "5432";

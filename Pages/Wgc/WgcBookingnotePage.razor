@@ -59,10 +59,10 @@ else
                       FixedFooter="@fixed_footer"
                       Bordered="@bordered"
                       Striped="@striped"
-                      Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc)" @bind-SelectedItems="selectedItems">
+                      Filter="new Func<BOOKING_NOTE_ITEMS,bool>(FilterFunc1)" @bind-SelectedItems="selectedItems">
                 <ToolBarContent>
                     <MudToolBarSpacer />
-                    <MudTextField @bind-Value="searchString"
+                    <MudTextField @bind-Value="searchString1"
                                   Placeholder=@L["Search"]
                                   Adornment="Adornment.Start"
                                   AdornmentIcon="@Icons.Material.Filled.Search"
@@ -89,19 +89,20 @@ else
                     <col />
                 </ColGroup>
                 <HeaderContent>
-                    <MudTh>@L["SoNo"]</MudTh>
-                    <MudTh>@L["ItemCode"]</MudTh>
-                    <MudTh>@L["Customer"]</MudTh>
-                    <MudTh>@L["Seq"]</MudTh>
-                    <MudTh>@L["LotNo"]</MudTh>
-                    <MudTh>@L["BatchNo"]</MudTh>
-                    <MudTh>@L["Packeting"]</MudTh>
-                    <MudTh>@L["Qty"]</MudTh>
-                    <MudTh>@L["Unit"]</MudTh>
-                    <MudTh>@L["PalletGo"]</MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.SO_NO)">@L["SoNo"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.ITEM_CODE)">@L["ItemCode"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.CUSTOMER_CODE)">@L["Customer"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.DN_SEQ)">@L["Seq"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.LOT_NO)">@L["LotNo"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.BATCH_NO)">@L["BatchNo"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.PACKETING_CODE)">@L["Qty"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.DN_QTY)">@L["Unit"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.DN_UM)">@L["Location"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BOOKING_NOTE_ITEMS, object>(x=>x.PALLET_GO)">@L["PalletGo"]</MudTableSortLabel></MudTh>
+
                 </HeaderContent>
                 <GroupHeaderTemplate>
-                    <MudTh Class="mud-table-cell-custom-group" colspan="10">@($"{context.GroupName}: {context.Key}")</MudTh>
+                    <MudTh Class="mud-table-cell-custom-group" colspan="10">@($"{context.GroupName}: {context.Key}") @L["TotalQuantity"]: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.DN_QTY))</MudTh>
                 </GroupHeaderTemplate>
                 <RowTemplate>
                     <MudTd DataLabel="@L["SoNo"]">@context.SO_NO</MudTd>
@@ -116,7 +117,7 @@ else
                     <MudTd DataLabel="@L["PalletGo"]">@context.PALLET_GO</MudTd>
                 </RowTemplate>
                 <GroupFooterTemplate>
-                    <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="1">@L["TotalQuantity"]: @context.Items.Sum((e) => e.DN_QTY)</MudTh>
+                    <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="1">@L["TotalQuantity"]: @string.Format(VarGlobals.FormatN0, @context.Items.Sum((e) => e.DN_QTY))</MudTh>
                 </GroupFooterTemplate>
             </MudTable>
 
@@ -140,6 +141,7 @@ else
     private bool fixed_header = true;
     private bool fixed_footer = true;
     private string searchString = "";
+    private string searchString1 = "";
     private BOOKING_NOTE_ITEMS selectedItem = null;
     private HashSet<BOOKING_NOTE_ITEMS> selectedItems = new HashSet<BOOKING_NOTE_ITEMS>();
     private IEnumerable<BOOKING_NOTE_ITEMS> Elements = new List<BOOKING_NOTE_ITEMS>();
@@ -160,14 +162,7 @@ else
         Indentation = true,
         Expandable = true,
         IsInitiallyExpanded = false,
-        Selector = (e) => e.SO_NO,
-        InnerGroup = new TableGroupDefinition<BOOKING_NOTE_ITEMS>()
-        {
-            GroupName = "PalletGo",
-            Expandable = true,
-            IsInitiallyExpanded = false,
-            Selector = (e) => e.PALLET_GO
-        }
+        Selector = (e) => e.SO_NO
     };
 
     protected override async Task OnInitializedAsync()
@@ -184,6 +179,8 @@ else
         Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         Elements = await Task.Run(() => objCS.GetAllApiNewBookingnoteWgc());
+
+     
     }
 
     async Task GetUserAthu()
@@ -203,22 +200,21 @@ else
         bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
+    private bool FilterFunc1(BOOKING_NOTE_ITEMS element) => FilterFunc(element, searchString1);
 
-    private bool FilterFunc(BOOKING_NOTE_ITEMS element)
+    private bool FilterFunc(BOOKING_NOTE_ITEMS element, string searchString)
     {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.PALLET_GO.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
+
         if (element.SO_NO.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.CUSTOMER_CODE.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        else if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if ($"{element.ITEM_CODE} {element.SEQ_NO} {element.DN_SEQ}".Contains(searchString))
+        else if ($"{element.ITEM_NAME} {element.LOT_NO} {element.BATCH_NO}".Contains(searchString))
             return true;
         return false;
-
     }
+
+
 
     private async void SelectOrder()
     {

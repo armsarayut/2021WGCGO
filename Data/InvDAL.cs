@@ -23,16 +23,6 @@ namespace GoWMS.Server.Data
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
             {
                 StringBuilder Sql = new StringBuilder();
-                /*
-                Sql.AppendLine("select row_number() over(order by  t1.item_code asc) AS rn,");
-                Sql.AppendLine("t1.item_code, t1.item_name, t1.qty, t1.su_no, t1.palletcode, t3.shelfname ");
-                Sql.AppendLine("from public.sap_stock t1");
-                Sql.AppendLine("left join public.sap_itemmaster_v t2");
-                Sql.AppendLine("on t1.item_code=t2.article");
-                Sql.AppendLine("left join wcs.set_shelf t3");
-                Sql.AppendLine("on t1.palletcode=t3.lpncode ");
-                Sql.AppendLine("order by item_code");
-                */
                 Sql.AppendLine("select row_number() over(order by  itemcode asc) AS rn,");
                 Sql.AppendLine("itemcode, itemname, quantity, pallettag, pallteno, storagearea, storagebin");
                 Sql.AppendLine("from wms.inv_stock_go ");
@@ -78,7 +68,8 @@ namespace GoWMS.Server.Data
                 Sql.AppendLine("from wms.inv_stock_go ");
                 Sql.AppendLine("order by itemcode, ");
                 */
-                Sql.AppendLine("SELECT efidx, efstatus, created, modified, innovator, device");
+
+                Sql.AppendLine("SELECT efidx , efstatus, created, modified, innovator, device");
                 Sql.AppendLine(", pono, pallettag, itemtag, itemcode, itemname, itembar, unit");
                 Sql.AppendLine(", weightunit, quantity, weight, lotno, totalquantity, totalweight");
                 Sql.AppendLine(", docno, docby, docdate, docnote, grnrefer, grntime, grtime");
@@ -86,6 +77,7 @@ namespace GoWMS.Server.Data
                 Sql.AppendLine(", storagearea, storagebin, gnrefer, allocatequantity, allocateweight");
                 Sql.AppendLine("FROM wms.inv_stock_go");
                 Sql.AppendLine("WHERE allocatequantity < quantity");
+     
                 Sql.AppendLine("order by itemcode ASC, docdate ASC, pallettag ASC");
 
 
@@ -154,6 +146,7 @@ namespace GoWMS.Server.Data
                 Sql.AppendLine("select row_number() over(order by itemcode asc) AS rn,");
                 Sql.AppendLine("itemcode, itemname, sum(quantity) as totalstock, count(pallteno) as countpallet");
                 Sql.AppendLine("from wms.inv_stock_go ");
+                Sql.AppendLine("WHERE allocatequantity < quantity");
                 Sql.AppendLine("group by itemcode, itemname");
                 Sql.AppendLine("order by itemcode");
 

@@ -206,17 +206,27 @@ namespace GoWMS.Server.Data
                 cmd.Parameters.AddWithValue(":sSeq", NpgsqlDbType.Varchar, sSeq);
 
                 con.Open();
-                NpgsqlDataReader rdr = cmd.ExecuteReader();
-                while (rdr.Read())
+                try
                 {
-                    iRet = rdr["_retchk"] == DBNull.Value ? null : (Int32?)rdr["_retchk"];
-                    sRet = rdr["_retmsg"].ToString();
+                    NpgsqlDataReader rdr = cmd.ExecuteReader();
+                    while (rdr.Read())
+                    {
+                        iRet = rdr["_retchk"] == DBNull.Value ? null : (Int32?)rdr["_retchk"];
+                        sRet = rdr["_retmsg"].ToString();
+                    }
+                    con.Close();
+                    if (iRet == 1)
+                    {
+                        bRet = true;
+                    }
                 }
-                con.Close();
-                if (iRet==1)
+                catch (Exception e)
                 {
-                    bRet = true;
+                    string str = e.Message.ToString(); 
                 }
+                   
+                    
+               
             }
             return bRet;
         }
@@ -330,12 +340,15 @@ namespace GoWMS.Server.Data
                 sql.AppendLine(", c.pallet_no");
 
                 sql.AppendLine("FROM wms.oub_deliveryorder_go c");
+                /*
                 sql.AppendLine("WHERE NOT EXISTS");
                 sql.AppendLine("(SELECT 1");
                 sql.AppendLine("FROM wms.inv_stock_go p");
                 //sql.AppendLine("WHERE p.pallettag = c.package_id)");
                 sql.AppendLine("WHERE p.pono = c.matelement AND p.pallettag = c.package_id AND p.docno =c.finished_product AND p.docnote = c.finished_product_description )");
                 sql.AppendLine("AND c.efstatus < 5");
+                */
+                sql.AppendLine("WHERE c.efstatus < 5");
                 sql.AppendLine("GROUP BY");
                 sql.AppendLine("package_id, material_code, material_description, unit,  customer_code, dnno, lotno, batchno, created, job, pallet_no");
                 sql.AppendLine(";");

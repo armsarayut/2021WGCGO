@@ -68,13 +68,13 @@ else
                     <col />
                 </ColGroup>
                 <HeaderContent>
-                    <MudTh>@L["REQUESTDATE"]</MudTh>
-                    <MudTh>@L["DNSEQ"]</MudTh>
-                    <MudTh>@L["ITEMCODE"]</MudTh>
-                    <MudTh>@L["ITEMNAME"]</MudTh>
-                    <MudTh>@L["QTY"]</MudTh>
-                    <MudTh>@L["UNIT"]</MudTh>
-                    <MudTh>@L["PALLET"]</MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Delivery_Date)">@L["REQUESTDATE"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Su_No)">@L["DNSEQ"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Item_Code)">@L["ITEMCODE"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Item_Name)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Request_Qty)">@L["QTY"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Unit)">@L["UNIT"]</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<Sap_Storeout, object>(x=>x.Pallet_No)">@L["PALLET"]</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <GroupHeaderTemplate>
                     <MudTh Class="mud-table-cell-custom-group" colspan="6">@($"{context.GroupName} : {context.Key}") @L["Total"]: @context.Items.Sum((e) => e.Request_Qty)</MudTh>

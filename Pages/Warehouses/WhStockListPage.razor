@@ -62,14 +62,14 @@ else
                               IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>@L["ItemCode"]</MudTh>
-                <MudTh>@L["ItemName"]</MudTh>
-                <MudTh>@L["Stock"]</MudTh>
-                <MudTh>@L["Lot"]</MudTh>
-                <MudTh>@L["SEQ"]</MudTh>
-                <MudTh>@L["PalletGo"]</MudTh>
-                <MudTh>@L["Area"]</MudTh>
-                <MudTh>@L["Location"]</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemcode)">@L["ItemCode"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itemname)">@L["ItemName"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Quantity)">@L["Stock"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Docno)">@L["Lot"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallettag)">@L["SEQ"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallteno)">@L["PalletGo"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Storagearea)">@L["Area"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Storagebin)">@L["Location"]</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel=@L["ItemCode"]>@context.Itemcode</MudTd>
@@ -103,9 +103,9 @@ else
                               IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh>@L["ItemCode"]</MudTh>
-                <MudTh>@L["ItemName"]</MudTh>
-                <MudTh>@L["TotalStock"]</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<InvStockSum, object>(x=>x.Item_code)">@L["ItemCode"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<InvStockSum, object>(x=>x.Item_name)">@L["ItemCode"]</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<InvStockSum, object>(x=>x.Totalstock)">@L["TotalStock"]</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="ItemCode">@context.Item_code</MudTd>

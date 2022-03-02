@@ -156,7 +156,7 @@ else
         Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         fromDateTime = fromDate.Value.Date;
-        toDateTime = toDate.Value.Date;
+        toDateTime = toDate.Value.Date.AddDays(1);
         Elements = await Task.Run(() => objCS.GetMenu6_7Abydate(fromDateTime.Value, toDateTime.Value));
     }
 
@@ -242,7 +242,7 @@ else
     async Task DbGetData()
     {
         DateTime newDateTimeFM = fromDate.Value.Date;
-        DateTime newDateTimeTO = toDate.Value.Date;
+        DateTime newDateTimeTO = toDate.Value.Date.AddDays(1);
         Elements = await Task.Run(() => ObjPublicService.GetMenu6_7Abydate(newDateTimeFM, newDateTimeTO));
     }
 
