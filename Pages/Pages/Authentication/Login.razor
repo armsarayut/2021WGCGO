@@ -22,16 +22,14 @@
 
 <MudTextField T="string" @bind-Value="@Userword" Label="UserID" Variant="Variant.Outlined" Class="my-6"></MudTextField>
 
-<MudTextField @bind-Value="@Password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" />
+<MudTextField @bind-Value="@Password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility"  OnKeyUp="KeyUp"/>
 
 <br />
 
 
 <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Large" FullWidth="true" OnClick="@btnLogin_Click">Sign In</MudButton>
 
-@*
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" Link="/dashboard" Size="Size.Large" FullWidth="true">Sign In</MudButton>
-*@
+
 
 @code {
     string Password { get; set; } = "";
@@ -69,45 +67,53 @@
 
     protected override async Task OnInitializedAsync()
     {
-      
-      await Task.Run(() => ObjUserService.InsertMenu(mPagename, mPagedesc));
-      
+
+        await Task.Run(() => ObjUserService.InsertMenu(mPagename, mPagedesc));
+
     }
 
     private async Task btnLogin_Click()
     {
 
-        if (Password.Length > 0 && Userword.Length > 0)
+        if (Userword.Length > 0)
         {
-            var key = Configuration.GetSection("Appkey")["Pass"].ToString();
-            //var encrypted = Security.EncryptString(Password, key);
-            var encrypted = EncryptProvider.DESEncrypt(Password, key);
-
-            UserElements = await Task.Run(() => ObjUserService.GetUser(Userword, encrypted));
-
-            if (UserElements.Count() > 0)
+            if  (Password.Length > 0)
             {
+                var key = Configuration.GetSection("Appkey")["Pass"].ToString();
+                //var encrypted = Security.EncryptString(Password, key);
+                var encrypted = EncryptProvider.DESEncrypt(Password, key);
 
-                var grouid = UserElements.Select(x => x.Usgid).FirstOrDefault();
+                UserElements = await Task.Run(() => ObjUserService.GetUser(Userword, encrypted));
 
-                var result1 = UserElements.Where(i => i.Usgid == grouid.Value).FirstOrDefault(); // = 0
+                if (UserElements.Count() > 0)
+                {
 
-                sUserID = result1.Usid.ToString();
+                    var grouid = UserElements.Select(x => x.Usgid).FirstOrDefault();
 
-                this.InsertAuditrial("SignIn User : " + Userword, pageheader);
+                    var result1 = UserElements.Where(i => i.Usgid == grouid.Value).FirstOrDefault(); // = 0
 
-                var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
-                await authModule.InvokeVoidAsync("SignIn", Userword, encrypted, grouid.ToString(), sUserID, "/gowms");
-                var authModules = authModule;
+                    sUserID = result1.Usid.ToString();
+
+                    this.InsertAuditrial("SignIn User : " + Userword, pageheader);
+
+                    var authModule = await JSRunTime.InvokeAsync<IJSObjectReference>("import", "./js/auth.js");
+                    await authModule.InvokeVoidAsync("SignIn", Userword, encrypted, grouid.ToString(), sUserID, "/gowms");
+                    var authModules = authModule;
+                }
+                else
+                {
+                    Snackbar.Add("The " + Userword + " user was not found in the system.", Severity.Error);
+                }
             }
             else
             {
-                Snackbar.Add("The " + Userword + " user was not found in the system.", Severity.Error);
+                Snackbar.Add("Please Enter Password", Severity.Warning);
             }
+
         }
         else
         {
-            Snackbar.Add("Please Enter User and Password", Severity.Error);
+            Snackbar.Add("Please Enter UserID", Severity.Warning);
         }
 
 
@@ -158,5 +164,13 @@
     private void InsertAuditrial(String actdesc, String munname)
     {
         bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
+    }
+
+    private async void KeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await Task.Run(() => btnLogin_Click());
+        }
     }
 }

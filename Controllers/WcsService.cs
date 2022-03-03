@@ -115,6 +115,12 @@ namespace GoWMS.Server.Controllers
             List<Rpt_Ejectgate> retlist = objDAL.GetReportEject(stime, etime).ToList();
             return retlist;
         }
+        public bool SetUrgentAsrsQueueByPallet(string spallet)
+        {
+            bool bret = objDAL.SetUrgentAsrsQueueByPallet(spallet);
+
+            return bret;
+        }
 
     }
 }

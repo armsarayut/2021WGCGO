@@ -132,6 +132,9 @@
   <data name="PDF" xml:space="preserve">
     <value>Pdf</value>
   </data>
+  <data name="PRIORITY" xml:space="preserve">
+    <value>PRIORITY</value>
+  </data>
   <data name="QUEUING" xml:space="preserve">
     <value>QUEUING</value>
   </data>

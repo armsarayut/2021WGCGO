@@ -20,6 +20,7 @@
 
 @inject WcsService ObjWcsService
 @inject UserServices OpjUserService
+@inject ISnackbar Snackbar
 @attribute [Authorize]
 
 
@@ -30,7 +31,7 @@
 else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
-    <MudTable Items="@Elements"
+    <MudTable Items="@Elements.OrderBy(m => m.Created).OrderByDescending(m => m.Work_Priority)"
               FixedHeader="@fixed_header"
               FixedFooter="@fixed_footer"
               Height="@(fixed_header || fixed_footer ?"500px":"")"
@@ -45,6 +46,7 @@ else
                           IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Work_Priority)">@L["PRIORITY"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Ctime)">@L["QUEUING"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Lpncode)">@L["PALLET"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Work_Code)">@L["TASKTYPE"]</MudTableSortLabel></MudTh>
@@ -52,8 +54,10 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_From)">@L["SOURCE"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Srm_To)">@L["DESTINATION"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Tas_Mcworks, object>(x=>x.Stime)">@L["STARTED"]</MudTableSortLabel></MudTh>
+            <MudTh>URGENT</MudTh>
         </HeaderContent>
         <RowTemplate>
+            <MudTd DataLabel=@L["PRIORITY"]>@context.Work_Priority</MudTd>
             <MudTd DataLabel=@L["QUEUING"]>@Convert.ToDateTime(context.Ctime).ToString(VarGlobals.FormatDT)</MudTd>
             <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
             <MudTd DataLabel=@L["TASKTYPE"]>@context.Work_Code</MudTd>
@@ -64,6 +68,12 @@ else
                 @if (context.Stime != null)
                     {
                     @Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)
+                    }
+            </MudTd>
+            <MudTd Class="clm-row-small" DataLabel="URGENT">
+                @if (context.Work_Code == "05")
+                    {
+                    <MudFab Color="Color.Error" OnClick="(()=> UpdateUrgent( context.Lpncode))" Icon="@Icons.Material.Filled.ArrowUpward" Size="Size.Small" IconSize="Size.Small" />
                     }
             </MudTd>
         </RowTemplate>
@@ -163,6 +173,27 @@ else
         if ($"{element.Work_Code} {element.Srm_No} {element.Work_Status}".Contains(searchString))
             return true;
         return false;
+    }
+
+    private async Task UpdateUrgent(string pallet)
+    {
+
+        bool? result = await CheckRoleApprove();
+        if (result == true)
+        {
+            if (ObjWcsService.SetUrgentAsrsQueueByPallet(pallet) == true)
+            {
+                Snackbar.Add("UpdateUrgent OK", Severity.Success);
+                this.InsertAuditrial("Set UpdateUrgent : " + pallet.ToString(), pageheader);
+                Elements = await Task.Run(() => ObjWcsService.GetASRSWorks());
+                this.StateHasChanged();
+            }
+            else
+            {
+                Snackbar.Add("UpdateUrgent Losss", Severity.Error);
+            }
+        }
+
     }
 
     #region "Role"

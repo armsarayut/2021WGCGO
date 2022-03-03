@@ -950,6 +950,45 @@ namespace GoWMS.Server.Data
             return lstobj;
         }
 
+        public bool SetUrgentAsrsQueueByPallet(string spallet)
+        {
+            bool bret = false;
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                try
+                {
+                    StringBuilder sql = new StringBuilder();
+                    sql.AppendLine("Update wcs.tas_mcworks");
+                    sql.AppendLine("Set work_priority = (SELECT max(work_priority) + 1 FROM wcs.tas_mcworks WHERE work_code = @work_code)");
+                    sql.AppendLine("where lpncode = @Pallet");
+
+                    NpgsqlCommand cmd = new NpgsqlCommand(sql.ToString(), con)
+                    {
+                        CommandType = CommandType.Text
+                    };
+
+                    cmd.Parameters.AddWithValue("@work_code", "05");
+                    cmd.Parameters.AddWithValue("@Pallet", spallet);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+
+                    bret = true;
+                }
+                catch (NpgsqlException ex)
+                {
+                    bret = false;
+                    Log.Error(ex.ToString());
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+
+            return bret;
+        }
+
 
 
 
