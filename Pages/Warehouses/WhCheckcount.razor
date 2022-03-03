@@ -36,6 +36,19 @@
 }
 else
 {
+<MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
+    <MudTooltip Text="Check All" Color="Color.Inherit" Placement="Placement.Top">
+        <MudIconButton Icon="@Icons.Material.Filled.Check" Color="Color.Error" OnClick="@CountMapAll"></MudIconButton>
+    </MudTooltip>
+    <MudTooltip Text="Claer All" Color="Color.Inherit" Placement="Placement.Top">
+        <MudIconButton Icon="@Icons.Material.Filled.Clear" Color="Color.Warning" OnClick="@DeleteMapAll"></MudIconButton>
+    </MudTooltip>
+    <MudTooltip Text="Reset All" Color="Color.Inherit" Placement="Placement.Top">
+        <MudIconButton Icon="@Icons.Material.Filled.Restore" Color="Color.Primary" OnClick="@ResetMapAll"></MudIconButton>
+    </MudTooltip>
+    <MudSpacer />
+</MudAppBar>
+
     <MudHidden Breakpoint="Breakpoint.Xs">
         <MudTable Items="@Elements"
                   Dense="@dense"
@@ -271,6 +284,7 @@ else
             Boolean bValidate = false;
             bValidate = await Task.Run(() => ObjMasService.ValidateMasterpallet(str.ToUpper()));
 
+            bValidate = true;
 
             if (bValidate)
             {
@@ -318,6 +332,9 @@ else
                             Snackbar.Add("Audit successfully", Severity.Success);
 
                             this.InsertAuditrial("Comfirm Counting Pallet : [" + mPalletcode + "]", pageheader);
+
+                            Elements = await Task.Run(() => ObjWhService.GetPicklist(mPalletcode));
+
                         }
                         else
                         {
@@ -444,6 +461,116 @@ else
         {
             Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
         }
+        this.StateHasChanged();
+
+    }
+
+    private async void DeleteMapAll()
+    {
+        /**/
+
+        bool? result = await CheckRoleDelete();
+        if (result == true)
+        {
+            string pack;
+            var listElements = Elements;
+
+            foreach (var s in listElements)
+            {
+                pack = s.Su_No;
+
+                var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+                //----------------------
+
+                if (iCorrect >= 0)
+                {
+                    Elements.ToList()[iCorrect].Bcount = true;
+                    Elements.ToList()[iCorrect].Movement_Type = "Z01";
+                    Elements.ToList()[iCorrect].Request_Qty = Elements.ToList()[iCorrect].Stock_Qty;
+                    this.InsertAuditrial("Counting DnSEQ: [" + pack + "] is not found", pageheader);
+
+                    //Snackbar.Add("Count DnSEQ: [" + pack + "] is OK", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
+                }
+            }
+        }
+
+        this.StateHasChanged();
+
+    }
+
+    private async void CountMapAll()
+    {
+        bool? result = await CheckRoleApprove();
+        if (result == true)
+        {
+            string pack;
+
+            var listElements = Elements;
+
+
+            foreach (var s in listElements)
+            {
+                pack = s.Su_No;
+                var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+                //----------------------
+
+                if (iCorrect >= 0)
+                {
+                    Elements.ToList()[iCorrect].Bcount = true;
+                    Elements.ToList()[iCorrect].Movement_Type = "CYC";
+                    Elements.ToList()[iCorrect].Request_Qty = 0;
+                    this.InsertAuditrial("Counting DnSEQ: [" + pack + "] is OK", pageheader);
+
+                    // Snackbar.Add("Count DnSEQ: [" + pack + "] is OK", Severity.Success);
+
+                }
+                else
+                {
+                    Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
+                }
+            }
+        }
+
+
+        this.StateHasChanged();
+
+    }
+
+    private void ResetMapAll()
+    {
+        /**/
+        string pack;
+
+        var listElements = Elements;
+        foreach (var s in listElements)
+        {
+            pack = s.Su_No;
+
+            var iCorrect = Elements.ToList().FindIndex(a => a.Su_No.ToUpper() == pack.ToUpper());
+
+            //----------------------
+
+            if (iCorrect >= 0)
+            {
+                Elements.ToList()[iCorrect].Bcount = false;
+                Elements.ToList()[iCorrect].Movement_Type = "CYC";
+                Elements.ToList()[iCorrect].Request_Qty = 0;
+
+                //Snackbar.Add("Reset DnSEQ: [" + pack + "] is OK", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Find not found DnSEQ please enter again", Severity.Warning);
+            }
+        }
+
+
         this.StateHasChanged();
 
     }
