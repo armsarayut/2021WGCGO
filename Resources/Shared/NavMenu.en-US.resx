@@ -180,6 +180,9 @@
   <data name="5.3.3.Inventory aging" xml:space="preserve">
     <value>5.3.3.Inventory aging</value>
   </data>
+  <data name="5.3.4.Inventory Customer" xml:space="preserve">
+    <value>5.3.4.Inventory Customer</value>
+  </data>
   <data name="5.4-Outbound" xml:space="preserve">
     <value>5.4.Outbound</value>
   </data>

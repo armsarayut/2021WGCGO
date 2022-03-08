@@ -6,6 +6,7 @@ using GoWMS.Server.Data;
 using GoWMS.Server.Models;
 using GoWMS.Server.Models.Das;
 using GoWMS.Server.Models.Public;
+using GoWMS.Server.Models.Wcs;
 
 namespace GoWMS.Server.Controllers
 {
@@ -27,6 +28,18 @@ namespace GoWMS.Server.Controllers
         public List<VLocationDash> GetAllTasworkofday()
         {
             List<VLocationDash> retlist = objDAL.GetAllTasworkofday().ToList();
+            return retlist;
+        }
+
+        public List<DashTaskTime> GetASRSDashboardComplete()
+        {
+            List<DashTaskTime> retlist = objDAL.GetASRSDashboardComplete().ToList();
+            return retlist;
+        }
+
+        public List<AsrsTaskSummary> GetTaskofday()
+        {
+            List<AsrsTaskSummary> retlist = objDAL.GetTaskofday().ToList();
             return retlist;
         }
     }

@@ -220,7 +220,6 @@
     {
         try
         {
-
             bool? result = await CheckRoleReport();
             if (result == true)
             {
@@ -232,8 +231,6 @@
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
                 this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
             }
-
-
         }
         catch (Exception e)
         {

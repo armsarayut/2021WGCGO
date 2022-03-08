@@ -135,6 +135,9 @@
   <data name="ORDERNO" xml:space="preserve">
     <value>คำลั่งซื้อ</value>
   </data>
+  <data name="PALLET" xml:space="preserve">
+    <value>พาเลท</value>
+  </data>
   <data name="PDF" xml:space="preserve">
     <value>Pdf</value>
   </data>

@@ -195,7 +195,7 @@ namespace GoWMS.Server.Reports
         {
             BaseFont baseFont = BaseFontForHeaderFooter;
 
-            int maxColum = 8;
+            int maxColum = 9;
             float[] sizes = new float[maxColum];
             for (var i = 0; i < maxColum; i++) // Set up Colum Size
             {
@@ -266,13 +266,23 @@ namespace GoWMS.Server.Reports
             };
             bodyTable.AddCell(cell);
 
-            cell = new PdfPCell(new Phrase("PALLET", _fontstyeheader))
+            cell = new PdfPCell(new Phrase("PALLETGO", _fontstyeheader))
             {
                 HorizontalAlignment = Element.ALIGN_LEFT,
                 VerticalAlignment = Element.ALIGN_MIDDLE,
                 BackgroundColor = headerBackcolor,
                 BorderWidth = Rectangle.NO_BORDER
             };
+            bodyTable.AddCell(cell);
+
+            cell = new PdfPCell(new Phrase("PALLETNO", _fontstyeheader))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE,
+                BackgroundColor = headerBackcolor,
+                BorderWidth = Rectangle.NO_BORDER
+            };
+
             bodyTable.AddCell(cell);
 
             cell = new PdfPCell(new Phrase("AREA", _fontstyeheader))
@@ -368,6 +378,19 @@ namespace GoWMS.Server.Reports
                 bodyTable.AddCell(cell);
 
                 cell = new PdfPCell(new Phrase(listRpt.Pallteno.ToString(), _fontstyebody))
+                {
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    BackgroundColor = bodyBackcolor,
+                    BorderWidthTop = 0.5f,
+                    BorderWidthRight = 0f,
+                    BorderWidthBottom = 0f,
+                    BorderWidthLeft = 0f,
+                    BorderColorTop = LineBorderColor
+                };
+                bodyTable.AddCell(cell);
+
+                cell = new PdfPCell(new Phrase(listRpt.Itembar.ToString(), _fontstyebody))
                 {
                     HorizontalAlignment = Element.ALIGN_LEFT,
                     VerticalAlignment = Element.ALIGN_MIDDLE,

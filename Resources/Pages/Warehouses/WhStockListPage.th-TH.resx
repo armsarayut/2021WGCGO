@@ -141,6 +141,9 @@
   <data name="pageHeaderlist" xml:space="preserve">
     <value>รายการคงคลัง</value>
   </data>
+  <data name="PalletErp" xml:space="preserve">
+    <value>พาเลทอ้างอิง</value>
+  </data>
   <data name="PalletGo" xml:space="preserve">
     <value>พาเลหลัก</value>
   </data>

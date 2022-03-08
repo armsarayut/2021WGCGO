@@ -627,9 +627,16 @@ namespace GoWMS.Server.Data
             using (OleDbConnection con = new OleDbConnection(connectionString))
             {
                 sql.Clear();
-                 sql.AppendLine("SELECT COUNT(*) ");
-                sql.AppendLine("FROM WGRB.DELIVERY_NOTE_ITEMS ");
-                sql.AppendLine("WHERE STATUS_GO is null");
+                 sql.AppendLine("SELECT COUNT(*) FROM (");
+                sql.AppendLine("SELECT t1.*");
+                sql.AppendLine("FROM WGRB.DELIVERY_NOTE_ITEMS t1");
+                sql.AppendLine("WHERE t1.STATUS = 'A'");
+                sql.AppendLine("AND (t1.STATUS_GO <> 'Y' or t1.STATUS_GO is null)");
+                sql.AppendLine("AND t1.REMARKS is null");
+                sql.AppendLine("AND t1.REMARKS_INV is null");
+                sql.AppendLine("AND t1.PALLET_GO is not null");
+                sql.AppendLine(")");
+
                 //sql.AppendLine("ORDER BY t1.SEQ_NO");
                 try
                 {
@@ -664,11 +671,16 @@ namespace GoWMS.Server.Data
             {
                 sql.Clear();
                 sql.AppendLine("SELECT COUNT(*) FROM (");
-                sql.AppendLine("SELECT t1.PALLET_GO,COUNT(t1.PALLET_GO) ");
+                sql.AppendLine("SELECT t1.PALLET_GO");
                 sql.AppendLine("FROM WGRB.DELIVERY_NOTE_ITEMS t1");
-                sql.AppendLine("WHERE t1.STATUS_GO is null");
+                sql.AppendLine("WHERE t1.STATUS = 'A'");
+                sql.AppendLine("AND (t1.STATUS_GO <> 'Y' or t1.STATUS_GO is null)");
+                sql.AppendLine("AND t1.REMARKS is null");
+                sql.AppendLine("AND t1.REMARKS_INV is null");
+                sql.AppendLine("AND t1.PALLET_GO is not null");
                 sql.AppendLine("GROUP BY t1.PALLET_GO");
                 sql.AppendLine(")");
+
                 try
                 {
                     OleDbCommand cmd = new OleDbCommand(sql.ToString(), con)
@@ -715,6 +727,8 @@ namespace GoWMS.Server.Data
                 sql.AppendLine("WHERE t1.PALLET_GO is not null");
                 sql.AppendLine("AND t1.STATUS_GO is not null");
                 sql.AppendLine("ORDER BY t1.SEQ_NO");
+
+
 
                 try
                 {

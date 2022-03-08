@@ -141,8 +141,14 @@
   <data name="pageHeaderlist" xml:space="preserve">
     <value>Stock List</value>
   </data>
+  <data name="PalletErp" xml:space="preserve">
+    <value>PalletNo</value>
+  </data>
   <data name="PalletGo" xml:space="preserve">
     <value>PalletGo</value>
+  </data>
+  <data name="Pallteno" xml:space="preserve">
+    <value>PALLET</value>
   </data>
   <data name="PDF" xml:space="preserve">
     <value>PDF</value>
@@ -156,7 +162,10 @@
   <data name="Stock" xml:space="preserve">
     <value>Stock</value>
   </data>
+  <data name="Storagebin" xml:space="preserve">
+    <value>LOCATION</value>
+  </data>
   <data name="TotalStock" xml:space="preserve">
-    <value>TotalStock</value>
+    <value>TOTALSTOCK</value>
   </data>
 </root>

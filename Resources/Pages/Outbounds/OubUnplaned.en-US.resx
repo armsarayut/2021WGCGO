@@ -126,6 +126,9 @@
   <data name="pageHeader" xml:space="preserve">
     <value>Unplanned</value>
   </data>
+  <data name="PALLETERP" xml:space="preserve">
+    <value>PalletNo</value>
+  </data>
   <data name="PalletGo" xml:space="preserve">
     <value>PalletGo</value>
   </data>

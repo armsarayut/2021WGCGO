@@ -86,7 +86,7 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<Class6_4_A, object>(x=>x.Item_Name)">@L["ITEMNAME"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Class6_4_A, object>(x=>x.Result_Qty)">@L["QTY"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Class6_4_A, object>(x=>x.Su_No)">@L["SEQ"]</MudTableSortLabel></MudTh>
-
+            <MudTh><MudTableSortLabel SortBy="new Func<Class6_4_A, object>(x=>x.Pallet_No)">@L["PALLET"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel=@L["DATE"]>@Convert.ToDateTime(context.Created).ToString(VarGlobals.FormatD)</MudTd>
@@ -95,6 +95,7 @@ else
             <MudTd DataLabel=@L["ITEMNAME"]>@context.Item_Name</MudTd>
             <MudTd DataLabel=@L["QTY"]>@string.Format(VarGlobals.FormatN2, context.Result_Qty)</MudTd>
             <MudTd DataLabel=@L["SEQ"]>@context.Su_No</MudTd>
+            <MudTd DataLabel=@L["PALLET"]>@context.Pallet_No</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />
@@ -125,12 +126,12 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
-    DateTime? fromDate = DateTime.Today.AddDays(-1);
+    DateTime? fromDate = DateTime.Today;
     TimeSpan? fromTime = DateTime.Now.TimeOfDay;
     DateTime? toDate = DateTime.Today;
     TimeSpan? toTime = DateTime.Now.TimeOfDay;
 
-    DateTime? fromDateTime = DateTime.Today.AddDays(-1);
+    DateTime? fromDateTime = DateTime.Today;
     DateTime? toDateTime = DateTime.Today;
 
     private bool _processing = false;

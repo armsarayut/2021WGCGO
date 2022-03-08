@@ -117,40 +117,70 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Block/Error" xml:space="preserve">
-    <value>Block/Error</value>
+  <data name="Area" xml:space="preserve">
+    <value>พื้นที่</value>
+  </data>
+  <data name="Bank" xml:space="preserve">
+    <value>แนว</value>
+  </data>
+  <data name="Bay" xml:space="preserve">
+    <value>ช่อง</value>
+  </data>
+  <data name="Bin" xml:space="preserve">
+    <value>ตำแหน่งจัดเก็บ</value>
   </data>
   <data name="Excel" xml:space="preserve">
-    <value>Excel</value>
+    <value>เอกเซล</value>
+  </data>
+  <data name="ItemCode" xml:space="preserve">
+    <value>รหัสสินค้า</value>
+  </data>
+  <data name="ItemName" xml:space="preserve">
+    <value>ชื่อสินค้า</value>
   </data>
   <data name="Lane" xml:space="preserve">
-    <value>Lane</value>
+    <value>ช่อง</value>
   </data>
-  <data name="Mass" xml:space="preserve">
-    <value>Free</value>
+  <data name="Level" xml:space="preserve">
+    <value>ชั้น</value>
   </data>
-  <data name="No" xml:space="preserve">
-    <value>No</value>
+  <data name="Location" xml:space="preserve">
+    <value>ตำแหน่ง</value>
   </data>
-  <data name="OccupancyRate" xml:space="preserve">
-    <value>Occupancy Rate</value>
-  </data>
-  <data name="Occupied" xml:space="preserve">
-    <value>Occupied</value>
+  <data name="Lot" xml:space="preserve">
+    <value>ลอท</value>
   </data>
   <data name="pageHeader" xml:space="preserve">
-    <value>Capacity</value>
+    <value>สรุปคงคลัง</value>
+  </data>
+  <data name="pageHeaderlist" xml:space="preserve">
+    <value>รายการคงคลัง</value>
+  </data>
+  <data name="PalletErp" xml:space="preserve">
+    <value>พาเลทอ้างอิง</value>
+  </data>
+  <data name="PalletGo" xml:space="preserve">
+    <value>พาเลหลัก</value>
+  </data>
+  <data name="Pallteno" xml:space="preserve">
+    <value>พาเลท</value>
   </data>
   <data name="PDF" xml:space="preserve">
-    <value>PDF</value>
-  </data>
-  <data name="ProhibitedLocation" xml:space="preserve">
-    <value>Prohibited Location</value>
+    <value>พีดีเอฟ</value>
   </data>
   <data name="Search" xml:space="preserve">
-    <value>Search</value>
+    <value>ค้นหา</value>
   </data>
-  <data name="Total" xml:space="preserve">
-    <value>Total</value>
+  <data name="SEQ" xml:space="preserve">
+    <value>ลำดับที่</value>
+  </data>
+  <data name="Stock" xml:space="preserve">
+    <value>คงคลัง</value>
+  </data>
+  <data name="Storagebin" xml:space="preserve">
+    <value>ตำแหน่งจัดเก็บ</value>
+  </data>
+  <data name="TotalStock" xml:space="preserve">
+    <value>รวมคงคลัง</value>
   </data>
 </root>

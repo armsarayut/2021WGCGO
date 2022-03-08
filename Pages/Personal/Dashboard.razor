@@ -1,6 +1,7 @@
 ﻿@page "/gowms"
 @using GoWMS.Server.Models.Das
 @using GoWMS.Server.Models.Public
+@using GoWMS.Server.Models.Wcs
 
 @using System.Threading
 @using GoWMS.Server.Data
@@ -74,7 +75,7 @@
             <MudIcon Icon="@Icons.Material.Filled.SyncAlt" Color="Color.Success" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["Total"]</MudText>
-                <MudText Typo="Typo.h5">@mtotal</MudText>
+                <MudText Typo="Typo.h5">@asrstaskcompletenow / @asrstaskcompletelast</MudText>
             </div>
         </MudPaper>
     </MudItem>
@@ -83,7 +84,7 @@
             <MudIcon Icon="@Icons.Material.Filled.Speed" Color="Color.Warning" Class="mx-4" Style="width:50px; height:50px;"></MudIcon>
             <div>
                 <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@L["AverageTime"]</MudText>
-                <MudText Typo="Typo.h5">00:00:00</MudText>
+                <MudText Typo="Typo.h5">@asrstasktimenow / @asrstasktimelast</MudText>
             </div>
         </MudPaper>
     </MudItem>
@@ -208,6 +209,11 @@
 
     private IEnumerable<VLocationDash> ElementWorks = new List<VLocationDash>();
 
+    private IEnumerable<DashTaskTime> AsrsCompleteData = new List<DashTaskTime>();
+
+    private IEnumerable<AsrsTaskSummary> AsrsTaskofday = new List<AsrsTaskSummary>();
+
+
     EarningReport[] earningReports = new EarningReport[]
 {
         new EarningReport { Name = "SRM01", Title = "Disconnect", Avatar = "https://avatars2.githubusercontent.com/u/71094850?s=460&u=66c16f5bb7d27dc751f6759a82a3a070c8c7fe4b&v=4", Salary = "10:01", Severity = Color.Error, SeverityTitle = "High"},
@@ -252,6 +258,17 @@
     string[] labels4 = { "Use", "Free", "Block", "Master" };
     string[] xlabels4 = { "80", "100" };
 
+
+    string asrstasktimenow { get; set; } = "";
+    Int64 asrstaskcompletenow { get; set; } = 0;
+
+    string asrstasktimelast { get; set; } = "";
+    Int64 asrstaskcompletelast { get; set; } = 0;
+
+    Int64 asrstaskpro { get; set; } = 0;
+    Int64 asrstaskque { get; set; } = 0;
+
+
     private ChartOptions _lineChartOptions = new ChartOptions
     {
         DisableLegend = true
@@ -278,6 +295,8 @@
 
 
         ElementWorks = await Task.Run(() => ObjDashService.GetAllTasworkofday());
+
+        AsrsCompleteData = await Task.Run(() => ObjDashService.GetASRSDashboardComplete());
 
         if (Elementorders.ToList().Count > 0)
         {
@@ -451,6 +470,49 @@
         }
 
 
+        ASRSDashboardData();
+
+
+
+
+    }
+
+    void ASRSDashboardData()
+    {
+        //AsrsCompleteData = ObjDashService.GetASRSDashboardComplete();
+
+        // AsrsCompleteData = await Task.Run(() => ObjDashService.GetASRSDashboardComplete());
+
+
+        if (AsrsCompleteData.ToList().Count > 0)
+        {
+            foreach (var val in AsrsCompleteData)
+            {
+                if (val.Checkday.ToString() == "CURR")
+                {
+                    asrstasktimenow = val.Tasktime.ToString();
+                    asrstaskcompletenow = val.Counttask.Value;
+                }
+                else if (val.Checkday.ToString() == "LAST")
+                {
+                    asrstasktimelast = val.Tasktime.ToString();
+                    asrstaskcompletelast = val.Counttask.Value;
+                }
+                else if (val.Checkday.ToString() == "QUEU")
+                {
+                    asrstaskque = val.Counttask.Value;
+                }
+                else if (val.Checkday.ToString() == "QPRO")
+                {
+                    asrstaskpro = val.Counttask.Value;
+                }
+            }
+        }
+        else
+        {
+
+
+        }
     }
 
 

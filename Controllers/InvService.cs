@@ -40,5 +40,10 @@ namespace GoWMS.Server.Controllers
             return objDAL.GetStockListInfo();
         }
 
+        public List<InvStockSumByCus> GetStockSumByCustomer()
+        {
+            List<InvStockSumByCus> ListRet = objDAL.GetStockSumByCustomer().ToList();
+            return ListRet;
+        }
     }
 }

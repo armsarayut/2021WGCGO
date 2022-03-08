@@ -124,7 +124,7 @@
     <value>Complete Order</value>
   </data>
   <data name="Empty" xml:space="preserve">
-    <value>Empty</value>
+    <value>Free</value>
   </data>
   <data name="Lane" xml:space="preserve">
     <value>Lane</value>

@@ -117,40 +117,64 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Block/Error" xml:space="preserve">
-    <value>Block/Error</value>
+  <data name="Area" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="Bank" xml:space="preserve">
+    <value>Bank</value>
+  </data>
+  <data name="Bay" xml:space="preserve">
+    <value>Bay</value>
+  </data>
+  <data name="Bin" xml:space="preserve">
+    <value>Location</value>
   </data>
   <data name="Excel" xml:space="preserve">
     <value>Excel</value>
   </data>
+  <data name="ItemCode" xml:space="preserve">
+    <value>ItemCode</value>
+  </data>
+  <data name="ItemName" xml:space="preserve">
+    <value>ItemName</value>
+  </data>
   <data name="Lane" xml:space="preserve">
     <value>Lane</value>
   </data>
-  <data name="Mass" xml:space="preserve">
-    <value>Free</value>
+  <data name="Level" xml:space="preserve">
+    <value>Level</value>
   </data>
-  <data name="No" xml:space="preserve">
-    <value>No</value>
+  <data name="Location" xml:space="preserve">
+    <value>Location</value>
   </data>
-  <data name="OccupancyRate" xml:space="preserve">
-    <value>Occupancy Rate</value>
-  </data>
-  <data name="Occupied" xml:space="preserve">
-    <value>Occupied</value>
+  <data name="Lot" xml:space="preserve">
+    <value>Lot</value>
   </data>
   <data name="pageHeader" xml:space="preserve">
-    <value>Capacity</value>
+    <value>Stock Summary</value>
+  </data>
+  <data name="pageHeaderlist" xml:space="preserve">
+    <value>Stock List</value>
+  </data>
+  <data name="PalletErp" xml:space="preserve">
+    <value>PalletNo</value>
+  </data>
+  <data name="PalletGo" xml:space="preserve">
+    <value>PalletGo</value>
   </data>
   <data name="PDF" xml:space="preserve">
     <value>PDF</value>
   </data>
-  <data name="ProhibitedLocation" xml:space="preserve">
-    <value>Prohibited Location</value>
-  </data>
   <data name="Search" xml:space="preserve">
     <value>Search</value>
   </data>
-  <data name="Total" xml:space="preserve">
-    <value>Total</value>
+  <data name="SEQ" xml:space="preserve">
+    <value>SEQ</value>
+  </data>
+  <data name="Stock" xml:space="preserve">
+    <value>Stock</value>
+  </data>
+  <data name="TotalStock" xml:space="preserve">
+    <value>TotalStock</value>
   </data>
 </root>

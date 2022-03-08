@@ -135,6 +135,9 @@
   <data name="ORDERNO" xml:space="preserve">
     <value>ORDERNO</value>
   </data>
+  <data name="PALLET" xml:space="preserve">
+    <value>PALLET</value>
+  </data>
   <data name="PDF" xml:space="preserve">
     <value>Pdf</value>
   </data>

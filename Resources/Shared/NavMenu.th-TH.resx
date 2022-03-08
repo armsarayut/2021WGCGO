@@ -180,6 +180,9 @@
   <data name="5.3.3.Inventory aging" xml:space="preserve">
     <value>5.3.3.อายุสินค้าคงคลัง</value>
   </data>
+  <data name="5.3.4.Inventory Customer" xml:space="preserve">
+    <value>5.3.4.สินค้าคงคลังตามลูกค้า</value>
+  </data>
   <data name="5.4-Outbound" xml:space="preserve">
     <value>5.4.ขาออก</value>
   </data>

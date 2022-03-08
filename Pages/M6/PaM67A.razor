@@ -125,12 +125,12 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
-    DateTime? fromDate = DateTime.Today.AddDays(-1);
+    DateTime? fromDate = DateTime.Today;
     TimeSpan? fromTime = DateTime.Now.TimeOfDay;
     DateTime? toDate = DateTime.Today;
     TimeSpan? toTime = DateTime.Now.TimeOfDay;
 
-    DateTime? fromDateTime = DateTime.Today.AddDays(-1);
+    DateTime? fromDateTime = DateTime.Today;
     DateTime? toDateTime = DateTime.Today;
 
     private bool _processing = false;

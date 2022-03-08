@@ -253,8 +253,8 @@ namespace GoWMS.Server.Data
             using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
             {
                 NpgsqlCommand cmd = new NpgsqlCommand("select count(*) " +
-                    "from wms.inb_goodreceipt_go " +
-                    "where efstatus=0 ", con)
+                    "from wms.inb_goodreceive_go " +
+                    "where pallteno in (select palletno from wms.inb_putaway_go)", con)
                 {
                     CommandType = CommandType.Text
                 };

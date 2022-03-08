@@ -127,12 +127,12 @@ else
     public int elevation = 0;
     private ResultReturn resultReturn = null;
 
-    DateTime? fromDate = DateTime.Today.AddDays(-1);
+    DateTime? fromDate = DateTime.Today;
     TimeSpan? fromTime = DateTime.Now.TimeOfDay;
     DateTime? toDate = DateTime.Today;
     TimeSpan? toTime = DateTime.Now.TimeOfDay;
 
-    DateTime? fromDateTime = DateTime.Today.AddDays(-1);
+    DateTime? fromDateTime = DateTime.Today;
     DateTime? toDateTime = DateTime.Today;
 
     private bool _processing = false;
@@ -158,7 +158,7 @@ else
         Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
         fromDateTime = fromDate.Value.Date;
-        toDateTime = toDate.Value.Date;
+        toDateTime = toDate.Value.Date.AddDays(1);
 
         Elements = await Task.Run(() => objCS.GetMenu6_5Bbydate(fromDateTime.Value, toDateTime.Value));
     }
@@ -244,8 +244,8 @@ else
 
     async Task DbGetData()
     {
-        DateTime newDateTimeFM = fromDate.Value.Date + fromTime.Value;
-        DateTime newDateTimeTO = toDate.Value.Date + toTime.Value;
+        DateTime newDateTimeFM = fromDate.Value.Date;
+        DateTime newDateTimeTO = toDate.Value.Date.AddDays(1);
         Elements = await Task.Run(() => ObjPublicService.GetMenu6_5Bbydate(newDateTimeFM, newDateTimeTO));
     }
 

@@ -126,6 +126,9 @@
   <data name="pageHeader" xml:space="preserve">
     <value>เบิกแมนนวล</value>
   </data>
+  <data name="PALLETERP" xml:space="preserve">
+    <value>พาเลทอ้างอิง</value>
+  </data>
   <data name="PalletGo" xml:space="preserve">
     <value>พาเลทหลัก</value>
   </data>

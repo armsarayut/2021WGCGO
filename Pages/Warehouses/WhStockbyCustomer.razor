@@ -1,60 +1,48 @@
-﻿@page "/5/5_5_6"
+﻿@page "/5/5_3_4"
+@using System
+@using System.IO
+@using System.Linq
+@using System.Text
+@using System.Threading
+@using System.Threading.Tasks
+@using System.Collections.Generic
 
-@using GoWMS.Server.Controllers;
-@using GoWMS.Server.Models.Wcs;
-@using GoWMS.Server.Data;
-@using GoWMS.Server.Models;
 @using GoWMS.Server.Pdf
+@using GoWMS.Server.Data
 @using GoWMS.Server.Reports
+@using GoWMS.Server.Models
+@using GoWMS.Server.Models.Inv
+@using GoWMS.Server.Controllers
 @using System.Security.Claims
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
-@inject IStringLocalizer<PaAuASRSLoadtimelist> L
 @inject ReportService UserlogService
-@inject WcsService ObjWcsService
+@inject InboundService ObjInboundService
+@inject InvService ObjInvService
 @inject UserServices OpjUserService
-@inject NavigationManager navigationManager
+@inject IStringLocalizer<WhStockbyCustomer> L
 @attribute [Authorize]
 
-@if (Elements != null)
+<style>
+    .mud-table-cell-custom-group {
+        font-weight: 500;
+    }
+
+    .mud-table-cell-custom-group-footer {
+        padding-bottom: 50px;
+        text-align: left;
+    }
+</style>
+
+@if (Elements == null)
+{
+    // <p><em>Loading...</em></p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
 {
     <MudText Typo="Typo.h6" Color="Color.Primary">@pageheader</MudText>
-
-
-    <MudGrid>
-
-        <MudItem Class="d-flex flex-row">
-            <MudItem>
-                <MudDatePicker Class="" Label=@L["FromDate"] @bind-Date="fromDate" DateFormat="@VarGlobals.FormatD" />
-            </MudItem>
-            <MudItem>
-                <MudTimePicker Class="px-2" Label=@L["FromTime"] @bind-Time="fromTime" />
-            </MudItem>
-        </MudItem>
-        <MudItem Class="d-flex flex-row">
-            <MudItem>
-                <MudDatePicker Class="" Label=@L["ToDate"] @bind-Date="toDate" DateFormat="@VarGlobals.FormatD" />
-            </MudItem>
-            <MudItem>
-                <MudTimePicker Class="px-2" Label=@L["ToTime"] @bind-Time="toTime" />
-            </MudItem>
-        </MudItem>
-        <MudItem Class="d-flex flex-row align-self-end">
-            <MudButton Disabled="@_processing" StartIcon="@Icons.Material.Filled.Search" Size="Size.Medium"
-                       OnClick="OnclickSearch" Variant="Variant.Filled" Color="Color.Primary">
-                @if (_processing)
-                {
-                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                    <MudText Class="ms-2">Processing</MudText>
-                }
-                else
-                {
-                    <MudText>@L["Search"]</MudText>
-                }
-            </MudButton>
-        </MudItem>
-    </MudGrid>
 
     <MudAppBar Color="Color.Transparent" Fixed="false" Dense="true">
         <MudSpacer />
@@ -64,66 +52,84 @@
         </MudTooltip>
     </MudAppBar>
 
-    <MudTable Items="@Elements"
-              FixedHeader="@fixed_header"
-              FixedFooter="@fixed_footer"
-              Height="@(fixed_header || fixed_footer ? "500px" : "")"
+    <MudTable Hover="@hover" Breakpoint="Breakpoint.Sm" Height="@(fixed_header || fixed_footer ?"500px":"")" FixedHeader="@fixed_header"
+              Items="@Elements.OrderBy(s => s.Itemcode).OrderBy(x => x.Cuscode)"
+              GroupBy="@_groupDefinition"
+              GroupHeaderStyle="background-color:var(--mud-palette-background-white)"
+              GroupFooterClass="mb-4"
               Dense="@dense"
-              Hover="@hover"
-              Bordered="@bordered" Striped="@striped" Filter="new Func<AsrsLoadtime, bool>(FilterFunc)" Style="width:100%;">
+              FixedFooter="@fixed_footer"
+              Bordered="@bordered"
+              Striped="@striped"
+              Filter="new Func<InvStockSumByCus,bool>(FilterFunc)" @bind-SelectedItem="selectedItem">
         <ToolBarContent>
-            <MudToolBarSpacer />
-            <MudTextField @bind-Value="searchString" Placeholder=@L["Search"] Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh>@L["PALLET"]</MudTh>
-            <MudTh>@L["TASKCODE"]</MudTh>
-            <MudTh>@L["TASKTYPE"]</MudTh>
-            <MudTh>@L["SRM"]</MudTh>
-            <MudTh>@L["SOURCE"]</MudTh>
-            <MudTh>@L["DESTINATION"]</MudTh>
-            <MudTh>@L["START"]</MudTh>
-            <MudTh>@L["END"]</MudTh>
-            <MudTh>@L["TIME"]</MudTh>
-        </HeaderContent>
-        <RowTemplate>
 
-            <MudTd DataLabel=@L["PALLET"]>@context.Lpncode</MudTd>
-            <MudTd DataLabel=@L["TASKCODE"]>@context.Work_code</MudTd>
-            <MudTd DataLabel=@L["TASKTYPE"]>@context.Work_text_th</MudTd>
-            <MudTd DataLabel=@L["SRM"]>@string.Format(VarGlobals.FormatD2, context.Srm_no)</MudTd>
-            <MudTd DataLabel=@L["SOURCE"]>@string.Format(VarGlobals.FormatD9, context.Srm_from)</MudTd>
-            <MudTd DataLabel=@L["DESTINATION"]>@string.Format(VarGlobals.FormatD9, context.Srm_to)</MudTd>
-            <MudTd DataLabel=@L["START"]>@Convert.ToDateTime(context.Stime).ToString(VarGlobals.FormatDT)</MudTd>
-            <MudTd DataLabel=@L["END"]>@Convert.ToDateTime(context.Etime).ToString(VarGlobals.FormatDT)</MudTd>
-            <MudTd DataLabel=@L["TIME"]>@context.Loadtime</MudTd>
+            <MudToolBarSpacer />
+            <MudTextField @bind-Value="searchString"
+                          Placeholder=@L["Search"]
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <ColGroup>
+            @if (_multiSelect)
+                {
+                <col style="width: 60px;" />
+                }
+            @if (_groupDefinition.Expandable)
+                {
+                <col style="width: 60px;" />
+                }
+            <col />
+    
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.Itemname)">@L["ItemName"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.Pallteno)">@L["Pallteno"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.Totalstock)">@L["Totalstock"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.Storagebin)">@L["Bin"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.StorageLane)">@L["Lane"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.StorageBank)">@L["Bank"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.StorageBay)">@L["Bay"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<InvStockSumByCus, object>(x=>x.StorageLevel)">@L["Level"]</MudTableSortLabel></MudTh>
+
+        </HeaderContent>
+        <GroupHeaderTemplate>
+            <MudTh Class="mud-table-cell-custom-group" colspan="10">@($"{context.GroupName}: {context.Key} ") Count: @string.Format(VarGlobals.FormatN0, @context.Items.Count()) Pallet</MudTh>
+        </GroupHeaderTemplate>
+        <RowTemplate>
+            <MudTd DataLabel="@L["ItemName"]">@context.Itemname</MudTd>
+            <MudTd DataLabel="@L["Pallteno"]">@context.Pallteno</MudTd>
+            <MudTd DataLabel="@L["Totalstock"]" Style="text-align: right">@string.Format(VarGlobals.FormatN0, context.Totalstock)</MudTd>
+            <MudTd DataLabel="@L["Bin"]">@context.Storagebin</MudTd>
+            <MudTd DataLabel="@L["Lane"]">@context.StorageLane</MudTd>
+            <MudTd DataLabel="@L["Bank"]">@context.StorageBank</MudTd>
+            <MudTd DataLabel="@L["Bay"]">@context.StorageBay</MudTd>
+            <MudTd DataLabel="@L["Level"]">@context.StorageLevel</MudTd>
         </RowTemplate>
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[] { 10, 20, 50, 100 }" />
-        </PagerContent>
+        <GroupFooterTemplate>
+            <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="10">Count: @string.Format(VarGlobals.FormatN0, @context.Items.Count()) </MudTh>
+        </GroupFooterTemplate>
+
     </MudTable>
 
 }
 
-
 @code {
-    private string pageheader { get; set; } = "5.5.6.ASRS-Loadtime";
 
-    public string mPagedesc { get; set; } = "5.5.6.ASRS-Loadtime";
-    private string mPagename { get; set; } = "/5/5_5_6";
+    private bool _dense = true;
+    private bool _multiSelect = false;
 
-    private IEnumerable<AsrsLoadtime> Elements = new List<AsrsLoadtime>();
-
-    DateTime? fromDate = DateTime.Today;
-    TimeSpan? fromTime = DateTime.Now.TimeOfDay;
-    DateTime? toDate = DateTime.Today;
-    TimeSpan? toTime = DateTime.Now.TimeOfDay;
-
-    DateTime? fromDateTime = DateTime.Today;
-    DateTime? toDateTime = DateTime.Today;
-
+    private string pageheader { get; set; } = "5.3.4.Inventory Customer";
     private bool _processing = false;
 
+    public string mPagedesc { get; set; } = "5.3.4.Inventory Customer";
+    private string mPagename { get; set; } = "/5/5_3_4";
+
+    private string msgAction = "Enter Palletcode";
+    private string mPalletcode { get; set; } = "";
+    private string mPackid { get; set; } = "";
+    private string palletcode { get; set; }
     private bool dense = true;
     private bool hover = true;
     private bool striped = true;
@@ -131,7 +137,11 @@
     private bool fixed_header = true;
     private bool fixed_footer = true;
     private string searchString = "";
+    private InvStockSumByCus selectedItem = null;
+    private HashSet<InvStockSumByCus> selectedItems = new HashSet<InvStockSumByCus>();
+    private IEnumerable<InvStockSumByCus> Elements = new List<InvStockSumByCus>();
 
+    public int elevation = 0;
     private ResultReturn resultReturn = null;
 
     string sUsername { get; set; } = "";
@@ -141,27 +151,40 @@
     List<Userroleinfo> Roles = new List<Userroleinfo>();
     [Inject] private IDialogService DialogService { get; set; }
 
+    private TableGroupDefinition<InvStockSumByCus> _groupDefinition = new()
+    {
+
+        GroupName = "ITEM",
+        Indentation = true,
+        Expandable = true,
+        IsInitiallyExpanded = false,
+        Selector = (e) => e.Itemcode,
+        InnerGroup = new TableGroupDefinition<InvStockSumByCus>()
+        {
+            GroupName = "CUSTOMER",
+            Expandable = true,
+            IsInitiallyExpanded = false,
+            Selector = (e) => e.Cusname
+        }
+
+
+    };
+
+
     protected override async Task OnInitializedAsync()
     {
-        WcsService objCS = new WcsService();
-
-
+        InvService objCS = new InvService();
 
         //////// Intial Menu and Privilege//////
         resultReturn = await Task.Run(() => OpjUserService.InsertMenu(mPagename, mPagedesc));
         resultReturn = await Task.Run(() => OpjUserService.InsertPrivilege(mPagename));
         ////////////////////////////////////////
-
+        ///
         await GetUserAthu();
         this.InsertAuditrial("View", pageheader);
         Roles = await Task.Run(() => OpjUserService.GetUserRole(mPagename, long.Parse(sGroupID)));
 
-        fromDateTime = fromDate.Value.Date + fromTime.Value;
-        toDateTime = toDate.Value.Date + toTime.Value;
-
-
-        Elements = await Task.Run(() => objCS.GetAsrsloadtime(fromDateTime.Value, toDateTime.Value));
-
+        Elements = await Task.Run(() => objCS.GetStockSumByCustomer());
     }
 
     async Task GetUserAthu()
@@ -181,49 +204,54 @@
         bool bRet = UserlogService.InsertAudittrial(actdesc, munname, long.Parse(sUserID));
     }
 
-    bool FilterFunc(AsrsLoadtime element)
+    private void setstr(string str)
+    {
+
+    }
+
+    private string stxtInput { get; set; }
+
+    private void DoTheThing(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter")        // fire on enter
+        {
+            setstr(palletcode);
+            palletcode = "";
+        }
+    }
+
+    private bool FilterFunc(InvStockSumByCus element)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.Lpncode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Pallteno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Cusname.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Cuscode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Itemcode.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Itemname}".Contains(searchString))
             return true;
         return false;
     }
-
-
-
-    async Task OnclickSearch()
-    {
-        _processing = true;
-        await DbGetData();
-        _processing = false;
-        this.StateHasChanged();
-    }
-
-    async Task DbGetData()
-    {
-        DateTime newDateTimeFM = fromDate.Value.Date + fromTime.Value;
-        DateTime newDateTimeTO = toDate.Value.Date + toTime.Value;
-        Elements = await Task.Run(() => ObjWcsService.GetAsrsloadtime(newDateTimeFM, newDateTimeTO));
-    }
-
-
 
     public async Task DownloadExcelDocument()
     {
         try
         {
             bool? result = await CheckRoleReport();
-            if (result==true)
+            if (result == true)
             {
-                AsrsloadtimeRptExcel excelReport = new AsrsloadtimeRptExcel();
-                List<AsrsLoadtime> listExcelReport = new List<AsrsLoadtime>();
-                listExcelReport = Elements.ToList();
+                WhStockbyCustomerRptExcel excelReport = new WhStockbyCustomerRptExcel();
+                List<InvStockSumByCus> listExcelReport = new List<InvStockSumByCus>();
+                listExcelReport = Elements.OrderBy(s => s.Itemcode).OrderBy(x => x.Cuscode).ToList();
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(excelReport.Report(listExcelReport)));
-
-                this.InsertAuditrial("Export excel file :" + fileName.ToString() , pageheader);
+                this.InsertAuditrial("Export excel file :" + fileName.ToString(), pageheader);
             }
+
 
         }
         catch (Exception e)
@@ -239,14 +267,12 @@
             bool? result = await CheckRoleReport();
             if (result == true)
             {
-                AsrsloadtimeRptPdf pdfReport = new AsrsloadtimeRptPdf();
-                List<AsrsLoadtime> listPdfReport = new List<AsrsLoadtime>();
-                listPdfReport = Elements.ToList();
+                WhStockbyCustomerRptPdf pdfReport = new WhStockbyCustomerRptPdf();
+                List<InvStockSumByCus> listPdfReport = new List<InvStockSumByCus>();
+                listPdfReport = Elements.OrderBy(s => s.Itemcode).OrderBy(x => x.Cuscode).ToList();
                 var fileName = $"{pageheader.ToString()}-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.pdf";
-                ////await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.Report(listPdfReport)));
                 await JSRuntime.InvokeAsync<object>("jsSaveAsFile", fileName, Convert.ToBase64String(pdfReport.ExportPDF(listPdfReport)));
-
-                this.InsertAuditrial("Export pdf file : " + fileName.ToString(), pageheader);
+                this.InsertAuditrial("Export pdf file :" + fileName.ToString(), pageheader);
             }
 
 
@@ -280,7 +306,6 @@
                 bool? result = await DialogService.ShowMessageBox(
                         "Warning", VarGlobals.MessageRoleAddPermit, yesText: "OK");
             }
-
         }
         else
         {

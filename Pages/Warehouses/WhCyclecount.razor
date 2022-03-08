@@ -66,6 +66,7 @@ else
                         <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Docno)">@L["Lot"] </MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallettag)">@L["SEQ"] </MudTableSortLabel></MudTh>
                         <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Pallteno)">@L["PalletGo"] </MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortBy="new Func<Inv_Stock_GoInfo, object>(x=>x.Itembar)">@L["PalletErp"] </MudTableSortLabel></MudTh>
                     </HeaderContent>
 
 
@@ -76,6 +77,7 @@ else
                         <MudTd DataLabel=@L["Lot"]>@context.Docno</MudTd>
                         <MudTd DataLabel=@L["SEQ"]>@context.Pallettag</MudTd>
                         <MudTd DataLabel=@L["PalletGo"]>@context.Pallteno</MudTd>
+                        <MudTd DataLabel=@L["PalletErp"]>@context.Itembar</MudTd>
                     </RowTemplate>
                     <PagerContent>
                         <MudTablePager PageSizeOptions="new int[]{10,20,50,100}" />

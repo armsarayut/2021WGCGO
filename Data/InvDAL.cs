@@ -174,6 +174,9 @@ namespace GoWMS.Server.Data
             return lstobj;
         }
 
+
+
+
         public IEnumerable<Vrpt_shelf_listInfo> GetShelfLocation()
         {
             List<Vrpt_shelf_listInfo> lstobj = new List<Vrpt_shelf_listInfo>();
@@ -212,8 +215,62 @@ namespace GoWMS.Server.Data
                         Actual_weight = rdr["actual_weight"] == DBNull.Value ? null : (decimal?)rdr["actual_weight"],
                         Actual_size = rdr["actual_size"] == DBNull.Value ? null : (Int32?)rdr["actual_size"],
                         Desc_size = rdr["desc_size"].ToString(),
-                        St_desc = rdr["st_desc"].ToString()
+                        St_desc = rdr["st_desc"].ToString(),
+                        Modified = rdr["modified"] == DBNull.Value ? null : (DateTime?)rdr["modified"]
 
+                    };
+                    lstobj.Add(objrd);
+                }
+                con.Close();
+            }
+            return lstobj;
+        }
+
+
+
+        public IEnumerable<InvStockSumByCus> GetStockSumByCustomer()
+        {
+            List<InvStockSumByCus> lstobj = new List<InvStockSumByCus>();
+            using (NpgsqlConnection con = new NpgsqlConnection(connectionString))
+            {
+                StringBuilder Sql = new StringBuilder();
+
+                Sql.AppendLine("SELECT t1.itemcode, t1.itemname, t1.palltmapkey, t2.cus_name, t1.pallteno, t1.storagebin, sum(t1.quantity) as totalstock, t1.itembar");
+                Sql.AppendLine(",t3.srm_no, t3.shelfbank, t3.shelfbay, t3.shelflevel");
+                Sql.AppendLine("FROM wms.inv_stock_go t1");
+                Sql.AppendLine("LEFT JOIN public.sap_customermaster_v t2");
+                Sql.AppendLine("ON t1.palltmapkey= t2.cus_code");
+                Sql.AppendLine("LEFT JOIN wcs.set_shelf t3");
+                Sql.AppendLine("ON t1.storagebin = t3.shelfcode");
+                Sql.AppendLine("WHERE t1.allocatequantity < t1.quantity");
+                Sql.AppendLine("GROUP BY t1.itemcode, t1.itemname, t1.palltmapkey,t1. pallteno, t1.storagebin,  t2.cus_name, t3.srm_no, t3.shelfbank, t3.shelfbay, t3.shelflevel, t1.itembar");
+                
+                //Sql.AppendLine("ORDER BY t1.itemcode");
+
+
+                NpgsqlCommand cmd = new NpgsqlCommand(Sql.ToString(), con)
+                {
+                    CommandType = CommandType.Text
+                };
+
+                con.Open();
+                NpgsqlDataReader rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    InvStockSumByCus objrd = new InvStockSumByCus
+                    {
+                        Itemcode = rdr["itemcode"].ToString(),
+                        Itemname = rdr["itemname"].ToString(),
+                        Cuscode = rdr["palltmapkey"].ToString(),
+                        Cusname = rdr["cus_name"].ToString(),
+                        Pallteno = rdr["itembar"].ToString(),
+                        Storagebin = rdr["storagebin"].ToString(),
+                        Totalstock = rdr["totalstock"] == DBNull.Value ? null : (Decimal?)rdr["totalstock"],
+                        StorageLane = rdr["srm_no"] == DBNull.Value ? null : (Int32?)rdr["srm_no"],
+                        StorageBank = rdr["shelfbank"] == DBNull.Value ? null : (Int16?)rdr["shelfbank"],
+                        StorageBay = rdr["shelfbay"] == DBNull.Value ? null : (Int32?)rdr["shelfbay"],
+                        StorageLevel = rdr["shelflevel"] == DBNull.Value ? null : (Int16?)rdr["shelflevel"],
+                        Palltego = rdr["pallteno"].ToString()
                     };
                     lstobj.Add(objrd);
                 }

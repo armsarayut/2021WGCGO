@@ -129,6 +129,9 @@
   <data name="pageHeader" xml:space="preserve">
     <value>รอบนับ</value>
   </data>
+  <data name="PalletErp" xml:space="preserve">
+    <value>พาเลทอ้างอิง</value>
+  </data>
   <data name="PalletGo" xml:space="preserve">
     <value>พาเลทหลัก</value>
   </data>
