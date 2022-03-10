@@ -333,6 +333,9 @@ else
 
         var strRES = filteredOrders.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
 
+
+
+
         //var strRES = selectedItems.OrderBy(x => x.Pallettag).Select(x => new { efidx = x.Efidx, quantity = x.Quantity, packageid = x.Pallettag, materialcode = x.Itemcode, palletno = x.Pallteno, sono = so, customer = cus, lotno = lot, batchno = batch, matematerialdescription = x.Itemname, unit = x.Unit, deliverydate = requestdate }).ToList();
 
 

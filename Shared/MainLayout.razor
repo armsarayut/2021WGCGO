@@ -47,7 +47,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" OnClick="@((e) => DarkMode())" />
         <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="@((e) => btnLogout_Click())" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="_themeManager.DrawerClipMode">
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="_themeManager.DrawerClipMode" Width="300px">
         <MudDrawerHeader>
             <div class="block center">
                 <img src="Images/AEI_Logo_2.png" width="150px" height="40px" style="align-items:center" />
