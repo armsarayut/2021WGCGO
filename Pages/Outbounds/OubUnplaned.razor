@@ -294,6 +294,8 @@ else
 
                 }
 
+                Elements = await Task.Run(() => ObjService.GetStockListInfo());
+
                 this.StateHasChanged();
             }
         }
